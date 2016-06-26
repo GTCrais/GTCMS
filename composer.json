@@ -1,0 +1,27 @@
+{
+    "name": "gtcrais/gtcms",
+    "description": "Automatic CMS generation for Laravel",
+    "keywords": ["GTCMS", "CMS for Laravel", "Admin for Laravel"],
+    "homepage": "http://gtcms.createcsolutions.co",
+    "authors": [
+        {
+            "name": "Tomislav Modrić",
+            "email": "tomislav@gtcrais.net"
+        }
+    ],
+    "license": "GTCMS Basic license",
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "GTCrais\\GTCMS\\": "src"
+        }
+    },
+    "require": {
+        "laravelcollective/html": "5.2.*",
+        "barryvdh/laravel-debugbar": "2.2.2",
+        "intervention/image": "2.3.7",
+        "doctrine/dbal": "2.5.4",
+        "mk-j/php_xlsxwriter": "0.22",
+        "unisharp/laravel-filemanager": "1.5.2"
+    }
+}

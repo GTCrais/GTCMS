@@ -1,0 +1,891 @@
+adminBlue = #0088cc
+adminOrange = #ffac6a
+hoverBlue = #005580
+hoverOrange = #e69b66
+lightGray = #fbfbfb
+lightGrayHover = #f5f5f5
+specialGreen = #51BD00
+
+
+lgbp = 1200px
+notlgBp = 1199px
+mdbp = 992px
+smbp = 768px
+xsbp = 767px
+
+maxMedia(width)
+  "screen and (max-width: " + width + ")"
+
+minMedia(width)
+  "screen and (min-width: " + width + ")"
+
+lgMedia = minMedia(lgbp)
+mdMedia = minMedia(mdbp)
+smMedia = minMedia(smbp)
+xsMedia = maxMedia(xsbp)
+notlgMedia = maxMedia(notlgBp)
+
+.hidden
+  display none
+
+.transparent
+  opacity 0
+
+strong span.regular {
+  font-weight: 400
+}
+
+a:focus
+a:hover
+a:active
+  outline none !important
+
+.table
+  margin-bottom 0
+  tr.childTableContainer
+    > td
+      padding 0 !important
+      border none !important
+
+
+
+.paginationContainer {
+  text-align: center
+}
+
+.pagination {
+  margin: 20px 0 0
+}
+
+.table-striped > tbody > tr:nth-child(2n+1),
+.table tr.depth0 {
+  background-color: lightGray
+}
+
+.table-striped > tbody > tr:nth-child(2n+1):hover {
+  background-color: lightGrayHover
+}
+
+.controls1 {
+  width: 73px
+}
+
+.controls2 {
+  width: 73px
+}
+
+.controls3 {
+  width: 94px
+}
+
+.controls4 {
+  width: 135px
+}
+
+.controls5 {
+  width: 165px
+}
+
+div.globalMessages
+  width 100%
+  max-width 783px
+  overflow hidden
+
+.alert-dismissable .close
+.alert-dismissible .close
+  opacity 0.8
+
+.indexTableHeader
+  margin-bottom: 10px
+
+  .openSearch
+    float right
+    margin-left 10px
+
+/*.btn
+  transition: background, 0.25s, linear, 0s*/
+
+.indexTableHeader .btn {
+  font-size: 14px
+}
+
+.btn.excelExport {
+  float: right
+}
+
+table td a {
+  font-weight: 700
+  color: adminBlue
+  text-decoration: none
+}
+
+table td a:hover {
+  text-decoration: none
+  color: hoverBlue
+  outline: 0 none
+}
+
+table td a:active,
+table td a:focus {
+  text-decoration: none
+  outline: 0 none
+}
+
+.buttonSeparator {
+  color: #919191
+  font-size: 18px
+  line-height: 18px
+  margin-left: 5px
+  position: relative
+  top: 1px
+}
+
+tr.depth1 td:nth-child(2) {
+  padding-left: 40px
+}
+
+tr.depth2 td:nth-child(2) {
+  padding-left: 80px
+}
+
+tr.depth3 td:nth-child(2) {
+  padding-left: 120px
+}
+
+.page-header {
+  margin-top: 27px
+  line-height 28px
+}
+
+.page-header a:hover,
+.page-header a:focus {
+  text-decoration: none
+  outline: none
+}
+
+.page-header i.fa {
+  margin-left: 5px
+  margin-right: 3px
+}
+
+h3, .h3 {
+  font-size: 20px
+}
+
+.selectize-input
+  max-width 350px
+  width 100%
+
+.ajaxSelectUpdate
+  .selectize-input
+    padding 2px 8px
+    margin-bottom -5px
+    width 190px
+    &.dropdown-active.input-active
+      margin-bottom -6px
+  .selectize-dropdown-content
+    max-height 400px
+  /*.selectize-input
+    font-size 12px
+  .selectize-dropdown
+    font-size 12px*/
+
+form
+  span.info
+    border-left: 4px solid adminBlue
+    display: block
+    font-size: 11px
+    min-height: 11px
+    line-height: 12px
+    margin-bottom 3px
+    padding-left: 4px
+    &.errorMsg
+      border-left: 4px solid adminOrange
+    &.specialInfo
+      border-left 4px solid specialGreen
+      color specialGreen
+    &:last-of-type
+      margin-bottom 5px
+  &:not(.form-horizontal)
+    span.info
+      &:first-of-type
+        margin-top -6px !important
+
+
+form span.info[class*="col-sm-offset"]
+  position relative
+  right -15px
+  padding-left 12px
+  margin-top 0
+
+.control-label
+  color black !important
+
+.info.checkInfo {
+  margin-bottom: -5px
+  margin-top: 10px
+}
+
+input[type="file"], input[type="image"], input[type="submit"], input[type="reset"], input[type="button"], input[type="radio"], input[type="checkbox"] {
+  width: auto
+}
+
+form.form-horizontal
+  i.inputEdit
+    right 23px
+
+.form-group.has-warning .checkbox, .form-group.has-warning .radio, .form-group.has-warning input, .form-group.has-warning select, .form-group.has-warning textarea {
+  color: adminOrange
+}
+
+.form-group.has-warning input, .form-group.has-warning select, .form-group.has-warning textarea {
+  border-color: adminOrange
+}
+
+.form-group.has-warning input:focus, .form-group.has-warning select:focus, .form-group.has-warning textarea:focus {
+  border-color: adminOrange
+}
+
+.selectize-dropdown, .selectize-input, .selectize-input input {
+  font-size: 14px
+}
+
+textarea {
+  resize: vertical
+}
+
+#page-wrapper {
+  position: relative
+  overflow: hidden
+}
+
+.row.absoluteRow {
+  margin-left: 100%
+  position: absolute
+  top: 0
+}
+
+.nav > li > a:hover,
+.nav > li > a:focus {
+  outline: none !important
+}
+
+.nav > li > a:focus {
+  color: #337ab7
+  background-color: transparent
+}
+
+.nav > li > a:hover {
+  color: #23527c
+  background-color: #eee
+}
+
+.table-responsive
+  border none
+  &.objectsContainer
+    overflow visible
+
+.table-responsive > .table > thead > tr > th,
+.table-responsive > .table > tbody > tr > th,
+.table-responsive > .table > tfoot > tr > th,
+.table-responsive > .table > thead > tr > td,
+.table-responsive > .table > tbody > tr > td,
+.table-responsive > .table > tfoot > tr > td
+  white-space: normal !important
+  @media (max-width: 767px)
+    word-break break-all
+
+table td a
+  @media (max-width: 767px)
+    word-break break-all
+
+td.controlButtons
+div.controlButtons
+  text-align: right
+
+.btn.btn-default:active,
+.btn.btn-default:focus {
+  border-color: #ccc
+  box-shadow: none
+  background-color: #fff
+  outline: none !important
+}
+
+.btn.btn-default:hover {
+  background-color: #e6e6e6
+  border-color: #adadad
+}
+
+div.formSubmitMessage {
+  display: inline
+  padding-left: 10px
+}
+
+div.formSubmitMessage i {
+  font-size: 25px
+  color: adminBlue
+  position: relative
+  top: 3px
+  display: none
+  margin-right: 5px
+}
+
+div.formSubmitMessage .errorMessage {
+  position: relative
+  top: 2px
+  color: adminOrange
+  font-weight: 700
+  display: none
+}
+
+div.formSubmitMessage .formSpinner {
+  display: inline-block
+  margin-right: 5px
+  width: 30px
+  height: 1px
+  top: -3px
+  position: relative
+}
+
+.has-warning .form-control:focus {
+  box-shadow: none
+}
+
+td.controlButtons a.btn
+div.controlButtons a.btn
+  padding: 0
+  border: none
+  background: transparent !important
+  font-size: 22px
+  display: inline-flex
+  margin-left: 5px
+  color: adminBlue
+
+td.controlButtons a.btn:hover
+div.controlButtons a.btn:hover
+  color hoverBlue
+
+td.controlButtons a.btn.disabled
+div.controlButtons a.btn.disabled
+  color: #d9d9d9 !important
+
+td.controlButtons a.addButton
+div.controlButtons a.addButton
+  font-size: 20px
+  position: relative
+  top: 1px
+
+td.controlButtons a.deleteButton
+div.controlButtons a.deleteButton
+  color: adminOrange
+
+td.controlButtons a.deleteButton:hover
+div.controlButtons a.deleteButton:hover
+  color: hoverOrange
+
+#modalDelete {
+  position: absolute
+  left: 0
+  top: 0
+  width: 100%
+  height: 100%
+  background-color: rgba(0, 0, 0, 0.7)
+  z-index: 1000
+  display: none
+}
+
+#modalDelete #confirmWindow {
+  position: absolute
+  margin: auto
+  top: 20%
+  left: 0
+  right: 0
+  min-height: 190px
+  width: 400px
+  max-width: 90%
+  max-height: 90%
+  background-color: white
+  text-align: center
+  font-size: 24px
+  padding: 30px
+  border-radius: 5px
+}
+
+#modalDelete span.objectData strong
+  display: inline-block
+  max-width: 100%
+  @media (max-width: 767px)
+    word-break break-all
+
+#confirmWindow p {
+  margin-bottom: 15px
+}
+
+#confirmWindow .btn {
+  font-size: 16px
+}
+
+#confirmWindow #confirmSpinner {
+  position: relative
+  height: 39px
+  display: none
+}
+
+#confirmWindow #successCheckmark {
+  height: 39px
+  display: none
+}
+
+#confirmWindow div#successCheckmark i {
+  font-size: 45px
+  color: adminBlue
+  position: relative
+}
+
+#confirmWindow #errorMsg {
+  font-size: 20px
+  line-height: 24px
+  display: none
+  color: adminOrange
+}
+
+.btn-primary {
+  background-color: adminBlue
+}
+
+.btn-primary:active,
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: hoverBlue
+  outline: none !important
+}
+
+.btn-warning {
+  background-color: adminOrange
+}
+
+.btn-warning:active,
+.btn-warning:hover,
+.btn-warning:focus {
+  background-color: hoverOrange
+  outline: none !important
+}
+
+body.loginBody
+  background-color white
+
+.login-panel.panel
+  margin-top 200px
+  box-shadow none
+  border none
+
+form.loginForm
+  opacity 0
+  div.form-group
+    margin-bottom 20px
+    span.info
+      margin-top -3px
+
+  div.loginSpinner
+    position relative
+    display none
+    height 39px
+    width 100%
+
+  div.errorMessage
+    display none
+    color adminOrange
+    font-size 16px
+
+body
+  position relative
+
+body.staticBody
+  overflow hidden
+
+body.loginRedirect
+  div#wrapper
+    opacity 0
+  div#page-wrapper
+    opacity 0
+
+@media (max-width: 767px) {
+  .navbar-top-links {
+    position absolute
+    top 0
+    right 50px
+  }
+}
+
+input.disabledInput
+  cursor default !important
+
+form.entityForm.editForm .form-group:not(.has-warning)
+form.entityForm.addForm .form-group.disabledInput
+  textarea.form-control
+    height auto
+    &.shortTextarea
+      height 75px
+  .form-control
+    box-shadow none
+    color: #555
+    background-color lightGray
+    background-image: none
+    border 1px solid lightGray
+
+    border-radius: 4px
+    display: block
+    font-size: 14px
+    height: 34px
+    line-height: 1.42857
+    padding: 6px 30px 6px 12px
+    /*transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s*/
+    width: 100%
+    cursor pointer
+
+    &:focus:not(.readOnly)
+      box-shadow none
+      color: #555
+      background-color: #fff
+      background-image: none
+      border: 1px solid #66afe9
+      cursor text
+      padding-right 12px
+
+form.entityForm.editForm .form-group.has-warning
+  i.inputEdit
+    display none !important
+
+form.entityForm.editForm .form-group:not(.has-warning)
+form.entityForm.addForm .form-group:not(.has-warning)
+  textarea.form-control.shortTextarea
+    height 75px
+
+form.entityForm.addForm .form-group
+  i.inputEdit
+    display none !important
+  &.disabledInput
+    display none
+  .form-control
+    box-shadow none
+
+.form-group.has-warning
+  .selectize-control .selectize-input
+  .selectize-dropdown
+    border-color adminOrange !important
+
+div.hasEditIcon
+  position relative
+
+i.inputEdit
+  position absolute
+  right 8px
+  bottom 10px
+  cursor pointer
+
+/*div.transitionWidth
+  transition width 0.15s linear 0s, padding-right 0.15s linear 0s, padding-left 0.15s linear 0s*/
+
+div.searchContainer.zeroWidth
+  @media lgMedia
+    width 0 !important
+    border: medium none !important
+    overflow: hidden
+    padding: 0 !important
+    height 10px
+
+button.openSearch
+  @media notlgMedia
+    display none
+  &.searchIsOpen
+    border-color adminOrange !important
+    background-color adminOrange !important
+    color white !important
+    &:hover
+      border-color hoverOrange !important
+      background-color hoverOrange !important
+
+form.searchForm
+  min-width 165px
+
+div.hasBottomMargin
+  margin-bottom 40px
+
+div.searchContainer
+  @media notlgMedia
+    display block !important
+
+  h4
+    margin-top 4px
+    margin-bottom 0
+    padding-bottom 11px
+    border-bottom none
+
+ul.searchCriteria
+  list-style: none outside none
+  margin: 0 0 10px 0
+  padding: 15px 100px 15px 20px
+  background-color: #f9f9f9
+
+  li.searchCriteriaTitle
+    font-size: 16px
+    font-weight: bold
+    margin-bottom: 10px
+
+  li:not(.searchCriteriaTitle)
+    display inline-block
+    margin-right 20px
+
+.searchData
+  position relative
+  span.clearSearchResults
+    position absolute
+    bottom 10px
+    right 18px
+    color adminOrange
+    cursor pointer
+    font-weight 700
+    &:hover
+      color hoverOrange
+    i.fa
+      font-weight 400
+      font-size 16px
+
+table.hasPositioning
+  tr.depth td:nth-child(2)
+    padding-left 10px !important
+
+table.hasTreeStructure
+  border-spacing 0
+  border-collapse: separate
+
+table.hasPositioning
+table.hasTreeStructure
+  tr.depth td.sortHandle
+    position relative
+    overflow hidden
+    cursor move
+    width 20px
+    -ms-touch-action none
+    div.sortHandle
+      width 12px
+      @media xsMedia
+        width 20px
+      /*transition width .1s linear 0s, opacity .2s linear 0s*/
+      background-color #fcfcfc
+      border-right 1px solid #ddd
+      height 105%
+      min-height 40px
+      left 0
+      top -2px
+      text-align center
+      position absolute
+      cursor move
+      &:hover
+        width 20px
+        i.fa
+          color #333
+      i.fa
+        bottom: 0
+        display: block
+        height: 12px
+        left: 0
+        margin: auto
+        position: absolute
+        right: 0
+        top: 0
+        color #b0b0b0
+
+
+.sortableDisabled div.sortHandle
+  opacity 0.5
+  &:hover
+    width 12px !important
+    @media xsMedia
+      width 20px !important
+  i.fa
+    color #b0b0b0
+
+th.sortablePadding
+  padding-left 30px !important
+
+.sortablePlaceholder
+  min-height 40px
+
+tbody.transitionHeight
+  /*transition height 0.15s linear 0s, min-height 0.15s linear 0s*/
+  &.openContainer
+    display block
+    min-height 10px
+
+div.sortLinks
+  display inline-block
+  cursor pointer
+  width 12px
+  overflow hidden
+  margin-bottom -5px
+  margin-left 3px
+  a.btn
+    padding 0
+    display block
+    height 10px
+    float left
+    font-size 16px
+    &:focus
+      box-shadow none
+    .fa
+      height 10px
+      float left
+      margin-top -5px
+
+div.panel-body
+  position relative
+
+div.disableRelatedModel
+  position absolute
+  width 100%
+  height 100%
+  top 0
+  left 0
+  background rgba(0,0,0,0.77)
+  font-size 20px
+  border-radius 4px
+  div.disableTextContainer
+    display table
+    height 100%
+    width 100%
+    p
+      color white
+      display table-cell
+      vertical-align middle
+      text-align center
+      padding 15px
+
+div.progress
+  margin-bottom 0
+
+div.uploadError
+  margin-top 5px
+  color adminOrange
+  display none
+
+span.fileinput-button
+  display inline-block
+  margin-bottom 10px
+
+div.controlButtons
+  float right
+  &.fileDelete
+    padding-top 5px
+    margin-right 7px
+
+.fileDownloadContainer
+  overflow hidden
+
+.uploadedImagePreview
+  float left
+
+.imageDownloadLink
+  padding 0
+  border none
+  background transparent
+  &:hover
+  &:focus
+  &:active
+    background transparent !important
+    box-shadow none !important
+  .theImage
+    max-width 200px
+    max-height 150px
+
+.fa-times.adminOrange
+  color adminOrange !important
+
+.fa-check.adminBlue
+  color adminBlue !important
+
+ul.nav-tabs
+  margin-bottom 15px
+
+body
+  .sidebar
+    a.changeNavigationSize
+      i.fa-angle-double-left
+        display inline-block
+        margin-left 5px
+      i.fa-angle-double-right
+        display none
+
+body.nav-narrow
+  .sidebar
+    @media (min-width: 768px)
+      width 50px
+    span.modelName
+      display none
+    a.changeNavigationSize
+      text-align center
+      i.fa-angle-double-left
+        display none
+      i.fa-angle-double-right
+        display inline-block
+
+  #page-wrapper
+    @media (min-width: 768px)
+      margin-left 50px
+
+.quickEditContainer
+  position fixed
+  top 0
+  right -100%
+  width 600px
+  height 100%
+  border-left 3px solid #eee
+  box-shadow: -2px 0 10px 1px #eee;
+  z-index 5000
+  background-color white
+
+  .page-header-container
+    padding 0 30px
+    h3
+      position relative
+      padding-right 30px
+      a
+        position absolute
+        right 0
+        top 2px
+        opacity 1
+        i
+          color adminOrange
+        &:hover
+          i
+            color hoverOrange
+
+  form
+    > .panel
+      border none
+      box-shadow none
+
+a.quickEditButton
+  i
+    position relative
+    top 1px
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

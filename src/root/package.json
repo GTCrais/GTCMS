@@ -1,0 +1,17 @@
+{
+	"name": "GTCMS",
+	"description": "GTCMS",
+	"private": true,
+	"scripts": {
+		"prod": "gulp --production",
+		"dev": "gulp watch"
+	},
+	"devDependencies": {
+		"gulp": "^3.9.1",
+        "gulp-stylus": "2.4.0",
+        "gulp-cssmin": "0.1.7",
+        "gulp-rename": "1.2.2",
+		"laravel-elixir": "^5.0.0",
+		"bootstrap-sass": "^3.0.0"
+	}
+}

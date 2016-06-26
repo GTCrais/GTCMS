@@ -1,0 +1,39 @@
+@font-face {
+	font-family: 'robotolocal';
+	src: url('/gtcms/css/fonts/roboto-regular-webfont.ttf');
+	src: url('/gtcms/css/fonts/roboto-regular-webfont.ttf') format('truetype'),
+	url('/gtcms/css/fonts/roboto-regular-webfont.eot?#iefix') format('embedded-opentype'),
+	url('/gtcms/css/fonts/roboto-regular-webfont.woff2') format('woff2'),
+	url('/gtcms/css/fonts/roboto-regular-webfont.woff') format('woff'),
+	url('/gtcms/css/fonts/roboto-regular-webfont.svg#robotoregular') format('svg');
+	font-weight: 400;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'robotolocal';
+	src: url('/gtcms/css/fonts/roboto-bold-webfont.ttf');
+	src: url('/gtcms/css/fonts/roboto-bold-webfont.ttf') format('truetype'),
+	url('/gtcms/css/fonts/roboto-bold-webfont.eot?#iefix') format('embedded-opentype'),
+	url('/gtcms/css/fonts/roboto-bold-webfont.woff2') format('woff2'),
+	url('/gtcms/css/fonts/roboto-bold-webfont.woff') format('woff'),
+	url('/gtcms/css/fonts/roboto-bold-webfont.svg#robotobold') format('svg');
+	font-weight: 700;
+	font-style: normal;
+}
+
+body {
+	background: #fbfbfb;
+	font-family: 'robotolocal';
+	font-size: 14px;
+	margin: -5px 13px 8px;
+}
+
+body.editMode {
+	background: white;
+}
+
+strong {
+	font-style: normal;
+	font-weight: 700;
+}
