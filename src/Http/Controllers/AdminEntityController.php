@@ -393,7 +393,7 @@ class AdminEntityController extends Controller {
 				'objectName' => $printProperty ? $object->$printProperty : false
 			);
 
-			$fullUrl = str_replace("/edit/new", "/edit/" . $object->id, \Request::fullUrl());
+			$fullUrl = str_replace("/edit/new", "/edit/" . $object->id, \Tools::fullUrl());
 			$data['replaceUrl'] = $fullUrl;
 			$data['objectId'] = $object->id;
 

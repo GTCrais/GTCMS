@@ -214,4 +214,15 @@ class Tools {
 		return $valid;
 	}
 
+	public static function fullUrl() {
+		$queryString = $_SERVER['QUERY_STRING'];
+		$fullUrl = \Request::url();
+
+		if ($queryString) {
+			$fullUrl .= "?" . $queryString;
+		}
+
+		return $fullUrl;
+	}
+
 }

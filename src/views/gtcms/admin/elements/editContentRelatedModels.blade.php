@@ -14,7 +14,9 @@
 
 		$method = $relatedModel->method;
 		$relatedModelConfig = AdminHelper::modelExists($relatedModel->name);
-		$gets = Tools::getGets(array($modelConfig->id => $object->id ? $object->id : "new_gtcms_entry"));
+
+		$prependGets = "?" . $modelConfig->id . "=" . ($object->id ? $object->id : "new_gtcms_entry");
+		$gets = $prependGets . Tools::getGets([], false, "&");
 
 		$configInParent = $object->relatedModelConfiguration($relatedModelConfig->name);
 		GtcmsPremium::setDisplayRelatedModelBasedOnModelKey($configInParent, $object, $displayModel);

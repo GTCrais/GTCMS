@@ -138,6 +138,18 @@ foreach ($formFields as $field) {
 
 			echo '</div>';
 
+			if ($field->subTab) {
+				if ($field->subTab->endSubTab) {
+					echo "</div>";
+				}
+				if ($field->subTab->endSubTabGroup) {
+					echo "
+						</div>
+					</div>
+				</div>";
+				}
+			}
+
 			continue;
 		}
 
