@@ -110,23 +110,22 @@ class ModelConfig {
 				if (in_array($field->type, array('select', 'multiSelect'))) {
 					$listMethod = $field->selectType->listMethod;
 					if ($field->selectType->type == 'model') {
+						/** @var BaseModel $selectModel */
 						$selectModel = ModelConfig::fullEntityName($field->selectType->modelName);
-						if ($field->selectType->callMethodOnInstance) {
-							$list = array();
-							/** @var BaseModel $modelName */
-							$modelName = ModelConfig::fullEntityName($field->selectType->modelName);
-							$idField = $field->selectType->callMethodOnInstance->id;
-							$valueField = $field->selectType->callMethodOnInstance->value;
-							$object = $modelName::where($idField, $value)->first();
-							if ($object) {
-								$list[$value] = $object->$valueField;
-							}
+						if ($field->selectType->ajax && config('gtcms.premium')) {
+							$valueProperty = $field->selectType->ajax->valueProperty;
+							$list = $selectModel::where('id', $value)->get()->pluck($valueProperty, 'id');
 						} else {
-							//id is passed to the list method so automatic Search can work
-							$list = $selectModel::$listMethod('id');
+
+							// Even if 'callMethodOnInstance' is declared we need a static method
+							// of the same name which will return the list of ALL selectable items
+							// instead of just the ones a particular object would return
+							// This method must be declared in Related Model Class
+
+							$list = $selectModel::$listMethod();
 						}
 					} else if ($field->selectType->type == 'list') {
-						$entity = ModelConfig::fullEntityName($this->name);
+						$entity = $this->myFullEntityName();
 						$list = $entity::$listMethod();
 					}
 					foreach ($list as $actualValue => $frontValue) {

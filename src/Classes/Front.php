@@ -533,20 +533,28 @@ class Front {
 						$options['class'] = '';
 						$list = array();
 						if ($field->selectType->type == 'model') {
-							$selectModel = $field->selectType->modelName;
-							$fullModelName = ModelConfig::fullEntityName($selectModel);
-							if ($field->selectType->callMethodOnInstance) {
-								$list = array();
-							} else {
-								$list = $fullModelName::$listMethod('id');
-							}
-
+							/** @var BaseModel $selectModel */
+							$selectModel = ModelConfig::fullEntityName($field->selectType->modelName);
 							if ($field->selectType->ajax) {
-								$options['data-searchfields'] = implode('|', AdminHelper::objectToArray($field->selectType->ajax->searchFields));
+								$list = array();
+								if ($value = \Request::get('search_' . $field->property)) {
+									$valueProperty = $field->selectType->ajax->valueProperty;
+									$list = $selectModel::where('id', $value)->get()->pluck($valueProperty, 'id');
+								}
+
+								$options['data-searchfields'] = $field->selectType->ajax->searchFields;
 								$options['data-model'] = $field->selectType->modelName;
-								$options['data-value'] = $field->selectType->ajax->value;
-								$options['data-text'] = $field->selectType->ajax->text;
+								$options['data-value'] = "id";
+								$options['data-text'] = $field->selectType->ajax->valueProperty;
 								$options['class'] .= " ajax ";
+							} else {
+
+								// Even if 'callMethodOnInstance' is declared we need a static method
+								// of the same name which will return the list of ALL selectable items
+								// instead of just the ones a particular object would return
+								// This method must be declared in Related Model Class
+
+								$list = $selectModel::$listMethod();
 							}
 						} else if ($field->selectType->type == 'list') {
 							$entity = $modelConfig->myFullEntityName();
@@ -561,8 +569,10 @@ class Front {
 							}
 						}
 
-						$null = array('' => '-');
-						$list = $null+$list;
+						if (!$field->selectType->ajax) {
+							$null = array('' => '-');
+							$list = $null + $list;
+						}
 
 						$options['class'] .= ' selectizeNoCreate doSelectize';
 						$html .= \Form::select("search_".$field->property, $list, \Request::get("search_".$field->property), $options);
