@@ -172,7 +172,7 @@ class Front {
 
 	}
 
-	public static function drawObjectTable($objects, ModelConfig $modelConfig, $tableType = 'table', $parent = "", $searchDataWithFieldValues = false, $ordering = false, $quickEdit = false) {
+	public static function drawObjectTable($objects, ModelConfig $modelConfig, $tableType = 'table', $parent = "", $searchDataWithFieldValues = false, $ordering = false, $quickEdit = false, $loadSideTablePaginationResults = false) {
 
 		$hasPositionInParent = false;
 		$parentModelName = false;
@@ -198,6 +198,9 @@ class Front {
 		// ------------ END EXCEPTIONS -------------
 
 		if (!$quickEdit) {
+
+			$tree .= '<div class="table-responsive ' . ($tableType == "sideTable" ? "objectsContainer " : " ") . ($loadSideTablePaginationResults ? "transparent " : " ") . '">';
+
 			$tree .= '
 				<table class="table table-striped table-hover table-type-' . $tableType . ($objectsAreMovable ? ' hasPositioning' : '') . '">
 				<tbody class="' . ($searchDataWithFieldValues || $ordering ? ' searchDataPresent' : '') . '">
@@ -282,11 +285,10 @@ class Front {
 							$image = true;
 						} else if ($field->displayProperty->type == 'model') {
 							$property = $field->displayProperty->property;
-							$displayProperty = $field->displayProperty ? $field->displayProperty : $field->property;
-							$method = $displayProperty->method;
-							$relatedProperty = $displayProperty->property;
+							$method = $field->displayProperty->method;
+							$relatedProperty = $field->displayProperty->property;
 							if ($object->$method()->count()) {
-								if ($displayProperty->multiple) {
+								if ($field->displayProperty->multiple) {
 									$relatedModels = $object->$method()->withPivot('position')->orderBy('pivot_position', 'asc')->get();
 									$value = "";
 									foreach ($relatedModels as $relModel) {
@@ -440,10 +442,18 @@ class Front {
 					</tbody>
 				</table>';
 
-			if ($tableType == 'table' && $objects->total() > $modelConfig->perPage) {
-				$tree .= '<div class="paginationContainer">' . $objects->appends(Tools::getGets(array('page' => NULL, 'getIgnore_getSearchResults' => 'true'), TRUE))->links() . '</div>';
-
+			if (is_a($objects, "Illuminate\\Pagination\\LengthAwarePaginator") && $objects->hasPages()) {
+				$tree .= '<div class="paginationContainer" data-tabletype="' . $tableType . '">' .
+					$objects->appends(Tools::getGets(array(
+						$objects->getPageName() => NULL,
+						'getIgnore_getSearchResults' => 'true',
+						'getIgnore_tableType' => $tableType,
+						'getIgnore_modelName' => $modelConfig->name
+					), TRUE))->links() .
+					'</div>';
 			}
+
+			$tree .= "</div>";
 		}
 
 		return $tree;

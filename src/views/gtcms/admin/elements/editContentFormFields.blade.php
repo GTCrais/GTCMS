@@ -296,7 +296,7 @@ foreach ($formFields as $field) {
 					$options['class'] .= " ajax ";
 					$method = $field->selectType->method;
 					$valueProperty = $field->selectType->ajax->valueProperty;
-					$list = $object->$method()->pluck($valueProperty, 'id');
+					$list = $object->$method()->get()->pluck($valueProperty, 'id');
 				} else {
 					if ($field->selectType->callMethodOnInstance) {
 						$list = $object->$listMethod();
@@ -365,7 +365,7 @@ foreach ($formFields as $field) {
 					$options['class'] .= " ajax ";
 					$method = $field->selectType->method;
 					$valueProperty = $field->selectType->ajax->valueProperty;
-					$list = $object->$method()->pluck($valueProperty, 'id');
+					$list = $object->$method()->get()->pluck($valueProperty, 'id');
 				} else {
 					if ($field->selectType->callMethodOnInstance) {
 						$list = $object->$listMethod();

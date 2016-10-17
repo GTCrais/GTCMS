@@ -177,12 +177,6 @@ class AdminEntityController extends Controller {
 
 		$ajaxRequest = \Request::ajax() && \Request::get('getIgnore_isAjax') ? true : false;
 
-		if ($settings) {
-			AdminHistoryManager::clearHistory();
-		} else {
-			AdminHistoryManager::addHistoryLink($historyLink, self::$entity, true);
-		}
-
 		/** @var \App\BaseModel $entity */
 		$entity = self::$entity;
 		/** @var \App\BaseModel $fullEntity */
@@ -204,6 +198,22 @@ class AdminEntityController extends Controller {
 		$quickEdit = false;
 		if (config('gtcms.premium')) {
 			$quickEdit = GtcmsPremium::getQuickEditVar();
+		}
+
+		$sideTablePaginationResults =
+			\Request::get('getIgnore_tableType') == 'sideTable' &&
+			$ajaxRequest &&
+			$action == "edit"
+				? true : false;
+
+		if ($settings) {
+			AdminHistoryManager::clearHistory();
+		} else {
+			AdminHistoryManager::addHistoryLink($historyLink, self::$entity, true, $sideTablePaginationResults);
+		}
+
+		if ($sideTablePaginationResults) {
+			return self::sideTablePaginationResults($object);
 		}
 
 		if (!empty($_POST) && $ajaxRequest) {
@@ -260,6 +270,28 @@ class AdminEntityController extends Controller {
 			return \View::make('gtcms.admin.elements.edit')->with($viewData);
 		}
 
+	}
+
+	public static function sideTablePaginationResults($object) {
+
+		$relatedModelName = \Request::get('getIgnore_modelName');
+		$relatedModelConfig = AdminHelper::modelExists($relatedModelName);
+		/** @var \App\BaseModel $object */
+		$configInParent = $object->relatedModelConfiguration($relatedModelConfig->name);
+		$method = $configInParent->method;
+
+		$relatedObjects = $object->$method()->orderBy($configInParent->orderBy, $configInParent->direction)->paginate($configInParent->perPage, ['*'], $configInParent->name . "Page");;
+		$objectsView = Front::drawObjectTable($relatedObjects, $relatedModelConfig, 'sideTable', '?' . self::$modelConfig->id . '=' . $object->id, false, false, false, true);
+		$setUrl = '/admin/'.self::$modelConfig->name . '/edit/' . ($object->id ? $object->id : 'new') . Tools::getGets();
+
+		$returnData = array(
+			'success' => true,
+			'setUrl' => $setUrl,
+			'view' => $objectsView,
+			'sideTablePagination' => true
+		);
+
+		return \Response::json($returnData);
 	}
 
 	public static function delete($id) {

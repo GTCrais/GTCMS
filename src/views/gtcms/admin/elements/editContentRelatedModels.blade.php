@@ -18,7 +18,7 @@
 		$prependGets = "?" . $modelConfig->id . "=" . ($object->id ? $object->id : "new_gtcms_entry");
 		$gets = $prependGets . Tools::getGets([], false, "&");
 
-		$configInParent = $object->relatedModelConfiguration($relatedModelConfig->name);
+		$configInParent = $relatedModel;
 		GtcmsPremium::setDisplayRelatedModelBasedOnModelKey($configInParent, $object, $displayModel);
 
 		?>
@@ -40,13 +40,16 @@
 					@endif
 
 					<?php
-					$relatedObjects = $object->$method()->orderBy($configInParent->orderBy, $configInParent->direction)->get();
+					$relatedObjects = $object->$method()->orderBy($configInParent->orderBy, $configInParent->direction);
+					if ($configInParent->paginate) {
+						$relatedObjects = $relatedObjects->paginate($configInParent->perPage, ['*'], $configInParent->name . "Page");
+					} else {
+						$relatedObjects = $relatedObjects->get();
+					}
 					?>
 
 					@if ($relatedObjects->count())
-						<div class="table-responsive">
-							{!! Front::drawObjectTable($relatedObjects, $relatedModelConfig, 'sideTable', '?' . $modelConfig->id . '=' . $object->id) !!}
-						</div>
+						{!! Front::drawObjectTable($relatedObjects, $relatedModelConfig, 'sideTable', '?' . $modelConfig->id . '=' . $object->id) !!}
 					@else
 						{!! trans('gtcms.noRelatedModels', array('modelName1' => $modelConfig->hrName, 'modelName2' => $relatedModelConfig->hrNamePlural)) !!}
 					@endif

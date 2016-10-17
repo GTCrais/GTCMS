@@ -788,10 +788,13 @@ function reloadSearchResults(objectsContainer, data) {
 			opacity: '1'
 		}, 250).promise().done(function(){
 			$(this).removeClass('hidden');
-			var addUrl = "/admin/"+data.entity+"/add"+data.getParams
-			var excelExport = "/admin/excelExport/"+data.entity+data.getParams
-			$("a.addButton").attr("href", addUrl);
-			$("a.excelExport").attr("href", excelExport);
+
+			if (!data.sideTablePagination) {
+				var addUrl = "/admin/" + data.entity + "/add" + data.getParams
+				var excelExport = "/admin/excelExport/" + data.entity + data.getParams
+				$("a.addButton").attr("href", addUrl);
+				$("a.excelExport").attr("href", excelExport);
+			}
 
 			setupRepositioning();
 			resetLinksAfterSearch();
@@ -885,7 +888,7 @@ function setLinkHandling() {
 
 			var objectsContainer = false;
 			if (loadType == 'fadeIn') {
-				objectsContainer = $(".searchResultObjects .objectsContainer");
+				objectsContainer = button.closest(".objectsContainer");
 			}
 
 			getAjaxContent(button, href, loadType, objectsContainer);

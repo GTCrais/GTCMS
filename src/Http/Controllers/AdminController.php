@@ -16,7 +16,12 @@ class AdminController extends Controller {
 
 	public static function index() {
 		$defaultModel = self::getDefaultModelForUser();
-		return \Redirect::to('/admin/' . $defaultModel . '?getIgnore_isAjax=true');
+		$append = "";
+		$ajaxRequest = \Request::ajax() && \Request::get('getIgnore_isAjax') ? true : false;
+		if ($ajaxRequest) {
+			$append = "?getIgnore_isAjax=true";
+		}
+		return \Redirect::to('/admin/' . $defaultModel . $append);
 	}
 
 	public static function login() {
