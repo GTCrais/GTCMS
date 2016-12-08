@@ -3,16 +3,24 @@
 namespace App\Http\Middleware;
 
 
-use App\User;
+use App\Classes\AdminHelper;
+use App\Classes\AdminHistoryManager;
+use App\Classes\Dbar;
+use App\Models\User;
 use Closure;
-use App\MessageManager;
-use App\Tools;
+use App\Classes\MessageManager;
+use App\Classes\Tools;
 
 class AdminAuth {
 
 	public function handle($request, Closure $next, $guard = null)  {
 
 		\App::setLocale(config('gtcmslang.defaultAdminLocale'));
+
+		/** @var \Illuminate\Http\Request $request */
+		$receivedCsrf = $request->header('X-CSRF-TOKEN');
+		$ajaxRequest = \Request::ajax() ? true : false;
+		$gtcmsAjaxRequest = $ajaxRequest && \Request::get('getIgnore_isAjax') ? true : false;
 
 		$showLoginMessage = true;
 		if (config('gtcms.adminAutoLogin') && \Auth::guest()) {
@@ -24,7 +32,7 @@ class AdminAuth {
 		$allowedUserRoles = config('gtcms.allowedUserRoles');
 
 		if(\Auth::guest() || !in_array(\Auth::user()->role, $allowedUserRoles)) {
-			if (\Route::current()->uri() != "admin/login") {
+			if (\Route::currentRouteName() != "adminLogin") {
 				if (\Request::ajax() && \Request::get('getIgnore_isAjax')) {
 					$data = array(
 						'success' => false,
@@ -34,26 +42,34 @@ class AdminAuth {
 
 					return \Response::json($data);
 				} else {
-					return \Redirect::to('/admin/login');
+					return \Redirect::to(AdminHelper::getCmsPrefix() . 'login');
 				}
 			}
-		} else if (\Route::current()->uri() == "admin/login") {
+		} else if ($gtcmsAjaxRequest && $receivedCsrf != csrf_token()) {
+			$message = trans('gtcms.errorHasOccurred');
+			$data = [
+				'success' => false,
+				'exception' => $message
+			];
+
+			return \Response::json($data);
+		} else if (\Route::currentRouteName() == "adminLogin") {
 			if ($showLoginMessage) {
 				MessageManager::setError(trans('gtcms.alreadyLoggedIn'));
 			}
-			return \Redirect::to("/admin");
+			return \Redirect::to(AdminHelper::getCmsPrefix());
 		}
 
 		if(\Session::get('accessDenied')) {
 			if (\Route::currentRouteName() != "restricted") {
 				\Session::put('accessDenied', true);
-				return \Redirect::to('/access-denied');
+				return \Redirect::route('restricted', ['getIgnore_isAjax' => \Request::get('getIgnore_isAjax')]);
 			}
 		} else {
 			if (\Route::currentRouteName() == "restricted") {
 				MessageManager::setError(trans('gtcms.accessGranted'));
 				\Session::put('accessDenied', false);
-				return \Redirect::to("/admin");
+				return \Redirect::to(AdminHelper::getCmsPrefix());
 			}
 		}
 

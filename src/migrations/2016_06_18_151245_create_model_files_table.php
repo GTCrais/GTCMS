@@ -14,10 +14,10 @@ class CreateModelFilesTable extends Migration
     {
         Schema::create('model_files', function (Blueprint $table) {
             $table->increments('id');
-			$table->string('filename');
+			$table->string('filename')->nullable();
 			$table->string('title')->nullable();
-			$table->dateTime('created_at');
-			$table->dateTime('updated_at');
+			$table->dateTime('created_at')->nullable();
+			$table->dateTime('updated_at')->nullable();
         });
     }
 

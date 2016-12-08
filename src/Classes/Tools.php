@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Classes;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -212,6 +212,17 @@ class Tools {
 			$valid = false;
 		}
 		return $valid;
+	}
+
+	public static function fullUrl() {
+		$queryString = $_SERVER['QUERY_STRING'];
+		$fullUrl = \Request::url();
+
+		if ($queryString) {
+			$fullUrl .= "?" . $queryString;
+		}
+
+		return $fullUrl;
 	}
 
 }

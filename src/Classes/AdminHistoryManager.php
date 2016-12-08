@@ -1,6 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Classes;
+
+use Monolog\ErrorHandler;
 
 class AdminHistoryManager {
 
@@ -16,7 +18,7 @@ class AdminHistoryManager {
 		return $links ? $links : false;
 	}
 
-	public static function addHistoryLink($link = false, $modelName = false, $ignoreRequestForModelName = false) {
+	public static function addHistoryLink($link = false, $modelName = false, $ignoreRequestForModelName = false, $sideTablePaginating = false) {
 		if (\Session::has('adminHistoryLinks')) {
 			$links = \Session::get('adminHistoryLinks');
 		} else {
@@ -27,23 +29,47 @@ class AdminHistoryManager {
 			$url = explode('?', $_SERVER["REQUEST_URI"]);
 			$link = (array_shift($url)) . Tools::getGets();
 		}
+
+		$subtract = config('gtcms.cmsPrefix') ? 0 : 1;
+
 		if (!$modelName) {
-			$modelName = \Request::segment(2);
+			$modelName = \Request::segment(2 - $subtract);
 		}
+
 		$linkSegments = explode("/", $link);
-		$action = isset($linkSegments[3]) ? $linkSegments[3] : false;
-		$addLink = isset($linkSegments[4]) && $linkSegments[4] == "new" ? true : false;
+		$action = isset($linkSegments[3 - $subtract]) ? $linkSegments[3 - $subtract] : false;
+		$addLink = isset($linkSegments[4 - $subtract]) && $linkSegments[4 - $subtract] == "new" ? true : false;
+
+		$modelConfig = AdminHelper::modelExists($modelName);
+
+		if ($ignoreRequestForModelName) {
+			$returnModelName = $modelConfig ? $modelConfig->hrName : $modelName;
+		} else {
+			$returnModelName = $modelConfig ? (count(\Request::segments()) > (2 - $subtract) && \Request::segment(3 - $subtract) == 'edit' ? $modelConfig->hrName : $modelConfig->hrNamePlural) : $modelName;
+		}
+
+		$currentLinkData = array(
+			'link' => $link,
+			'action' => $action,
+			'addLink' => $addLink,
+			'modelConfigName' => $modelConfig ? $modelConfig->name : $modelName,
+			'modelName' => $returnModelName,
+			'modelIcon' => $modelConfig && $modelConfig->faIcon ? $modelConfig->faIcon : 'fa-circle'
+		);
 
 		$tempLinks = $links;
 		if (count($links)) {
 			$delete = false;
+			$currentIndex = null;
 			foreach ($links as $index => $cLink) {
 
-				// If ModelName and Action already exist in history, it means we're going back
+				// If ModelName and Action already exist in history, it means we're
+				// either going back or side-table paginating
 				// therefore delete all history links AFTER the current history link
 				// and replace current history with the newly modified one
 				if ($cLink['modelConfigName'] == $modelName && $cLink['action'] == $action) {
 					$delete = true;
+					$currentIndex = $index;
 
 					// Skip this iteration because this is the link we're going back to
 					continue;
@@ -55,6 +81,14 @@ class AdminHistoryManager {
 				}
 			}
 			if ($delete) {
+				if ($sideTablePaginating) {
+					// If side-table paginating then replace last link with current link
+					// so the $_GET side-table page parameter is added
+					if (!is_null($currentIndex) && isset($tempLinks[$currentIndex])) {
+						$tempLinks[$currentIndex] = $currentLinkData;
+					}
+				}
+
 				\Session::put('adminHistoryLinks', $tempLinks);
 
 				// There is no need to insert the current link because it already exists
@@ -63,22 +97,7 @@ class AdminHistoryManager {
 			}
 		}
 
-		$modelConfig = AdminHelper::modelExists($modelName);
-
-		if ($ignoreRequestForModelName) {
-			$returnModelName = $modelConfig ? $modelConfig->hrName : $modelName;
-		} else {
-			$returnModelName = $modelConfig ? (count(\Request::segments()) > 2 && \Request::segment(3) == 'edit' ? $modelConfig->hrName : $modelConfig->hrNamePlural) : $modelName;
-		}
-
-		$links[] = array(
-			'link' => $link,
-			'action' => $action,
-			'addLink' => $addLink,
-			'modelConfigName' => $modelConfig ? $modelConfig->name : $modelName,
-			'modelName' => $returnModelName,
-			'modelIcon' => $modelConfig && $modelConfig->faIcon ? $modelConfig->faIcon : 'fa-circle'
-		);
+		$links[] = $currentLinkData;
 
 		\Session::put('adminHistoryLinks', $links);
 	}

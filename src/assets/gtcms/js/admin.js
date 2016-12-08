@@ -21,15 +21,17 @@ var $adminTitle;
 
 $(document).ready(function(){
 
-	$csrf = $('body').attr('data-csrf');
+	var head = $('head');
+
+	$csrf = head.attr('data-csrf');
+	$adminTitle = head.attr('data-title');
+	$cmsPrefix = head.attr('data-cmsprefix');
 
 	setupApp();
 
 });
 
 function setupApp(afterLogin, afterLogout) {
-
-	$adminTitle = "Admin";
 
 	$linksEnabled = true;
 	$modalLinksEnabled = true;
@@ -154,8 +156,10 @@ function setIndexSelectAjaxUpdate() {
 		selects.off("change");
 		selects.on("change", function(){
 			var select = $(this);
-			var control = select[0].selectize;
-			control.disable();
+			if (select.hasClass('disabled')) {
+				return;
+			}
+			select.addClass('disabled');
 
 			var className = select.attr('data-classname');
 			var objectId = select.attr('data-objectid');
@@ -165,7 +169,7 @@ function setIndexSelectAjaxUpdate() {
 
 			$.ajax({
 				type: 'POST',
-				url: '/admin/ajaxUpdate',
+				url: getCmsPrefix(true, true) + 'ajaxUpdate',
 				data: {
 					className: className,
 					objectId: objectId,
@@ -174,13 +178,16 @@ function setIndexSelectAjaxUpdate() {
 					_token: token,
 					getIgnore_isAjax: true
 				},
+				beforeSend: function(xhr){
+					xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+				},
 				success: function(data) {
 					if (data) {
 						if (data.success) {
 
 						} else {
 							if (data.redirectToLogin) {
-								window.location.replace("/admin/login");
+								window.location.replace(getCmsPrefix(true, true) + "login");
 							} else {
 								displayMessage(data);
 							}
@@ -195,7 +202,7 @@ function setIndexSelectAjaxUpdate() {
 					displayMessage($genericException);
 				},
 				complete: function() {
-					control.enable();
+					select.removeClass('disabled');
 				}
 			});
 
@@ -244,7 +251,7 @@ function setFileUpload() {
 			var fileNameField = container.attr('data-filenamefield');
 
 			var getParams = window.location.search.replace("?", "");
-			var url = "/admin/"+entityName+"/"+entityUrlParam+"/"+fileNameField+"/"+entityId+"?"+getParams;
+			var url = getCmsPrefix(true, true) + entityName + "/" + entityUrlParam + "/" + fileNameField + "/" + entityId + "?" + getParams;
 
 			field.fileupload({
 				url: url,
@@ -287,7 +294,7 @@ function setFileUpload() {
 							setTimeout(function(){field.progressBar.css('width', '0')}, 550);
 						} else {
 							if (data.redirectToLogin) {
-								window.location.replace("/admin/login");
+								window.location.replace(getCmsPrefix(true, true) + "login");
 							} else {
 								field.hiddenInput.val("");
 								field.progressBar.css('width', '0');
@@ -323,7 +330,7 @@ function setFileUpload() {
 								//console.error("file size");
 								field.messageContainer.html('Filesize is too big. Maximum filesize is 2 MB.').show();
 							} else {
-								console.error("submitting");
+								//console.error("submitting");
 								data.submit();
 							}
 						} else {
@@ -408,7 +415,7 @@ function setupRepositioning() {
 					var modelName = ui.item.attr('data-modelname');
 
 					$.ajax({
-						url: "/admin/" + modelName + "/ajaxMove",
+						url: getCmsPrefix(true, true) + modelName + "/ajaxMove",
 						type: "GET",
 						data: {
 							objectId: ui.item.attr('data-objectid'),
@@ -419,9 +426,12 @@ function setupRepositioning() {
 							treeStructure: false,
 							getIgnore_isAjax: true
 						},
+						beforeSend: function(xhr){
+							xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+						},
 						success: function (data) {
 							if (data.redirectToLogin) {
-								window.location.replace("/admin/login");
+								window.location.replace(getCmsPrefix(true, true) + "login");
 							} else {
 								enableRepositioning();
 							}
@@ -515,7 +525,7 @@ function setupRepositioning() {
 					disableRepositioning();
 
 					$.ajax({
-						url: "/admin/" + modelName + "/ajaxMove",
+						url: getCmsPrefix(true, true) +  + modelName + "/ajaxMove",
 						type: "GET",
 						data: {
 							objectId: objectId,
@@ -524,9 +534,12 @@ function setupRepositioning() {
 							treeStructure: true,
 							getIgnore_isAjax: true,
 						},
+						beforeSend: function(xhr){
+							xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+						},
 						success: function (data) {
 							if (data.redirectToLogin) {
-								window.location.replace("/admin/login");
+								window.location.replace(getCmsPrefix(true, true) + "login");
 							} else {
 								enableRepositioning();
 							}
@@ -592,10 +605,32 @@ function enableUrlChange() {
 }
 
 function getCurrentModel() {
+	var cmsPrefix = getCmsPrefix(false, false, true);
+	var subtract = cmsPrefix.length > 0 ? 0 : 1;
+
 	var href = document.URL;
 	var segments = href.split("?");
 	segments = segments[0].split("/");
-	return segments[4];
+
+	return segments[4 - subtract];
+}
+
+function getCmsPrefix(prependSlash, appendSlash, returnEmptyIfNoPrefix) {
+	var prefix = $cmsPrefix;
+
+	if (returnEmptyIfNoPrefix && !prefix.length) {
+		return "";
+	}
+
+	if (prependSlash) {
+		prefix = "/" + prefix;
+	}
+	if (appendSlash) {
+		prefix += "/";
+	}
+	prefix = prefix.replace("//", "/");
+
+	return prefix;
 }
 
 function setIndexSearchFunctionality() {
@@ -631,7 +666,7 @@ function setIndexSearchFunctionality() {
 	if (button.hasClass('searchIsOpen')) {
 		searchIsOpen = "&getIgnore_searchIsOpen=true";
 	}
-	var href = "/admin/"+model+"?getIgnore_getSearchResults=true"+searchIsOpen;
+	var href = getCmsPrefix(true, true) + model + "?getIgnore_getSearchResults=true" + searchIsOpen;
 
 	//objectsContainer is set up at the beginning of the function
 
@@ -643,6 +678,9 @@ function setIndexSearchFunctionality() {
 				url: href,
 				data: {
 					getIgnore_isAjax: true
+				},
+				beforeSend: function(xhr){
+					xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
 				},
 				success: function (data) {
 					//console.error(data);
@@ -657,7 +695,7 @@ function setIndexSearchFunctionality() {
 						forms.find("input.dateTime").val("");
 					} else {
 						if (data.redirectToLogin) {
-							window.location.replace("/admin/login");
+							window.location.replace(getCmsPrefix(true, true) + "login");
 						} else {
 							resetLinksAfterSearch();
 							setSelectize();
@@ -723,6 +761,9 @@ function setIndexSearchFunctionality() {
 			type: "GET",
 			url: href,
 			data: form.serialize() + "&getIgnore_isAjax=true",
+			beforeSend: function(xhr){
+				xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+			},
 			success: function (data) {
 				if (data.success) {
 					spinnerTarget.fadeOut(100).promise().done(function(){
@@ -739,7 +780,7 @@ function setIndexSearchFunctionality() {
 					});
 				} else {
 					if (data.redirectToLogin) {
-						window.location.replace("/admin/login");
+						window.location.replace(getCmsPrefix(true, true) + "login");
 					} else {
 						spinnerTarget.fadeOut(100).promise().done(function(){
 							$searchSpinner.stop();
@@ -788,10 +829,13 @@ function reloadSearchResults(objectsContainer, data) {
 			opacity: '1'
 		}, 250).promise().done(function(){
 			$(this).removeClass('hidden');
-			var addUrl = "/admin/"+data.entity+"/add"+data.getParams
-			var excelExport = "/admin/excelExport/"+data.entity+data.getParams
-			$("a.addButton").attr("href", addUrl);
-			$("a.excelExport").attr("href", excelExport);
+
+			if (!data.sideTablePagination) {
+				var addUrl = getCmsPrefix(true, true) +  + data.entity + "/add" + data.getParams
+				var excelExport = getCmsPrefix(true, true) + "excelExport/" + data.entity + data.getParams
+				$("a.addButton").attr("href", addUrl);
+				$("a.excelExport").attr("href", excelExport);
+			}
 
 			setupRepositioning();
 			resetLinksAfterSearch();
@@ -835,9 +879,12 @@ function setEditFormFunctionality() {
 }
 
 function setBackAndForth() {
+	var cmsPrefix = getCmsPrefix(false, false, true);
+	var subtract = cmsPrefix.length > 0 ? 0 : 1;
+
 	var href = document.URL;
 	var segments = href.split("/");
-	if (segments.length <= 5) {
+	if (segments.length <= (5 - subtract)) {
 		$backForthEnabled = false;
 	} else {
 		$backForthEnabled = true;
@@ -885,7 +932,7 @@ function setLinkHandling() {
 
 			var objectsContainer = false;
 			if (loadType == 'fadeIn') {
-				objectsContainer = $(".searchResultObjects .objectsContainer");
+				objectsContainer = button.closest(".objectsContainer");
 			}
 
 			getAjaxContent(button, href, loadType, objectsContainer);
@@ -905,10 +952,13 @@ function toggleNavigationSize() {
 			body.removeClass('nav-narrow');
 			$.ajax({
 				type: 'GET',
-				url: '/admin/setNavigationSize',
+				url: getCmsPrefix(true, true) + 'setNavigationSize',
 				data: {
 					navigationSize: "wide",
 					getIgnore_isAjax: true
+				},
+				beforeSend: function(xhr){
+					xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
 				},
 				complete: function() {
 					$linksEnabled = true;
@@ -918,10 +968,13 @@ function toggleNavigationSize() {
 			body.addClass('nav-narrow');
 			$.ajax({
 				type: 'GET',
-				url: '/admin/setNavigationSize',
+				url: getCmsPrefix(true, true) + 'setNavigationSize',
 				data: {
 					navigationSize: "narrow",
 					getIgnore_isAjax: true
+				},
+				beforeSend: function(xhr){
+					xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
 				},
 				complete: function() {
 					$linksEnabled = true;
@@ -944,7 +997,7 @@ function handleDeleteLink(button) {
 	if (objectName == 'image') {
 		objectData = "this <strong>image</strong>?";
 	} else {
-		objectData = modelName+" <strong>"+objectName+"<span class='regular'>?</span></strong>";
+		objectData = modelName+" <strong>" + htmlEntities(objectName) + "<span class='regular'>?</span></strong>";
 	}
 
 	$("div#confirmWindow span.objectData").html(objectData);
@@ -1015,6 +1068,9 @@ function handleDeleteLink(button) {
 				type: 'GET',
 				data: {
 					getIgnore_isAjax: true
+				},
+				beforeSend: function(xhr){
+					xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
 				},
 				success: function(data) {
 					//console.error(data);
@@ -1132,6 +1188,9 @@ function getAjaxContent(button, href, loadType, objectsContainer) {
 			getIgnore_isAjax: true
 		},
 		type: "GET",
+		beforeSend: function(xhr){
+			xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+		},
 		success: function(data) {
 			if (data.success) {
 				var historyLinks = "";
@@ -1191,7 +1250,7 @@ function getAjaxContent(button, href, loadType, objectsContainer) {
 				}
 			} else {
 				if (data.redirectToLogin) {
-					window.location.replace("/admin/login");
+					window.location.replace(getCmsPrefix(true, true) + "login");
 				} else {
 					$linksEnabled = true;
 					$urlChangeThroughJs = false;
@@ -1325,9 +1384,12 @@ function setLoginHandling() {
 				spin($loginSpinner);
 
 				$.ajax({
-					url: '/admin/login',
+					url: getCmsPrefix(true, true) + 'login',
 					type: 'POST',
 					data: form.serialize() + "&getIgnore_isAjax=true",
+					beforeSend: function(xhr){
+						xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+					},
 					success: function (data) {
 						if (data) {
 							if (data.success) {
@@ -1362,7 +1424,7 @@ function setLoginHandling() {
 									});
 								});
 							} else {
-								errorMsg.html(data.exception);
+								errorMsg.html(data.message);
 								resetLoginForm(errorMsg, spinnerTarget, button);
 							}
 						} else {
@@ -1388,7 +1450,7 @@ function resetLoginForm(errorMsg, spinnerTarget, button) {
 	spinnerTarget.fadeOut(100).promise().done(function(){
 		$loginSpinner.stop();
 		errorMsg.fadeIn(250).promise().done(function(){
-			errorMsg.delay(500).fadeOut(250).promise().done(function(){
+			errorMsg.delay(3500).fadeOut(250).promise().done(function(){
 				button.fadeIn(250).promise().done(function(){
 					setLoginHandling();
 				})
@@ -1442,6 +1504,9 @@ function setFormHandling() {
 			type: "POST",
 			url: href,
 			data: form.serialize() + "&getIgnore_isAjax=true",
+			beforeSend: function(xhr){
+				xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+			},
 			success: function (data) {
 				if (data) {
 					//console.error(data, "data");
@@ -1479,8 +1544,8 @@ function setFormHandling() {
 									if (data.replaceCurrentHistory) {
 										var historyContainer = $("h3.page-header");
 										var newHistory = data.replaceCurrentHistory.modelName;
-										if (data.replaceCurrentHistory.objectName) {
-											newHistory += " <strong>"+data.replaceCurrentHistory.objectName+"</strong>";
+										if (htmlEntities(data.replaceCurrentHistory.objectName)) {
+											newHistory += " <strong>" + htmlEntities(data.replaceCurrentHistory.objectName) + "</strong>";
 										}
 										historyContainer.find("span.currentHistory").fadeOut(100).promise().done(function(){
 											$(this).html(newHistory);
@@ -1514,7 +1579,7 @@ function setFormHandling() {
 						});
 					} else {
 						if (data.redirectToLogin) {
-							window.location.replace("/admin/login");
+							window.location.replace(getCmsPrefix(true, true) + "login");
 						}
 
 						if (data.exception) {
@@ -1618,6 +1683,16 @@ function setFormHandling() {
 	});
 }
 
+function htmlEntities(str) {
+	if (str) {
+		return str.replace(/[\u00A0-\u9999<>\&]/gim, function (i) {
+			return '&#' + i.charCodeAt(0) + ';';
+		});
+	}
+
+	return str;
+}
+
 function spin(target) {
 	var opts = {
 		lines: 11, // The number of lines to draw
@@ -1678,20 +1753,28 @@ function setEditors() {
 	var editors = $(".simpleEditor");
 	var editorObjects = [];
 
-	if (!$editorStylesAdded) {
-		$editorStylesAdded = true;
-		/*CKEDITOR.stylesSet.add('contactPage', [
-		 {name: 'Title', element: 'h5'},
-		 {name: 'Span', element: 'span'}
-		 ]);*/
-	}
-
-	if (!$editorPluginsAdded) {
-		$editorPluginsAdded = true;
-		CKEDITOR.plugins.addExternal( 'webkit-span-fix', '/gtcms/ckeditor/webkit-span-fix/', 'plugin.js' );
-	}
-
 	if (editors.length) {
+		if (typeof(CKEDITOR) === "undefined") {
+			var editorScripts =
+				"<script src='/components/ckeditor/ckeditor.js'></script>" +
+				"<script src='/components/ckeditor/adapters/jquery.js'></script>";
+
+			$("head").append(editorScripts);
+		}
+
+		if (!$editorStylesAdded) {
+			$editorStylesAdded = true;
+			/*CKEDITOR.stylesSet.add('contactPage', [
+			 {name: 'Title', element: 'h5'},
+			 {name: 'Span', element: 'span'}
+			 ]);*/
+		}
+
+		if (!$editorPluginsAdded) {
+			$editorPluginsAdded = true;
+			CKEDITOR.plugins.addExternal('webkit-span-fix', '/gtcms/ckeditor/webkit-span-fix/', 'plugin.js');
+		}
+
 		editors.each(function(i){
 			editorObjects[i] = $(this).ckeditor({
 				toolbar: [
@@ -1706,7 +1789,11 @@ function setEditors() {
 				resize_dir: 'vertical',
 				tabSpaces: 4,
 				skin: "gtcms,/gtcms/ckeditor/gtcms-skin/gtcms/",
-				extraPlugins: 'justify,stylesheetparser,webkit-span-fix',
+				extraPlugins: 'justify,stylesheetparser,webkit-span-fix,autogrow',
+				autoGrow_minHeight: 130,
+				autoGrow_maxHeight: 600,
+				autoGrow_bottomSpace: 20,
+				autoGrow_onStartup: true,
 				contentsCss: '/gtcms/css/gtcms-ckeditor.css?v=1.1',
 				entities_latin: false,
 				forcePasteAsPlainText: true,
@@ -1742,50 +1829,42 @@ function setEditors() {
 	}
 }
 
-/* -------- SELECTIZE HACK UNTIL NEW RELEASE ---------- */
-
-var hash_key = function(value) {
-	if (typeof value === 'undefined' || value === null) return null;
-	if (typeof value === 'boolean') return value ? '1' : '0';
-	return value + '';
-};
-$.extend(Selectize.prototype, {
-	registerOption: function(data) {
-		var key = hash_key(data[this.settings.valueField]);
-		// Line 1187 of src/selectize.js should be changed
-		// if (!key || this.options.hasOwnProperty(key)) return false;
-		if (typeof key === 'undefined' || key === null || this.options.hasOwnProperty(key)) return false;
-		data.$order = data.$order || ++this.order;
-		this.options[key] = data;
-		return key;
-	}
-});
-
-/* ---------------------------------------------------- */
-
 function setSelectize() {
 	var $selects = $("select.doSelectize");
 	var jqSelects = [];
 	if ($selects.length) {
 		var $cSelect;
 		var $isSelectized;
+		var $pluginsArray;
 
 		$selects.each(function(i) {
 			$cSelect = $(this);
 			$isSelectized = $cSelect.next("div.selectize-control");
 			if (!$isSelectized.length) {
 				jqSelects[i] = $(this);
+
+				$pluginsArray = [];
+				if (!jqSelects[i].hasClass('selectablePlaceholder')) {
+					$pluginsArray.push('remove_button');
+				}
+				if (getGtcmsPremium()) {
+					$pluginsArray.push('drag_drop');
+				}
+
 				var $select = $cSelect.selectize({
-					plugins: getGtcmsPremium() ? ['drag_drop', 'remove_button'] : ['remove_button'],
+					plugins: $pluginsArray,
 					delimiter: ',',
 					persist: false,
 					createOnBlur: true,
-					allowEmptyOption: !jqSelects[i].hasClass('required'),
+					allowEmptyOption: jqSelects[i].hasClass('selectablePlaceholder'),
 					create: !$cSelect.hasClass('selectizeCreate') || !getGtcmsPremium() ? false : function(input) {
 						return {
 							value: input + "_gtcms_selectizejs_newitem",
 							text: input
 						}
+					},
+					createFilter: function(input) {
+						return input.length <= 50;
 					},
 					load: function(query, callback) {
 						if (!jqSelects[i].hasClass('ajax') || !getGtcmsPremium()) {

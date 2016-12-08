@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Page;
-use App\PageMetaManager;
+use App\Classes\AdminHelper;
+use App\Classes\Dbar;
+use App\Models\Page;
+use App\Classes\PageMetaManager;
 
 class PageController extends Controller {
 
@@ -20,7 +22,7 @@ class PageController extends Controller {
 				'cPage' => $homepage
 			);
 
-			return \View::make('gtcms.front.elements.homepage')->with($data);
+			return \View::make('front.elements.homepage')->with($data);
 
 		} else {
 			if (config('gtcms.premium') && config('gtcmslang.siteIsMultilingual')) {
@@ -35,7 +37,7 @@ class PageController extends Controller {
 				$data = array(
 					'cPage' => $cPage
 				);
-				return \View::make('gtcms.front.elements.page')->with($data);
+				return \View::make('front.elements.page')->with($data);
 			} else {
 				\App::abort(404);
 			}

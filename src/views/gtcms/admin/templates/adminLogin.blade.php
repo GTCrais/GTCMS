@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
-<head>
+
 	@include("gtcms.admin.templates.adminTemplateHead")
-</head>
-<body class="loginBody nav-{{AdminHelper::getNavigationSize()}}" data-csrf="{{csrf_token()}}">
+
+<body class="loginBody nav-{{AdminHelper::getNavigationSize()}} skin-{{config('gtcms.skin', 'dark')}}">
 	<div class="quickEditContainer"></div>
 
 	<div class="container">
@@ -11,7 +11,7 @@
 			<div class="col-md-4 col-md-offset-4">
 				<div class="login-panel panel panel-default">
 					<div class="panel-body">
-					{{Form::open(array('url' => '/admin/login', 'class' => 'entityForm loginForm'))}}
+					{{Form::open(array('url' => AdminHelper::getCmsPrefix() . 'login', 'class' => 'entityForm loginForm'))}}
 					<fieldset>
 						<div class="form-group">
 							{{Form::label('email', 'Email')}}
@@ -39,10 +39,6 @@
 	</div>
 
 	@include("gtcms.admin.elements.modalDelete")
-
-	<script src={{asset("/components/bootstrap/dist/js/bootstrap.min.js")}}></script>
-	<script src={{asset("/gtcms/js/metis-menu.min.js")}}></script>
-	<script src={{asset("/gtcms/js/template.js")}}></script>
 
 </body>
 </html>

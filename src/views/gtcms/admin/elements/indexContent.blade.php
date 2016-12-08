@@ -16,7 +16,7 @@
 		</div>
 
 		<div class="indexTableHeader">
-			<a href="/admin/{{$modelConfig->name}}/add" class="btn btn-primary btn-sm addButton"><i class="fa fa-plus-circle"></i> {{$modelConfig->hrName}}</a>
+			<a href="{{AdminHelper::getCmsPrefix() . $modelConfig->name}}/add" class="btn btn-primary btn-sm addButton"><i class="fa fa-plus-circle"></i> {{$modelConfig->hrName}}</a>
 
 			@if ($modelConfig->searchPropertiesExist())
 			<button class="btn btn-default btn-sm openSearch {{$searchIsOpen ? 'searchIsOpen' : ''}}" type="button">
@@ -25,7 +25,7 @@
 			@endif
 
 			@if (config('gtcms.premium') && $modelConfig->getExcelExportFields(true) && $objects->count())
-			<a href="/admin/excelExport/{{$modelConfig->name . Tools::getGets()}}" class="btn btn-primary btn-sm excelExport standardLink"><i class="fa fa-download"></i> {{trans('gtcms.excelExport')}}</a>
+			<a href="{{AdminHelper::getCmsPrefix()}}excelExport/{{$modelConfig->name . Tools::getGets()}}" class="btn btn-primary btn-sm excelExport standardLink"><i class="fa fa-download"></i> {{trans('gtcms.excelExport')}}</a>
 			@endif
 		</div>
 @endif

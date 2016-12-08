@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Classes;
 
 class ImageHandler {
 
@@ -88,7 +88,7 @@ class ImageHandler {
 					$returnFolder = 'gtcmsThumb';
 
 					$gtcmsSize = array(
-						80, 80, 'resizeCanvas', 'gtcmsThumb', 100
+						80, 50, 'resizeCanvas', 'gtcmsThumb', 100
 					);
 
 					$sizes = AdminHelper::objectToArray($sizes);

@@ -21,7 +21,8 @@ return array(
 	'pleaseRefresh' => 'Molimo osvježite stranicu i pokušajte ponovo',
 	'administration' => 'Administracija',
 	'logout' => 'Odjava',
-	'pageTitle' => 'Admin',
+	'optimization' => 'Optimizacija',
+	'adminTitle' => 'Administracija',
 	'unauthorizedAccess' => 'Neovlašten pristup',
 	'incorrectUsernameOrPassword' => 'Netočno korisničko ime ili lozinka',
 	'pleaseTryAgain' => 'Please try again',
@@ -37,6 +38,9 @@ return array(
 	'excelExport' => 'Excel',
 	'from' => 'od',
 	'to' => 'do',
-	'newEntry' => 'Novi zapis'
+	'newEntry' => 'Novi zapis',
+
+	// Exceptions
+	'createOnTheFlyTooLong' => 'Svaki zapis može imati najviše 50 znakova.',
 
 );

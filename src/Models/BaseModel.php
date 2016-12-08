@@ -1,8 +1,14 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 //use Illuminate\Database\Eloquent\Model as Eloquent;
+
+use App\Classes\AdminEntityHandler;
+use App\Classes\AdminHelper;
+use App\Classes\Dbar;
+use App\Classes\GtcmsPremium;
+use App\Classes\ModelConfig;
 
 class BaseModel extends \Eloquent {
 
@@ -622,10 +628,13 @@ class BaseModel extends \Eloquent {
 	}
 
 	public function getSideTableParentModelData() {
-		$parentModel = \Request::segment(2);
+
+		$subtract = config('gtcms.cmsPrefix') ? 0 : 1;
+
+		$parentModel = \Request::segment(2 - $subtract);
 		$parentModelConfig = AdminHelper::modelExists($parentModel);
 		$parentIdProperty = $parentModelConfig->id;
-		$parentId = \Request::segment(4);
+		$parentId = \Request::segment(4 - $subtract);
 
 		return array(
 			'parentIdProperty' => $parentIdProperty,
@@ -694,6 +703,10 @@ class BaseModel extends \Eloquent {
 
 	public function isEditable() {
 		return true;
+	}
+
+	public function runMutators() {
+		// Implement this method per model, if needed
 	}
 
 }

@@ -40,9 +40,9 @@
 
 		<?php
 			if ($modelConfig->name == "GtcmsSetting") {
-				$submitUrl = '/admin/GtcmsSetting'.Tools::getGets();
+				$submitUrl = AdminHelper::getCmsPrefix() . 'GtcmsSetting'.Tools::getGets();
 			} else {
-				$submitUrl = '/admin/' . ($modelConfig->name) . '/edit/' . ($object->id ? $object->id : 'new') . Tools::getGets();
+				$submitUrl = AdminHelper::getCmsPrefix() . ($modelConfig->name) . '/edit/' . ($object->id ? $object->id : 'new') . Tools::getGets();
 			}
 		?>
 
@@ -51,7 +51,7 @@
 			array(
 				'url' => $submitUrl,
 				'files' => true,
-				'class' => 'entityForm ' . ($object->id ? 'editForm' : 'addForm') . (!$quickEdit && $modelConfig->form && $modelConfig->form->horizontal ? ' form-horizontal' : ''),
+				'class' => 'entityForm ' . ($object->id || $modelConfig->name == 'GtcmsSetting' ? 'editForm' : 'addForm') . (!$quickEdit && $modelConfig->form && $modelConfig->form->horizontal ? ' form-horizontal' : ''),
 				'data-infooffset' => $modelConfig->form && $modelConfig->form->horizontal ? $modelConfig->form->labelWidth : false,
 				'data-infowidth' => $modelConfig->form && $modelConfig->form->horizontal ? $modelConfig->form->inputWidth : false
 			)
@@ -76,7 +76,7 @@
 						@foreach ($modelConfig->tabs as $index => $tab)
 							<div class="tab-pane fade {{$index == 0 ? 'active in' : ''}}" id="tab-{{\Illuminate\Support\Str::slug($tab)}}">
 								@if (config('gtcms.premium') && $modelConfig->tabbedLanguageFields)
-									@include('gtcms.admin.elements.premium.tabbedLanguageFields')
+									@include('gtcms.admin.elements.tabbedLanguageFields')
 								@else
 									<?php
 									$fieldType = 'all';
@@ -92,7 +92,7 @@
 				@else
 					<?php $index = 0; ?>
 					@if (config('gtcms.premium') && $modelConfig->tabbedLanguageFields)
-						@include('gtcms.admin.elements.premium.tabbedLanguageFields')
+						@include('gtcms.admin.elements.tabbedLanguageFields')
 					@else
 						<?php
 						$fieldType = 'all';

@@ -1,7 +1,9 @@
 <?php
 
-namespace App;
+namespace App\Classes;
 
+use App\Models\BaseModel;
+use App\Models\GtcmsSetting;
 use Illuminate\Support\Str;
 
 class AdminEntityHandler {
@@ -11,7 +13,6 @@ class AdminEntityHandler {
 		/** @var BaseModel $object */
 		\DB::transaction(function() use (&$object, $modelConfig) {
 			$originalObject = clone $object;
-			$input = AdminHelper::input($modelConfig);
 
 			if ($object->id) {
 				$action = 'edit';
@@ -21,6 +22,8 @@ class AdminEntityHandler {
 				$fullEntityName = $modelConfig->myFullEntityName();
 				$object = $fullEntityName::create();
 			}
+
+			$input = AdminHelper::input($modelConfig, $action);
 
 			AdminHelper::standaloneCheck($modelConfig, $action, $input, $object);
 			if (config('gtcms.premium')) {
@@ -32,11 +35,11 @@ class AdminEntityHandler {
 			AdminEntityHandler::generateSlug($modelConfig, $object, null, false, $originalObject, 0, $action);
 			AdminEntityHandler::manyToMany($modelConfig, $input, $object);
 
-			if ($modelConfig->hasMutators) $object->runMutators();
+			$object->runMutators();
 
 			// Set correct positions when adding entry
 			if ($action == 'add') {
-				$parentData = (new BaseModel)->getParentData($modelConfig);
+				$parentData = (new BaseModel())->getParentData($modelConfig);
 				/** @var BaseModel $entity */
 				/** @var ModelConfig $modelConfig */
 				$entity = $modelConfig->myFullEntityName();
@@ -58,7 +61,7 @@ class AdminEntityHandler {
 	}
 
 	public static function editSettings($modelConfig) {
-		$input = AdminHelper::input($modelConfig);
+		$input = AdminHelper::input($modelConfig, 'edit');
 
 		\DB::transaction(function() use ($input, $modelConfig){
 			foreach ($input as $settingKey => $settingValue) {
@@ -77,14 +80,10 @@ class AdminEntityHandler {
 		foreach ($modelConfig->formFields as $field) {
 			if ($field->type == 'multiSelect' && $field->selectType->type == 'model') {
 				$method = $field->selectType->method;
-				/** @var BaseModel $modelName */
-				$modelName = $field->selectType->modelName;
-				/** @var BaseModel $fullModelName */
-				$fullModelName = ModelConfig::fullEntityName($modelName);
 				$relatedIds = array();
 
 				if (config('gtcms.premium') && $field->create) {
-					GtcmsPremium::manyToManyCreate($relatedIds, $field, $fullModelName, $input);
+					GtcmsPremium::manyToManyCreate($modelConfig, $relatedIds, $field, $input);
 				} else {
 					if (isset($input[$field->property])) {
 						if (config('gtcms.premium')) {

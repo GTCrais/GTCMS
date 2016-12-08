@@ -176,19 +176,32 @@ h3, .h3 {
   max-width 350px
   width 100%
 
+.selectize-control
+  &.single:not(.selectablePlaceholder)
+    .item
+      padding-left 18px
+
+      a.remove-single
+        top -1px
+        left 0
+        right auto
+        color #828282
+
+        &:hover
+          text-decoration none
+          color #555555
+
 .ajaxSelectUpdate
-  .selectize-input
-    padding 2px 8px
-    margin-bottom -5px
-    width 190px
-    &.dropdown-active.input-active
-      margin-bottom -6px
-  .selectize-dropdown-content
-    max-height 400px
-  /*.selectize-input
-    font-size 12px
-  .selectize-dropdown
-    font-size 12px*/
+  border 1px solid #dddddd
+  border-radius 4px
+
+.form-horizontal
+  .checkbox
+    min-height auto
+    padding-top 0
+
+.checkbox
+  margin-top 0
 
 form
   span.info
@@ -208,23 +221,21 @@ form
       margin-bottom 5px
   &:not(.form-horizontal)
     span.info
-      &:first-of-type
+      &:first-of-type:not(.checkInfo)
         margin-top -6px !important
 
+form span.info.checkInfo
+  margin-bottom 3px
+  &:last-of-type
+    margin-bottom 0
 
 form span.info[class*="col-sm-offset"]
   position relative
   right -15px
-  padding-left 12px
   margin-top 0
 
 .control-label
   color black !important
-
-.info.checkInfo {
-  margin-bottom: -5px
-  margin-top: 10px
-}
 
 input[type="file"], input[type="image"], input[type="submit"], input[type="reset"], input[type="button"], input[type="radio"], input[type="checkbox"] {
   width: auto
@@ -508,6 +519,12 @@ body.loginRedirect
     opacity 0
   div#page-wrapper
     opacity 0
+
+.navbar-top-links
+  .dropdown-menu
+    li
+      a
+        padding 8px 20px
 
 @media (max-width: 767px) {
   .navbar-top-links {
@@ -816,18 +833,22 @@ body
       i.fa-angle-double-right
         display none
 
+    @media (max-width: 767px)
+      li.navResizer
+        display none
+
 body.nav-narrow
   .sidebar
     @media (min-width: 768px)
       width 50px
-    span.modelName
-      display none
-    a.changeNavigationSize
-      text-align center
-      i.fa-angle-double-left
+      span.modelName
         display none
-      i.fa-angle-double-right
-        display inline-block
+      a.changeNavigationSize
+        text-align center
+        i.fa-angle-double-left
+          display none
+        i.fa-angle-double-right
+          display inline-block
 
   #page-wrapper
     @media (min-width: 768px)
@@ -870,8 +891,76 @@ a.quickEditButton
     position relative
     top 1px
 
+/* Dark Skin */
 
+darkSkinBlack = #232323
+darkSkinBlackActive = #484848
+darkSkinBlackLightOne = #2d2d2d
+darkSkinBorder = #464646
+darkSkinBorderLightOne = #827f7f
+darkSkinTextColor = #ececec
+darkSkinTextColorActive = #f6f6f6
 
+body.skin-dark
+  background-color darkSkinBlackLightOne
+
+  @media (min-width: 768px)
+    &.nav-narrow
+      .sidebar
+        ul li a i
+          color darkSkinTextColor
+
+  nav.navbar-default
+    background-color darkSkinBlack
+    border-color darkSkinBorder
+
+    .navbar-brand
+      color darkSkinTextColor
+
+      &:hover
+      &:focus
+        color darkSkinTextColor
+
+    .navbar-toggle
+      border-color darkSkinBorderLightOne
+
+      &:hover
+      &:focus
+        background-color transparent
+
+    .navbar-collapse
+      border-color darkSkinBorder
+
+    li
+      a.dropdown-toggle
+        &:hover
+        &:active
+          background-color darkSkinBlackActive !important
+          color adminBlue
+
+      &.open
+        > a.dropdown-toggle
+          background-color darkSkinBlackActive !important
+          color adminBlue
+
+  .sidebar
+    background-color darkSkinBlackLightOne
+
+    ul
+      background-color darkSkinBlackLightOne
+      li
+        border-bottom 1px solid darkSkinBorder
+
+        a
+          color darkSkinTextColor
+
+          &.active
+          &:hover
+            background-color darkSkinBlackActive
+            color darkSkinTextColor
+
+          i
+            color adminBlue
 
 
 

@@ -8,24 +8,24 @@ var rename = require('gulp-rename');
 gulp.task('frontStyle', function () {
 	return gulp.src('public/css/style.styl')
 		.pipe(stylus())
+		.on('error', function(err){
+			console.log(err);
+			this.emit('end');
+		})
+		.pipe(gulp.dest('public/css'))
+		.pipe(cssmin())
+		.pipe(rename({suffix: '.min'}))
 		.pipe(gulp.dest('public/css'));
 });
 
 gulp.task('adminStyle', function () {
 	return gulp.src('public/gtcms/css/style.styl')
 		.pipe(stylus())
-		.pipe(gulp.dest('public/gtcms/css'));
-});
-
-gulp.task('minifyFront', ['frontStyle'], function() {
-	return gulp.src('public/css/style.css')
-		.pipe(cssmin())
-		.pipe(rename({suffix: '.min'}))
-		.pipe(gulp.dest('public/css'));
-});
-
-gulp.task('minifyAdmin', ['adminStyle'], function() {
-	return gulp.src('public/gtcms/css/style.css')
+		.on('error', function(err){
+			console.log(err);
+			this.emit('end');
+		})
+		.pipe(gulp.dest('public/gtcms/css'))
 		.pipe(cssmin())
 		.pipe(rename({suffix: '.min'}))
 		.pipe(gulp.dest('public/gtcms/css'));
@@ -36,7 +36,7 @@ gulp.task('watch', function() {
 	gulp.watch('public/gtcms/css/style.styl', ['adminStyle']);
 });
 
-gulp.task('default', ['frontStyle', 'adminStyle', 'minifyFront', 'minifyAdmin']);
+gulp.task('default', ['frontStyle', 'adminStyle']);
 
 /*
  |--------------------------------------------------------------------------

@@ -1,7 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Foundation\Auth\Access\Authorizable;
@@ -16,11 +17,11 @@ class User extends BaseModel implements
 	CanResetPasswordContract
 {
 
-	use Authenticatable, Authorizable, CanResetPassword;
+	use Authenticatable, Authorizable, CanResetPassword, Notifiable;
 
 	protected $table = 'users';
 	protected $hidden = array('password', 'remember_token');
-	protected $fillable = array('email', 'password', 'first_name', 'last_name', 'role');
+	protected $fillable = array('email', 'password', 'first_name', 'last_name', 'role', 'is_superadmin');
 
 	public static function userList() {
 		return User::pluck('email', 'id');

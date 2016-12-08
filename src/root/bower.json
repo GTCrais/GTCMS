@@ -21,7 +21,7 @@
 		"ckeditor": "4.5.9",
 		"chosen": "1.5.1",
 		"sifter": "0.4.5",
-		"selectize": "~0.12.1",
+		"selectize": "~0.12.4",
 		"history.js": "~1.8.0",
 		"spin.js": "2.3.2",
 		"blueimp-file-upload": "9.12.3",

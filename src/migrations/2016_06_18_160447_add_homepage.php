@@ -15,9 +15,11 @@ class AddHomepage extends Migration
 		DB::table('pages')->insert(array(
 			'depth' => '0',
 			'position' => '1',
-			'name' => 'Home',
-			'title' => 'Home',
-			'model_key' => 'standard'
+			'name' => 'Homepage',
+			'title' => 'Homepage',
+			'model_key' => 'standard',
+			'created_at' => date('Y-m-d H:i:s'),
+			'updated_at' => date('Y-m-d H:i:s')
 		));
     }
 

@@ -22,7 +22,7 @@
             // only for Webkit browsers
             if (CKEDITOR.env.webkit) {
 
-                console.log('>>> Using Webkit Span Bugfix');
+                //console.log('>>> Using Webkit Span Bugfix');
 
                 var getParentsToClosestBlockElement = function(node) {
                     var parentsToBlockElement = [];

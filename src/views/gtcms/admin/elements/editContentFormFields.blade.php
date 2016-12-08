@@ -107,7 +107,9 @@ foreach ($formFields as $field) {
 			$infoWidthClass = " col-sm-offset-" . $modelConfig->form->labelWidth . " col-sm-" . $modelConfig->form->inputWidth;
 		}
 
-		if ($field->viewField) {
+		$role = \Auth::user()->role;
+
+		if ($field->viewField || ($field->viewFieldForRoles && $field->viewFieldForRoles->$role)) {
 
 			try {
 				$label = AdminHelper::getModelConfigFieldValue($modelConfig, clone $field, $object, $trueCurrentLanguage, true);
@@ -137,6 +139,18 @@ foreach ($formFields as $field) {
 			}
 
 			echo '</div>';
+
+			if ($field->subTab) {
+				if ($field->subTab->endSubTab) {
+					echo "</div>";
+				}
+				if ($field->subTab->endSubTabGroup) {
+					echo "
+						</div>
+					</div>
+				</div>";
+				}
+			}
 
 			continue;
 		}
@@ -192,7 +206,7 @@ foreach ($formFields as $field) {
 		}
 
 		if ($field->specialInfo) {
-			$infoSpans .= "<span class='info specialInfo  " . $infoWidthClass . "'>"  .  $field->specialInfo  .  "</span>";
+			$infoSpans .= "<span class='info specialInfo  " . $infoClass . " " . $infoWidthClass . "'>"  .  $field->specialInfo  .  "</span>";
 		}
 
 		$ctrlGroup = " " . $containerClass;
@@ -265,7 +279,7 @@ foreach ($formFields as $field) {
 			$fieldProperty = $field->property;
 			echo '<input type="hidden" value="0" name="' . $field->property . '">';
 			echo "<div class='checkbox'><label>";
-			echo Form::$type($field->property, 1, $object->$fieldProperty);
+			echo Form::$type($field->property, 1, $originalValue);
 			echo " " . $field->label . "</label></div>";
 
 			$showEditIcon = false;
@@ -284,7 +298,7 @@ foreach ($formFields as $field) {
 					$options['class'] .= " ajax ";
 					$method = $field->selectType->method;
 					$valueProperty = $field->selectType->ajax->valueProperty;
-					$list = $object->$method()->pluck($valueProperty, 'id');
+					$list = $object->$method()->get()->pluck($valueProperty, 'id');
 				} else {
 					if ($field->selectType->callMethodOnInstance) {
 						$list = $object->$listMethod();
@@ -307,11 +321,6 @@ foreach ($formFields as $field) {
 				}
 			}
 
-			if (!$field->required) {
-				$null = array("" => " - ");
-				$list = $null+$list;
-			}
-
 			if (isset($_GET[$field->property]) && !$object->id) {
 				if (isset($list[$_GET[$field->property]])) {
 					$options['readonly'] = true;
@@ -322,8 +331,9 @@ foreach ($formFields as $field) {
 					Throw new Exception("You are not allowed to add ".$modelConfig->hrNamePlural." for this model, or non-existing parent model.");
 				}
 			} else {
+				$options['placeholder'] = is_string($field->selectablePlaceholder) ? $field->selectablePlaceholder : " - ";
 				$options['class'] .= $field->create ? ' doSelectize selectizeCreate ' : ' doSelectize selectizeNoCreate ';
-				$options['class'] .= $field->required ? " required " : '';
+				$options['class'] .= $field->selectablePlaceholder ? " selectablePlaceholder " : '';
 				echo Form::select($field->property, $list, \Request::old($field->property) ? \Request::old($field->property) : $originalValue, $options);
 			}
 
@@ -353,7 +363,7 @@ foreach ($formFields as $field) {
 					$options['class'] .= " ajax ";
 					$method = $field->selectType->method;
 					$valueProperty = $field->selectType->ajax->valueProperty;
-					$list = $object->$method()->pluck($valueProperty, 'id');
+					$list = $object->$method()->get()->pluck($valueProperty, 'id');
 				} else {
 					if ($field->selectType->callMethodOnInstance) {
 						$list = $object->$listMethod();
