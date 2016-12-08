@@ -206,7 +206,7 @@ foreach ($formFields as $field) {
 		}
 
 		if ($field->specialInfo) {
-			$infoSpans .= "<span class='info specialInfo  " . $infoWidthClass . "'>"  .  $field->specialInfo  .  "</span>";
+			$infoSpans .= "<span class='info specialInfo  " . $infoClass . " " . $infoWidthClass . "'>"  .  $field->specialInfo  .  "</span>";
 		}
 
 		$ctrlGroup = " " . $containerClass;

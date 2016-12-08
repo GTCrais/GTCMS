@@ -341,7 +341,7 @@ class Front {
 						}
 						$tree .= '
 							<a href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id . $gets . '">
-								<img style="height: 60px;" src="' . $object->$method('url', 'gtcmsThumb') . '">
+								<img src="' . $object->$method('url', 'gtcmsThumb') . '">
 							</a>';
 						if (!$objectName) {
 							$objectName = "image";

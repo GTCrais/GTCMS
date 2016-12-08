@@ -195,6 +195,14 @@ h3, .h3 {
   border 1px solid #dddddd
   border-radius 4px
 
+.form-horizontal
+  .checkbox
+    min-height auto
+    padding-top 0
+
+.checkbox
+  margin-top 0
+
 form
   span.info
     border-left: 4px solid adminBlue
@@ -213,23 +221,21 @@ form
       margin-bottom 5px
   &:not(.form-horizontal)
     span.info
-      &:first-of-type
+      &:first-of-type:not(.checkInfo)
         margin-top -6px !important
 
+form span.info.checkInfo
+  margin-bottom 3px
+  &:last-of-type
+    margin-bottom 0
 
 form span.info[class*="col-sm-offset"]
   position relative
   right -15px
-  padding-left 12px
   margin-top 0
 
 .control-label
   color black !important
-
-.info.checkInfo {
-  margin-bottom: -5px
-  margin-top: 10px
-}
 
 input[type="file"], input[type="image"], input[type="submit"], input[type="reset"], input[type="button"], input[type="radio"], input[type="checkbox"] {
   width: auto

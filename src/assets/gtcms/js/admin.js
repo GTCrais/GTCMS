@@ -330,7 +330,7 @@ function setFileUpload() {
 								//console.error("file size");
 								field.messageContainer.html('Filesize is too big. Maximum filesize is 2 MB.').show();
 							} else {
-								console.error("submitting");
+								//console.error("submitting");
 								data.submit();
 							}
 						} else {
@@ -1684,9 +1684,13 @@ function setFormHandling() {
 }
 
 function htmlEntities(str) {
-	return str.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
-		return '&#'+i.charCodeAt(0)+';';
-	});
+	if (str) {
+		return str.replace(/[\u00A0-\u9999<>\&]/gim, function (i) {
+			return '&#' + i.charCodeAt(0) + ';';
+		});
+	}
+
+	return str;
 }
 
 function spin(target) {
