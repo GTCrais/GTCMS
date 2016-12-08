@@ -18,7 +18,7 @@
 		@else
 			@if($addEntity)
 				<div class="indexTableHeader">
-					<a href="/admin/{{$modelConfig->name}}/add" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> {{$modelConfig->hrName}}</a>
+					<a href="{{AdminHelper::getCmsPrefix() . $modelConfig->name}}/add" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> {{$modelConfig->hrName}}</a>
 				</div>
 			@endif
 

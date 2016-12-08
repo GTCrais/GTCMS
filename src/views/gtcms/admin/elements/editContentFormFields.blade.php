@@ -277,7 +277,7 @@ foreach ($formFields as $field) {
 			$fieldProperty = $field->property;
 			echo '<input type="hidden" value="0" name="' . $field->property . '">';
 			echo "<div class='checkbox'><label>";
-			echo Form::$type($field->property, 1, $object->$fieldProperty);
+			echo Form::$type($field->property, 1, $originalValue);
 			echo " " . $field->label . "</label></div>";
 
 			$showEditIcon = false;
@@ -319,11 +319,6 @@ foreach ($formFields as $field) {
 				}
 			}
 
-			if (!$field->required) {
-				$null = array("" => " - ");
-				$list = $null+$list;
-			}
-
 			if (isset($_GET[$field->property]) && !$object->id) {
 				if (isset($list[$_GET[$field->property]])) {
 					$options['readonly'] = true;
@@ -334,8 +329,9 @@ foreach ($formFields as $field) {
 					Throw new Exception("You are not allowed to add ".$modelConfig->hrNamePlural." for this model, or non-existing parent model.");
 				}
 			} else {
+				$options['placeholder'] = is_string($field->selectablePlaceholder) ? $field->selectablePlaceholder : " - ";
 				$options['class'] .= $field->create ? ' doSelectize selectizeCreate ' : ' doSelectize selectizeNoCreate ';
-				$options['class'] .= $field->required ? " required " : '';
+				$options['class'] .= $field->selectablePlaceholder ? " selectablePlaceholder " : '';
 				echo Form::select($field->property, $list, \Request::old($field->property) ? \Request::old($field->property) : $originalValue, $options);
 			}
 

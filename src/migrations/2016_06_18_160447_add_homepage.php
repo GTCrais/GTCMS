@@ -17,7 +17,9 @@ class AddHomepage extends Migration
 			'position' => '1',
 			'name' => 'Homepage',
 			'title' => 'Homepage',
-			'model_key' => 'standard'
+			'model_key' => 'standard',
+			'created_at' => date('Y-m-d H:i:s'),
+			'updated_at' => date('Y-m-d H:i:s')
 		));
     }
 

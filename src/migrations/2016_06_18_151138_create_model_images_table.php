@@ -14,10 +14,10 @@ class CreateModelImagesTable extends Migration
     {
         Schema::create('model_images', function (Blueprint $table) {
             $table->increments('id');
-			$table->string('imagename');
+			$table->string('imagename')->nullable();
 			$table->string('caption')->nullable();
-			$table->dateTime('created_at');
-			$table->dateTime('updated_at');
+			$table->dateTime('created_at')->nullable();
+			$table->dateTime('updated_at')->nullable();
         });
     }
 

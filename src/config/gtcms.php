@@ -7,6 +7,7 @@ return [
 	'allowedUserRoles' => [
 		'admin'
 	],
+	'cmsPrefix' => 'admin',
 	'throwExceptions' => true,
 	'adminAutoLogin' => false,
 	'allowDelete' => true,

@@ -7,7 +7,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="/admin">{{trans('gtcms.administration')}}</a>
+			<a class="navbar-brand" href="{{AdminHelper::getCmsPrefix()}}">{{trans('gtcms.administration')}}</a>
 		</div>
 
 		<ul class="nav navbar-top-links navbar-right">
@@ -16,8 +16,14 @@
 					<i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
 				</a>
 				<ul class="dropdown-menu dropdown-user">
+					@if (\Auth::user()->is_superadmin)
+						<li>
+							<a href="{{\URL::route('optimize')}}" class="standardLink"><i class="fa fa-wrench fa-fw"></i> {{trans('gtcms.optimization')}}</a>
+						</li>
+					@endif
+
 					<li>
-						<a href="/admin/logout" class="standardLink"><i class="fa fa-sign-out fa-fw"></i> {{trans('gtcms.logout')}}</a>
+						<a href="{{AdminHelper::getCmsPrefix()}}logout" class="standardLink"><i class="fa fa-sign-out fa-fw"></i> {{trans('gtcms.logout')}}</a>
 					</li>
 				</ul>
 			</li>
@@ -28,12 +34,16 @@
 				<ul class="nav" id="side-menu">
 					<?php $userRole = Auth::user() ? Auth::user()->role : false; ?>
 					@foreach (AdminHelper::modelConfigs() as $modelConfig)
-						@if ($userRole && $modelConfig->standalone !== false && !$modelConfig->hiddenInNavigation && (!$modelConfig->restrictedAccess || $modelConfig->restrictedAccess->$userRole))
+						@if ($userRole && $modelConfig->standalone !== false &&
+							!$modelConfig->hiddenInNavigation &&
+							(!$modelConfig->restrictedAccess || $modelConfig->restrictedAccess->$userRole) &&
+							(!$modelConfig->hiddenInNavigationForRoles || !$modelConfig->hiddenInNavigationForRoles->$userRole) &&
+							(!$modelConfig->restrictedToSuperadmin || (Auth::check() && Auth::user()->is_superadmin)))
 							<li>
 								<a
 									data-loadtype="{{count(Request::segments()) == 2 ? 'moveLeft' : 'moveRight'}}"
 									class="{{$modelConfig->name == $active ? 'active ' : ''}} navigationLink model{{$modelConfig->name}}"
-									href="/admin/{{$modelConfig->name}}"
+									href="{{AdminHelper::getCmsPrefix() . $modelConfig->name}}"
 								>
 									<i class="fa {{$modelConfig->faIcon}} fa-fw"></i> <span class="modelName">{{$modelConfig->hrNamePlural}}</span>
 								</a>

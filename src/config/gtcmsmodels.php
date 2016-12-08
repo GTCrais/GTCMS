@@ -229,11 +229,11 @@ return [
 					'type' => 'text',
 					'rules' => '{addRequired}',
 					'info' => 'Leave empty to keep current password',
-					'hidden' => array(
-						'view' => true
-					),
 					'hiddenInfo' => array(
 						'add' => true
+					),
+					'options' => array(
+						'autocomplete' => 'off'
 					),
 					'autofill' => false
 				),

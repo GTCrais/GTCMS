@@ -1,6 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Classes;
+
+use App\Models\BaseModel;
 
 class AdminHelper {
 
@@ -64,6 +66,9 @@ class AdminHelper {
 		/** @var ModelConfig $modelConfig */
 		$formFields = $quickEdit ? $modelConfig->getQuickEditFields('all') : $modelConfig->formFields;
 		if ($formFields) {
+
+			$user = \Auth::user();
+
 			foreach ($formFields as $field) {
 				if ($field->rules && !in_array($field->type, array('file', 'image'))) {
 					$editRules = array();
@@ -74,16 +79,24 @@ class AdminHelper {
 
 					// If object is set and complete, it means it's being Edited
 					if ($object && $object->id) {
-						$fieldRules = $field->editRules ? $editRules : $addRules;
-						foreach ($fieldRules as &$rule) {
-							$rule = str_replace('{ignoreId}', $object->id, $rule);
-							$rule = str_replace('{addRequired}', '', $rule);
+						if (self::fieldShouldBeUnsetFromInput($modelConfig, $field, 'edit', $user)) {
+							$fieldRules = [];
+						} else {
+							$fieldRules = $field->editRules ? $editRules : $addRules;
+							foreach ($fieldRules as &$rule) {
+								$rule = str_replace('{ignoreId}', $object->id, $rule);
+								$rule = str_replace('{addRequired}', '', $rule);
+							}
 						}
 					} else {
 						// New object is being created
-						$fieldRules = $addRules;
-						foreach ($fieldRules as &$rule) {
-							$rule = str_replace('{addRequired}', 'required', $rule);
+						if (self::fieldShouldBeUnsetFromInput($modelConfig, $field, 'add', $user)) {
+							$fieldRules = [];
+						} else {
+							$fieldRules = $addRules;
+							foreach ($fieldRules as &$rule) {
+								$rule = str_replace('{addRequired}', 'required', $rule);
+							}
 						}
 					}
 					if (config('gtcms.premium') && $field->langDependent) {
@@ -360,14 +373,15 @@ class AdminHelper {
 	}
 
 
-	public static function input($modelConfig) {
+	public static function input($modelConfig, $action) {
 		$input = \Request::all();
+		$user = \Auth::user();
+
 		if (is_array($input) && !empty($input)) {
 			$formFields = array();
 			foreach ($modelConfig->formFields as $field) {
 				$formFields[$field->property] = $field;
 			}
-			$userRole = \Auth::user()->role;
 
 			foreach ($input as $property => &$value) {
 
@@ -382,8 +396,7 @@ class AdminHelper {
 					if (isset($formFields[$property])) {
 						$field = $formFields[$property];
 
-						//unset property if user isn't allowed to edit it
-						if ($field->restrictedAccess && !$field->restrictedAccess->$userRole) {
+						if (self::fieldShouldBeUnsetFromInput($modelConfig, $field, $action, $user)) {
 							unset($input[$property]);
 						} else {
 							//format DateTime / Date
@@ -405,6 +418,32 @@ class AdminHelper {
 							if ($field->setNullWhenEmpty && !$value && $value !== 0 && $value !== "0") {
 								$value = null;
 							}
+
+							if (!is_array($value)) {
+								$value = trim($value);
+							}
+						}
+					} else {
+						// unset property if it's not defined in ModelConfig's formFields, i.e. the
+						// property is for some reason listed in Model's $fillables but is not meant
+						// to be edited through CMS.
+						//
+						// Make sure parent properties aren't unset.
+
+						$unset = true;
+
+						// make sure parent isn't removed from input (tree structure)
+						if ($modelConfig->parent && $modelConfig->parent->property == $property) {
+							$unset = false;
+						}
+
+						// make sure parent isn't removed from input (table structure)
+						if ($property == self::firstParamIsParent($modelConfig)) {
+							$unset = false;
+						}
+
+						if ($unset) {
+							unset($input[$property]);
 						}
 					}
 				}
@@ -416,6 +455,40 @@ class AdminHelper {
 		}
 
 		return $input;
+	}
+
+	public static function fieldShouldBeUnsetFromInput($modelConfig, $field, $action, $user = null) {
+
+		// unset property if it's only meant to be viewed
+		if ($field->viewField) {
+			return true;
+
+			// unset property if it's supposed to be hidden for current action
+		} else if ($field->hidden && $field->hidden->$action) {
+			return true;
+		}
+
+		if (!$user) {
+			$user = \Auth::user();
+		}
+
+		// unset property if it's restricted to superadmin and user isn't superadmin
+		if ($field->restrictedToSuperadmin && (!$user || !$user->is_superadmin)) {
+			return true;
+		}
+
+		$userRole = $user && $user->role ? $user->role : "gtcms_undefined_user_role";
+
+		// unset property if user isn't allowed to edit it
+		if ($field->restrictedAccess && !$field->restrictedAccess->$userRole) {
+			return true;
+
+			// unset property if it's only meant to be viewed by current user based on their role
+		} else if ($field->viewFieldForRoles && $field->viewFieldForRoles->$userRole) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public static function modelImageMinDimensions() {
@@ -634,7 +707,7 @@ class AdminHelper {
 		return 'wide';
 	}
 
-	public static function handleException(\Exception $e, $message = null, $preventException = false) {
+	public static function handleException(\Exception $e, $message = null, $preventException = false, $messageType = 'exception') {
 		$requestIsAjax = \Request::ajax() && \Request::get('getIgnore_isAjax') ? true : false;
 
 		if (config('gtcms.throwExceptions') && !$preventException) {
@@ -649,15 +722,57 @@ class AdminHelper {
 				Dbar::critical($e);
 				$data = array(
 					'success' => false,
-					'exception' => is_null($message) ? "Error: " . $e->getMessage() : $message
+					$messageType => is_null($message) ? "Error: " . $e->getMessage() : $message
 				);
 				return \Response::json($data);
 			} else {
 				$message = is_null($message) ? "Error: " . $e->getMessage() : $message;
-				MessageManager::setException($message);
-				return \Redirect::to("/admin");
+
+				// Sometimes the request can be Ajax request even if
+				// it doesn't have getIgnore_isAjax set to true.
+				// In this case we don't want to se the exception via Message Manager.
+				// Example: Image / File uploading.
+
+				if (!\Request::ajax()) {
+					MessageManager::setException($message);
+				}
+
+				return \Redirect::to(AdminHelper::getCmsPrefix());
 			}
 		}
+	}
+
+	public static function getCmsPrefix($prependSlash = true, $appendSlash = true, $returnEmptyIfNoPrefix = false) {
+		$prefix = config('gtcms.cmsPrefix');
+
+		if ($returnEmptyIfNoPrefix && !$prefix) {
+			return "";
+		}
+
+		if ($prependSlash) {
+			$prefix = "/" . $prefix;
+		}
+		if ($appendSlash) {
+			$prefix .= "/";
+		}
+		$prefix = str_replace("//", "/", $prefix);
+
+		return $prefix;
+	}
+
+	public static function returnDefaultDataSet($testMessage = "Returning default data set", $success = false, $message = "Testing") {
+
+		// This method is used for debugging purposes.
+		// By default it's not called anywhere.
+
+		Dbar::error($testMessage);
+
+		$data = [
+			'success' => $success,
+			'message' => $message
+		];
+
+		return \Response::json($data);
 	}
 
 }

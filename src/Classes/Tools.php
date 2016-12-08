@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Classes;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;

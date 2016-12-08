@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Classes;
 
 class PageMetaManager {
 
@@ -61,6 +61,14 @@ class PageMetaManager {
 		}
 		return $title;
 
+	}
+
+	public static function getAdminTitle() {
+		$title = trans('gtcms.adminTitle');
+		$siteName = config('gtcms.siteName');
+
+		//return $title. " :: " . $siteName;
+		return $siteName . " :: " . $title;
 	}
 
 	private static function getDefaultMeta($attr = 'description') {

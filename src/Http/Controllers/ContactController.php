@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Dbar;
-use App\Mailer;
+use App\Classes\Dbar;
+use App\Classes\Mailer;
 
 class ContactController extends Controller {
 

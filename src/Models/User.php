@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Classes;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Authenticatable;
@@ -21,7 +21,7 @@ class User extends BaseModel implements
 
 	protected $table = 'users';
 	protected $hidden = array('password', 'remember_token');
-	protected $fillable = array('email', 'password', 'first_name', 'last_name', 'role');
+	protected $fillable = array('email', 'password', 'first_name', 'last_name', 'role', 'is_superadmin');
 
 	public static function userList() {
 		return User::pluck('email', 'id');

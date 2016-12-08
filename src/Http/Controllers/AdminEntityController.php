@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\AdminEntityHandler;
-use App\AdminHelper;
-use App\AdminHistoryManager;
-use App\Dbar;
-use App\Front;
-use App\GtcmsPremium;
-use App\GtcmsSetting;
-use App\MessageManager;
-use App\Tools;
+use App\Classes\AdminEntityHandler;
+use App\Classes\AdminHelper;
+use App\Classes\AdminHistoryManager;
+use App\Classes\Dbar;
+use App\Classes\Front;
+use App\Classes\GtcmsPremium;
+use App\Classes\Tools;
+use App\Models\GtcmsSetting;
 
 class AdminEntityController extends Controller {
 
@@ -26,12 +25,14 @@ class AdminEntityController extends Controller {
 		try {
 			if (self::$modelConfig = AdminHelper::modelExists($entity)) {
 
-				if (self::$modelConfig->restrictedAccess && $action != 'ajaxSearch') {
-					$role = \Auth::user()->role;
-					if (!self::$modelConfig->restrictedAccess->$role) {
-						\Session::put('accessDenied', true);
-						return \Redirect::route('restricted');
-					}
+				$user = \Auth::user();
+				$role = $user->role;
+
+				if ((self::$modelConfig->restrictedAccess && $action != 'ajaxSearch' && !self::$modelConfig->restrictedAccess->$role) ||
+					(self::$modelConfig->restrictedToSuperadmin && !$user->is_superadmin))
+				{
+					\Session::put('accessDenied', true);
+					return \Redirect::route('restricted', ['getIgnore_isAjax' => \Request::get('getIgnore_isAjax')]);
 				}
 
 				self::$entity = $entity;
@@ -76,7 +77,7 @@ class AdminEntityController extends Controller {
 		AdminHistoryManager::clearHistory();
 		if ($loginRedirect) {
 			$defaultModel = AdminController::getDefaultModelForUser();
-			$startUrl = "/admin/" . $defaultModel;
+			$startUrl = AdminHelper::getCmsPrefix() . $defaultModel;
 			AdminHistoryManager::addHistoryLink($startUrl, $defaultModel);
 		} else {
 			AdminHistoryManager::addHistoryLink();
@@ -86,9 +87,9 @@ class AdminEntityController extends Controller {
 		$getSearchResults = isset($_GET['getIgnore_getSearchResults']) && $ajaxRequest ? true : false;
 		$searchIsOpen = isset($_GET['getIgnore_searchIsOpen']) && $ajaxRequest ? true : false;
 
-		/** @var \App\BaseModel $entity */
+		/** @var \App\Models\BaseModel $entity */
 		$entity = self::$entity;
-		/** @var \App\BaseModel $fullEntity */
+		/** @var \App\Models\BaseModel $fullEntity */
 		$fullEntity = self::$modelConfig->myFullEntityName();
 		$indexType = self::$modelConfig->index ? ucfirst(self::$modelConfig->index) : '';
 		$searchParams = array();
@@ -133,6 +134,7 @@ class AdminEntityController extends Controller {
 
 		if ($ajaxRequest) {
 			$view = \View::make('gtcms.admin.elements.index'.$indexType.'Content')->with($viewData);
+
 			if ($loginRedirect) {
 				$data = array(
 					'success' => true,
@@ -141,13 +143,14 @@ class AdminEntityController extends Controller {
 				);
 				return \Response::json($data);
 			}
+
 			$data = array(
 				'success' => true,
 				'view' => $view->render(),
 				'setHistoryLinks' => false,
 				'modelConfigName' => self::$modelConfig->name,
 				'indexView' => true,
-				'setUrl' => "/admin/" . $entity . Tools::getGets(),
+				'setUrl' => AdminHelper::getCmsPrefix() . $entity . Tools::getGets(),
 				'getParams' => Tools::getGets(),
 				'entity' => $entity,
 				'searchDataWithFieldValues' => $searchDataWithFieldValues || $ordering ? true : false
@@ -163,11 +166,11 @@ class AdminEntityController extends Controller {
 	public static function add() {
 		$ajaxRequest = \Request::ajax() && \Request::get('getIgnore_isAjax') ? true : false;
 
-		/** @var \App\BaseModel $entity */
+		/** @var \App\Models\BaseModel $entity */
 		$entity = self::$entity;
 
 		if ($ajaxRequest) {
-			return self::edit("new", "/admin/" . $entity . "/edit/new" . Tools::getGets());
+			return self::edit("new", AdminHelper::getCmsPrefix() . $entity . "/edit/new" . Tools::getGets());
 		}
 
 		\App::abort(404);
@@ -177,15 +180,15 @@ class AdminEntityController extends Controller {
 
 		$ajaxRequest = \Request::ajax() && \Request::get('getIgnore_isAjax') ? true : false;
 
-		/** @var \App\BaseModel $entity */
+		/** @var \App\Models\BaseModel $entity */
 		$entity = self::$entity;
-		/** @var \App\BaseModel $fullEntity */
+		/** @var \App\Models\BaseModel $fullEntity */
 		$fullEntity = self::$modelConfig->myFullEntityName();
 
 		if (config('gtcms.premium') && $entity == "GtcmsSetting") {
 			$object = GtcmsSetting::createSettingsObject();
 		} else {
-			/** @var \App\BaseModel $object */
+			/** @var \App\Models\BaseModel $object */
 			if ($id == "new") {
 				$object = new $fullEntity();
 			} else {
@@ -198,6 +201,11 @@ class AdminEntityController extends Controller {
 		$quickEdit = false;
 		if (config('gtcms.premium')) {
 			$quickEdit = GtcmsPremium::getQuickEditVar();
+		}
+
+		if ($action == 'edit' && !$object->isEditable()) {
+			\Session::put('accessDenied', true);
+			return \Redirect::route('restricted', ['getIgnore_isAjax' => \Request::get('getIgnore_isAjax')]);
 		}
 
 		$sideTablePaginationResults =
@@ -232,7 +240,7 @@ class AdminEntityController extends Controller {
 			} else {
 				if ($entity == "GtcmsSetting") {
 					AdminEntityHandler::editSettings(self::$modelConfig);
-				} else if ($object->isEditable()) {
+				} else {
 					$object = AdminEntityHandler::edit($object, self::$modelConfig);
 				}
 
@@ -251,7 +259,7 @@ class AdminEntityController extends Controller {
 
 		$setUrl = false;
 		if (!$settings) {
-			$setUrl = '/admin/'.self::$modelConfig->name . '/edit/' . ($object->id ? $object->id : 'new') . Tools::getGets();
+			$setUrl = AdminHelper::getCmsPrefix() . self::$modelConfig->name . '/edit/' . ($object->id ? $object->id : 'new') . Tools::getGets();
 		}
 
 		if ($ajaxRequest) {
@@ -265,6 +273,7 @@ class AdminEntityController extends Controller {
 				'modelConfigName' => self::$modelConfig->name,
 				'replaceCurrentHistory' => false
 			);
+
 			return \Response::json($data);
 		} else {
 			return \View::make('gtcms.admin.elements.edit')->with($viewData);
@@ -276,13 +285,13 @@ class AdminEntityController extends Controller {
 
 		$relatedModelName = \Request::get('getIgnore_modelName');
 		$relatedModelConfig = AdminHelper::modelExists($relatedModelName);
-		/** @var \App\BaseModel $object */
+		/** @var \App\Models\BaseModel $object */
 		$configInParent = $object->relatedModelConfiguration($relatedModelConfig->name);
 		$method = $configInParent->method;
 
 		$relatedObjects = $object->$method()->orderBy($configInParent->orderBy, $configInParent->direction)->paginate($configInParent->perPage, ['*'], $configInParent->name . "Page");;
 		$objectsView = Front::drawObjectTable($relatedObjects, $relatedModelConfig, 'sideTable', '?' . self::$modelConfig->id . '=' . $object->id, false, false, false, true);
-		$setUrl = '/admin/'.self::$modelConfig->name . '/edit/' . ($object->id ? $object->id : 'new') . Tools::getGets();
+		$setUrl = AdminHelper::getCmsPrefix() . self::$modelConfig->name . '/edit/' . ($object->id ? $object->id : 'new') . Tools::getGets();
 
 		$returnData = array(
 			'success' => true,
@@ -295,16 +304,21 @@ class AdminEntityController extends Controller {
 	}
 
 	public static function delete($id) {
-		/** @var \App\BaseModel $entity */
+		/** @var \App\Models\BaseModel $entity */
 		$entity = self::$modelConfig->myFullEntityName();
-		/** @var \App\BaseModel $object */
+		/** @var \App\Models\BaseModel $object */
 		$object = $entity::find($id);
+
+		if (!$object->isDeletable()) {
+			\Session::put('accessDenied', true);
+			return \Redirect::route('restricted', ['getIgnore_isAjax' => \Request::get('getIgnore_isAjax')]);
+		}
 
 		$ajaxRequest = \Request::ajax() && \Request::get('getIgnore_isAjax') ? true : false;
 
 		if ($ajaxRequest) {
 			try {
-				if (config('gtcms.allowDelete') && $object->isDeletable()) {
+				if (config('gtcms.allowDelete')) {
 					$object->delete();
 				}
 				$data = array(
@@ -322,7 +336,7 @@ class AdminEntityController extends Controller {
 	public static function ajaxMove() {
 
 		$objectId = isset($_GET['objectId']) ? $_GET['objectId'] : false;
-		/** @var \App\BaseModel $entity */
+		/** @var \App\Models\BaseModel $entity */
 		$entity = self::$modelConfig->myFullEntityName();
 		$ajaxRequest = \Request::ajax() && \Request::get('getIgnore_isAjax') ? true : false;
 		$message = false;
@@ -330,7 +344,7 @@ class AdminEntityController extends Controller {
 
 		if ($ajaxRequest) {
 			if ($objectId) {
-				/** @var \App\BaseModel $object */
+				/** @var \App\Models\BaseModel $object */
 				$object = $entity::find($objectId);
 				if ($object) {
 					if (isset($_GET['treeStructure']) && $_GET['treeStructure'] == 'true') {
@@ -411,7 +425,7 @@ class AdminEntityController extends Controller {
 			$data['returnToParent'] = false;
 		}
 
-		/** @var \App\BaseModel $object */
+		/** @var \App\Models\BaseModel $object */
 
 		if (config('gtcms.premium') && $quickEdit) {
 			GtcmsPremium::setQuickEditReturnData($data, $object, self::$modelConfig);

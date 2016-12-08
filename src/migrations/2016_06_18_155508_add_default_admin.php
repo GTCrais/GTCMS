@@ -18,7 +18,9 @@ class AddDefaultAdmin extends Migration
 			'first_name' => 'Admin',
 			'last_name' => 'Admin',
 			'is_superadmin' => 1,
-			'role' => 'admin'
+			'role' => 'admin',
+			'created_at' => date('Y-m-d H:i:s'),
+			'updated_at' => date('Y-m-d H:i:s')
 		));
     }
 

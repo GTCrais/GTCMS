@@ -33,7 +33,7 @@
 			<a class="btn btn-default btn-xs deleteButton deleteUploadedFile deleteImageFile"
 			   data-objectname=""
 			   data-modelname="{{rtrim($field->label, '*')}}"
-			   href="/admin/{{$modelConfig->name}}/deleteFile/{{$field->property}}/{{$object->id ? $object->id : 'new_gtcms_entry'}}"
+			   href="{{AdminHelper::getCmsPrefix() . $modelConfig->name}}/deleteFile/{{$field->property}}/{{$object->id ? $object->id : 'new_gtcms_entry'}}"
 				>
 				<i class="fa fa-times"></i>
 			</a>

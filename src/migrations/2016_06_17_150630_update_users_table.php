@@ -17,12 +17,12 @@ class UpdateUsersTable extends Migration
 		});
 
 		Schema::table('users', function ($table) {
-			$table->string('role')->after('password');
+			$table->string('role')->nullable()->after('password');
 			$table->string('first_name')->nullable()->after('role');
 			$table->string('last_name')->nullable()->after('first_name');
-			$table->boolean('is_superadmin')->default('0')->after('last_name');
-			$table->dateTime('created_at');
-			$table->dateTime('updated_at');
+			$table->boolean('is_superadmin')->nullable()->default('0')->after('last_name');
+			$table->dateTime('created_at')->nullable();
+			$table->dateTime('updated_at')->nullable();
 		});
     }
 

@@ -21,7 +21,8 @@ return array(
 	'pleaseRefresh' => 'Please refresh the page and try again',
 	'administration' => 'Administration',
 	'logout' => 'Logout',
-	'pageTitle' => 'Admin',
+	'optimization' => 'Optimizations',
+	'adminTitle' => 'Administracija',
 	'unauthorizedAccess' => 'Unauthorized access',
 	'incorrectUsernameOrPassword' => 'Incorrect username or password',
 	'pleaseTryAgain' => 'Please try again',
@@ -37,6 +38,9 @@ return array(
 	'excelExport' => 'Excel Export',
 	'from' => 'from',
 	'to' => 'to',
-	'newEntry' => 'New entry'
+	'newEntry' => 'New entry',
+
+	// Exceptions
+	'createOnTheFlyTooLong' => 'Each item may not be greater than 50 characters.',
 
 );

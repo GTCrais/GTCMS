@@ -1,4 +1,4 @@
-@extends('gtcms.front.templates.default')
+@extends('front.templates.default')
 
 @section('content')
 

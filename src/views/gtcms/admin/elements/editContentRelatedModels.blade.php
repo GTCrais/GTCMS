@@ -33,7 +33,7 @@
 					?>
 					@if ($addObject)
 						<div class="indexTableHeader">
-							<a href="/admin/{{$relatedModelConfig->name}}/add{{$gets}}&addToParent=true" class="btn btn-primary btn-sm addRelatedObject">
+							<a href="{{AdminHelper::getCmsPrefix() . $relatedModelConfig->name}}/add{{$gets}}&addToParent=true" class="btn btn-primary btn-sm addRelatedObject">
 								<i class="fa fa-plus-circle"></i> {{$relatedModelConfig->hrName}}
 							</a>
 						</div>

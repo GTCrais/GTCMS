@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Classes;
 
 class Mailer {
 
@@ -13,7 +13,7 @@ class Mailer {
 			Message: <br>" . \Html::entities($inputData['message']) . "<br>
 		";
 
-		\Mail::send('templates.email.standard', array('body' => $body), function($message) {
+		\Mail::send('front.templates.email.simple', array('body' => $body), function($message) {
 			$message->to(config('gtcms.adminEmail'))->subject(config('gtcms.contactMessageSubject'));
 		});
 	}
@@ -25,7 +25,7 @@ class Mailer {
 		if (!$subject) {
 			$subject = "[Testing email functionality]";
 		}
-		\Mail::send('templates.email.standard', array('body' => $body), function($message) use ($email, $subject){
+		\Mail::send('front.templates.email.simple', array('body' => $body), function($message) use ($email, $subject){
 			$message->to($email)->from(config('gtcms.fromEmail'), config('gtcms.fromPerson'))->subject($subject);
 		});
 	}

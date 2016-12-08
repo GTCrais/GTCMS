@@ -42,6 +42,17 @@ class RouteServiceProvider extends ServiceProvider
 		if (!$adminRoute) {
 			$this->mapWebRoutes();
 		}
+
+		if (!config('gtcms.cmsPrefix')) {
+
+			// No prefix means we need to catch all non-existent
+			// routes, and redirect them back to Admin. We're doing
+			// this here instead of in 'routes/admin.php' because we
+			// don't want this default route to be checked
+			// by AdminAuth Middleware
+
+			\Route::match(['post', 'get'], '{segments}', $this->namespace . '\AdminController@redirectToAdmin')->where('segments', '(.*)');
+		}
     }
 
 	protected function mapAdminRoutes()
@@ -49,14 +60,14 @@ class RouteServiceProvider extends ServiceProvider
 		\App::setLocale(config('gtcmslang.defaultAdminLocale'));
 
 		\Route::group([
-			'prefix' => 'admin',
+			'prefix' => config('gtcms.cmsPrefix'),
 			'middleware' => ['web', 'adminAuth'],
 			'namespace' => $this->namespace,
 		], function ($router) {
 			require base_path('routes/admin.php');
 		});
 
-		return (\Request::segment(1) == 'admin') ? true : false;
+		return (!config('gtcms.cmsPrefix') || \Request::segment(1) == config('gtcms.cmsPrefix')) ? true : false;
 	}
 
     /**

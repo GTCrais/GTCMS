@@ -24,11 +24,11 @@
 	<body>
 		<div id="wrap">
 
-			@include("gtcms.front.elements.header")
+			@include("front.elements.header")
 
 			@yield('content')
 
-			@include("gtcms.front.elements.footer")
+			@include("front.elements.footer")
 
 		</div>
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Classes;
 
 use Collective\Html\FormFacade as Form;
 use Illuminate\Database\Eloquent\Collection;
@@ -29,7 +29,7 @@ class Front {
 			$parentProperty = $modelConfig->parent->property;
 		}
 
-		/** @var BaseModel $object */
+		/** @var \App\Models\BaseModel $object */
 		foreach ($objects as $object) {
 
 			$addParentName = $editParentName = "";
@@ -44,7 +44,7 @@ class Front {
 			if ($modelConfig->children) {
 				$objectChildren = $modelConfig->children;
 				$childModelName = $objectChildren->name;
-				$addUrl = '/admin/' . $childModelName . '/add' . $addParentName;
+				$addUrl = AdminHelper::getCmsPrefix() . $childModelName . '/add' . $addParentName;
 			} else {
 				$addDisabled = "disabled";
 				$addUrl = "javascript:;";
@@ -65,7 +65,6 @@ class Front {
 				$addDisabled = "disabled";
 				$addUrl = "javascript:;";
 			}
-
 
 			$hasChildren = false;
 			if ($modelConfig->children) {
@@ -92,13 +91,13 @@ class Front {
 						<i class="fa fa-ellipsis-v"></i>
 					</div>
 				</td>
-				<td><a class="printPropertyValue" href="/admin/' . $modelConfig->name . '/edit/' . $object->id . '">' . $object->$linkProperty . '</a></td>
+				<td><a class="printPropertyValue" href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id . '">' . \Html::entities($object->$linkProperty) . '</a></td>
 				<td class="controlButtons controls3">';
 
 			if ($modelConfig->getQuickEditFields('all')) {
 				$tree .=
 					'<a
-						href="/admin/' . $modelConfig->name . '/edit/' . $object->id  . '"
+						href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id  . '"
 						class="btn btn-default btn-xs quickEditButton treeQuickEdit"
 						>
 							<i class="fa fa-pencil-square-o"></i>
@@ -110,7 +109,7 @@ class Front {
 			if ($object->isDeletable()) {
 				$tree .= '
 					<a
-						href="/admin/' . $modelConfig->name . '/delete/' . $object->id . '"
+						href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/delete/' . $object->id . '"
 						class="btn btn-default btn-xs deleteButton"
 						data-modelname="' . $modelConfig->name . '"
 						data-objectname="' . $object->$printProperty . '"
@@ -178,7 +177,7 @@ class Front {
 		$parentModelName = false;
 		$hidePositionControls = $modelConfig->hidePositionControls;
 		if ($tableType == 'sideTable' && $objects->count()) {
-			/** @var BaseModel $firstObject */
+			/** @var \App\Models\BaseModel $firstObject */
 			$firstObject = $objects[0];
 			$configuration = $firstObject->getRelatedModelConfigurationInParentModel($modelConfig);
 			$hasPositionInParent = $configuration['position'];
@@ -225,10 +224,10 @@ class Front {
 					if ($field->order && $tableType == 'table') {
 						$tree .= '
 							<div class="sortLinks">
-								<a class="btn btn-xs" href="/admin/' . $modelConfig->name . '?&orderBy=' . $field->property . '&direction=asc&getIgnore_getSearchResults=true' . (Tools::getSearchAndOrderGets(false, true, true)) . '" class="sortLink" data-loadtype="fadeIn">
+								<a class="btn btn-xs" href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '?&orderBy=' . $field->property . '&direction=asc&getIgnore_getSearchResults=true' . (Tools::getSearchAndOrderGets(false, true, true)) . '" class="sortLink" data-loadtype="fadeIn">
 									<i class="fa fa-caret-up"></i>
 								</a>
-								<a class="btn btn-mini" href="/admin/' . $modelConfig->name . '?orderBy=' . $field->property . '&direction=desc&getIgnore_getSearchResults=true' . (Tools::getSearchAndOrderGets(false, true, true)) . '" class="sortLink" data-loadtype="fadeIn">
+								<a class="btn btn-mini" href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '?orderBy=' . $field->property . '&direction=desc&getIgnore_getSearchResults=true' . (Tools::getSearchAndOrderGets(false, true, true)) . '" class="sortLink" data-loadtype="fadeIn">
 									<i class="fa fa-caret-down"></i>
 								</a>
 							</div>
@@ -248,7 +247,7 @@ class Front {
 			</tr>';
 		}
 
-		/** @var BaseModel $object */
+		/** @var \App\Models\BaseModel $object */
 		foreach ($objects as $object) {
 
 			$objectName = "";
@@ -287,17 +286,21 @@ class Front {
 							$property = $field->displayProperty->property;
 							$method = $field->displayProperty->method;
 							$relatedProperty = $field->displayProperty->property;
-							if ($object->$method()->count()) {
-								if ($field->displayProperty->multiple) {
-									$relatedModels = $object->$method()->withPivot('position')->orderBy('pivot_position', 'asc')->get();
-									$value = "";
-									foreach ($relatedModels as $relModel) {
-										$value .= ($relModel->$relatedProperty).", ";
-									}
-									$value = rtrim($value, ", ");
+
+							if ($field->displayProperty->multiple && $object->$method->count()) {
+								if ($field->displayProperty->autoSort === false || !config('gtcms.premium')) {
+									$relatedModels = $object->$method;
 								} else {
-									$value = $object->$method->$relatedProperty;
+									$relatedModels = $object->$method()->withPivot('position')->orderBy('pivot_position', 'asc')->get();
 								}
+
+								$value = "";
+								foreach ($relatedModels as $relModel) {
+									$value .= ($relModel->$relatedProperty).", ";
+								}
+								$value = rtrim($value, ", ");
+							} else if (!$field->displayProperty->multiple && $object->$method) {
+								$value = $object->$method->$relatedProperty;
 							} else {
 								$value = " - ";
 							}
@@ -321,14 +324,14 @@ class Front {
 
 					if (property_exists($field, $tableType.'Link') && !$image) {
 						if ($field->displayProperty && $field->displayProperty->type == 'model') {
-							$tree .= '<a href="/admin/' . $modelConfig->name . '/edit/' . $object->id . $gets . '">' . ($object->$method ? $object->$method->$property : '- deleted -') . '</a>';
+							$tree .= '<a href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id . $gets . '">' . ($object->$method ? \Html::entities($object->$method->$property) : '- deleted -') . '</a>';
 							if (!$objectName) {
-								$objectName = $object->$method ? $object->$method->$property : '';
+								$objectName = $object->$method ? \Html::entities($object->$method->$property) : '';
 							}
 						} else {
-							$tree .= '<a href="/admin/' . $modelConfig->name . '/edit/' . $object->id . $gets . '">' . $object->$property . '</a>';
+							$tree .= '<a href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id . $gets . '">' . \Html::entities($object->$property) . '</a>';
 							if (!$objectName) {
-								$objectName = $object->$property;
+								$objectName = \Html::entities($object->$property);
 							}
 						}
 					} else if ($image) {
@@ -336,7 +339,7 @@ class Front {
 							$method = $image;
 						}
 						$tree .= '
-							<a href="/admin/' . $modelConfig->name . '/edit/' . $object->id . $gets . '">
+							<a href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id . $gets . '">
 								<img style="height: 60px;" src="' . $object->$method('url', 'gtcmsThumb') . '">
 							</a>';
 						if (!$objectName) {
@@ -344,9 +347,9 @@ class Front {
 						}
 					} else if ($field->displayProperty && $field->displayProperty->type == 'model') {
 						if ($field->displayProperty->multiple) {
-							$tree .= $value;
+							$tree .= \Html::entities($value);
 						} else {
-							$tree .= ($object->$method ? $object->$method->$property : ' - ');
+							$tree .= ($object->$method ? \Html::entities($object->$method->$property) : ' - ');
 						}
 					} else if (in_array($field->type, array('date', 'dateTime'))) {
 						$tree .= $object->formatDate($object->$property, $field->displayProperty->dateFormat ? $field->displayProperty->dateFormat : $field->dateFormat);
@@ -374,13 +377,12 @@ class Front {
 							}
 						}
 
-						if (!$field->required) {
+						if ($field->selectablePlaceholder) {
 							$null = array('' => '-');
 							$list = $null+$list;
 						}
 
-						$options['class'] .= ' doSelectize selectizeNoCreate ajaxSelectUpdate ';
-						$options['class'] .= $field->required ? " required " : '';
+						$options['class'] .= ' ajaxSelectUpdate ';
 						$options['data-classname'] = $modelConfig->name;
 						$options['data-objectid'] = $object->id;
 						$options['data-property'] = $property;
@@ -393,7 +395,7 @@ class Front {
 						$tree .= \Form::select($field->property, $list, $originalValue, $options);
 
 					} else {
-						$tree .= $object->$property;
+						$tree .= \Html::entities($object->$property);
 					}
 
 					$tree .= "</td>";
@@ -411,7 +413,7 @@ class Front {
 					$tree .= $quickEditControl;
 					$tree .=
 						'<a
-						href="/admin/' . $modelConfig->name . '/delete/' . $object->id . $gets . '"
+						href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/delete/' . $object->id . $gets . '"
 						class="btn btn-default btn-xs deleteButton"
 						data-modelname="' . $modelConfig->hrName . '"
 						data-objectname="' . $objectName . '"
@@ -479,7 +481,7 @@ class Front {
 		$html = \Form::open(
 			array(
 				'method' => 'get',
-				'url' => '/admin/' . ($modelConfig->name),
+				'url' => AdminHelper::getCmsPrefix() . ($modelConfig->name),
 				'class' => 'searchForm model' . $modelConfig->name . " " . (($modelConfig->form && $modelConfig->form->horizontal) ? ' form-horizontal' : '')
 			)
 		);
@@ -543,7 +545,7 @@ class Front {
 						$options['class'] = '';
 						$list = array();
 						if ($field->selectType->type == 'model') {
-							/** @var BaseModel $selectModel */
+							/** @var \App\Models\BaseModel $selectModel */
 							$selectModel = ModelConfig::fullEntityName($field->selectType->modelName);
 							if ($field->selectType->ajax) {
 								$list = array();
@@ -579,11 +581,7 @@ class Front {
 							}
 						}
 
-						if (!$field->selectType->ajax) {
-							$null = array('' => '-');
-							$list = $null + $list;
-						}
-
+						$options['placeholder'] = " - ";
 						$options['class'] .= ' selectizeNoCreate doSelectize';
 						$html .= \Form::select("search_".$field->property, $list, \Request::get("search_".$field->property), $options);
 					} else if (in_array($field->type, array('date', 'dateTime'))) {
@@ -629,7 +627,7 @@ class Front {
 
 			foreach ($searchData as $criteria) {
 				$html .= "
-					<li><strong>" . $criteria['label'] . ":</strong> " . $criteria['value'] . "
+					<li><strong>" . $criteria['label'] . ":</strong> " . \Html::entities($criteria['value']) . "
 				";
 			}
 

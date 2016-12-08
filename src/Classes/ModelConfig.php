@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Classes;
 
 class ModelConfig {
 
@@ -21,12 +21,12 @@ class ModelConfig {
 
 	public function myFullEntityName() {
 		$namespace = $this->namespace ? $this->namespace : config('gtcms.defaultNamespace');
-		return $namespace . "\\" . $this->name;
+		return $namespace . "\\Models\\" . $this->name;
 	}
 
 	public static function fullEntityName($entity, $namespace = false) {
 		if ($namespace) {
-			return $namespace . "\\" . $entity;
+			return $namespace . "\\Models\\" . $entity;
 		} else {
 			$modelConfig = AdminHelper::modelExists($entity);
 			if ($modelConfig) {
@@ -110,7 +110,7 @@ class ModelConfig {
 				if (in_array($field->type, array('select', 'multiSelect'))) {
 					$listMethod = $field->selectType->listMethod;
 					if ($field->selectType->type == 'model') {
-						/** @var BaseModel $selectModel */
+						/** @var \App\Models\BaseModel $selectModel */
 						$selectModel = ModelConfig::fullEntityName($field->selectType->modelName);
 						if ($field->selectType->ajax && config('gtcms.premium')) {
 							$valueProperty = $field->selectType->ajax->valueProperty;

@@ -1,6 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Classes;
+
+use Monolog\ErrorHandler;
 
 class AdminHistoryManager {
 
@@ -27,19 +29,23 @@ class AdminHistoryManager {
 			$url = explode('?', $_SERVER["REQUEST_URI"]);
 			$link = (array_shift($url)) . Tools::getGets();
 		}
+
+		$subtract = config('gtcms.cmsPrefix') ? 0 : 1;
+
 		if (!$modelName) {
-			$modelName = \Request::segment(2);
+			$modelName = \Request::segment(2 - $subtract);
 		}
+
 		$linkSegments = explode("/", $link);
-		$action = isset($linkSegments[3]) ? $linkSegments[3] : false;
-		$addLink = isset($linkSegments[4]) && $linkSegments[4] == "new" ? true : false;
+		$action = isset($linkSegments[3 - $subtract]) ? $linkSegments[3 - $subtract] : false;
+		$addLink = isset($linkSegments[4 - $subtract]) && $linkSegments[4 - $subtract] == "new" ? true : false;
 
 		$modelConfig = AdminHelper::modelExists($modelName);
 
 		if ($ignoreRequestForModelName) {
 			$returnModelName = $modelConfig ? $modelConfig->hrName : $modelName;
 		} else {
-			$returnModelName = $modelConfig ? (count(\Request::segments()) > 2 && \Request::segment(3) == 'edit' ? $modelConfig->hrName : $modelConfig->hrNamePlural) : $modelName;
+			$returnModelName = $modelConfig ? (count(\Request::segments()) > (2 - $subtract) && \Request::segment(3 - $subtract) == 'edit' ? $modelConfig->hrName : $modelConfig->hrNamePlural) : $modelName;
 		}
 
 		$currentLinkData = array(
