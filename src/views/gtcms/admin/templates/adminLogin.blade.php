@@ -3,7 +3,7 @@
 
 	@include("gtcms.admin.templates.adminTemplateHead")
 
-<body class="loginBody nav-{{AdminHelper::getNavigationSize()}}">
+<body class="loginBody nav-{{AdminHelper::getNavigationSize()}} skin-{{config('gtcms.skin', 'dark')}}">
 	<div class="quickEditContainer"></div>
 
 	<div class="container">

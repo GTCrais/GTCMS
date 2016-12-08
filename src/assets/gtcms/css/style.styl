@@ -827,18 +827,22 @@ body
       i.fa-angle-double-right
         display none
 
+    @media (max-width: 767px)
+      li.navResizer
+        display none
+
 body.nav-narrow
   .sidebar
     @media (min-width: 768px)
       width 50px
-    span.modelName
-      display none
-    a.changeNavigationSize
-      text-align center
-      i.fa-angle-double-left
+      span.modelName
         display none
-      i.fa-angle-double-right
-        display inline-block
+      a.changeNavigationSize
+        text-align center
+        i.fa-angle-double-left
+          display none
+        i.fa-angle-double-right
+          display inline-block
 
   #page-wrapper
     @media (min-width: 768px)
@@ -881,8 +885,76 @@ a.quickEditButton
     position relative
     top 1px
 
+/* Dark Skin */
 
+darkSkinBlack = #232323
+darkSkinBlackActive = #484848
+darkSkinBlackLightOne = #2d2d2d
+darkSkinBorder = #464646
+darkSkinBorderLightOne = #827f7f
+darkSkinTextColor = #ececec
+darkSkinTextColorActive = #f6f6f6
 
+body.skin-dark
+  background-color darkSkinBlackLightOne
+
+  @media (min-width: 768px)
+    &.nav-narrow
+      .sidebar
+        ul li a i
+          color darkSkinTextColor
+
+  nav.navbar-default
+    background-color darkSkinBlack
+    border-color darkSkinBorder
+
+    .navbar-brand
+      color darkSkinTextColor
+
+      &:hover
+      &:focus
+        color darkSkinTextColor
+
+    .navbar-toggle
+      border-color darkSkinBorderLightOne
+
+      &:hover
+      &:focus
+        background-color transparent
+
+    .navbar-collapse
+      border-color darkSkinBorder
+
+    li
+      a.dropdown-toggle
+        &:hover
+        &:active
+          background-color darkSkinBlackActive !important
+          color adminBlue
+
+      &.open
+        > a.dropdown-toggle
+          background-color darkSkinBlackActive !important
+          color adminBlue
+
+  .sidebar
+    background-color darkSkinBlackLightOne
+
+    ul
+      background-color darkSkinBlackLightOne
+      li
+        border-bottom 1px solid darkSkinBorder
+
+        a
+          color darkSkinTextColor
+
+          &.active
+          &:hover
+            background-color darkSkinBlackActive
+            color darkSkinTextColor
+
+          i
+            color adminBlue
 
 
 

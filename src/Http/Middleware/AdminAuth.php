@@ -17,6 +17,11 @@ class AdminAuth {
 
 		\App::setLocale(config('gtcmslang.defaultAdminLocale'));
 
+		/** @var \Illuminate\Http\Request $request */
+		$receivedCsrf = $request->header('X-CSRF-TOKEN');
+		$ajaxRequest = \Request::ajax() ? true : false;
+		$gtcmsAjaxRequest = $ajaxRequest && \Request::get('getIgnore_isAjax') ? true : false;
+
 		$showLoginMessage = true;
 		if (config('gtcms.adminAutoLogin') && \Auth::guest()) {
 			$user = User::where('role', 'admin')->first();
@@ -40,6 +45,14 @@ class AdminAuth {
 					return \Redirect::to(AdminHelper::getCmsPrefix() . 'login');
 				}
 			}
+		} else if ($gtcmsAjaxRequest && $receivedCsrf != csrf_token()) {
+			$message = trans('gtcms.errorHasOccurred');
+			$data = [
+				'success' => false,
+				'exception' => $message
+			];
+
+			return \Response::json($data);
 		} else if (\Route::currentRouteName() == "adminLogin") {
 			if ($showLoginMessage) {
 				MessageManager::setError(trans('gtcms.alreadyLoggedIn'));

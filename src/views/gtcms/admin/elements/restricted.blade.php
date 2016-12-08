@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
-<head>
-	<title>{{PageMetaManager::getAdminTitle()}}</title>
+@extends('gtcms.admin.templates.admin')
 
-	<meta charset="utf-8">
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-</head>
-<body>
-
-	<h1>{{trans('gtcms.unauthorizedAccess')}}.</h1>
-
-</body>
-</html>
+@section('content')
+	<div class="row">
+		<div class="col-lg-12">
+			<h3 class="page-header">{{trans('gtcms.unauthorizedAccess')}}</h3>
+		</div>
+	</div>
+@endsection

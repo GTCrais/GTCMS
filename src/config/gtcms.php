@@ -24,5 +24,6 @@ return [
 	'fromPerson' => 'Site Name',
 	'contactMessageSubject' => '[Site Name] - New message',
 	'ogImage' => false,
+	'skin' => 'dark'
 
 ];

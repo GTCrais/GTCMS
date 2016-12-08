@@ -178,6 +178,9 @@ function setIndexSelectAjaxUpdate() {
 					_token: token,
 					getIgnore_isAjax: true
 				},
+				beforeSend: function(xhr){
+					xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+				},
 				success: function(data) {
 					if (data) {
 						if (data.success) {
@@ -423,6 +426,9 @@ function setupRepositioning() {
 							treeStructure: false,
 							getIgnore_isAjax: true
 						},
+						beforeSend: function(xhr){
+							xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+						},
 						success: function (data) {
 							if (data.redirectToLogin) {
 								window.location.replace(getCmsPrefix(true, true) + "login");
@@ -527,6 +533,9 @@ function setupRepositioning() {
 							position: position,
 							treeStructure: true,
 							getIgnore_isAjax: true,
+						},
+						beforeSend: function(xhr){
+							xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
 						},
 						success: function (data) {
 							if (data.redirectToLogin) {
@@ -670,6 +679,9 @@ function setIndexSearchFunctionality() {
 				data: {
 					getIgnore_isAjax: true
 				},
+				beforeSend: function(xhr){
+					xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+				},
 				success: function (data) {
 					//console.error(data);
 					if (data.success) {
@@ -749,6 +761,9 @@ function setIndexSearchFunctionality() {
 			type: "GET",
 			url: href,
 			data: form.serialize() + "&getIgnore_isAjax=true",
+			beforeSend: function(xhr){
+				xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+			},
 			success: function (data) {
 				if (data.success) {
 					spinnerTarget.fadeOut(100).promise().done(function(){
@@ -942,6 +957,9 @@ function toggleNavigationSize() {
 					navigationSize: "wide",
 					getIgnore_isAjax: true
 				},
+				beforeSend: function(xhr){
+					xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+				},
 				complete: function() {
 					$linksEnabled = true;
 				}
@@ -954,6 +972,9 @@ function toggleNavigationSize() {
 				data: {
 					navigationSize: "narrow",
 					getIgnore_isAjax: true
+				},
+				beforeSend: function(xhr){
+					xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
 				},
 				complete: function() {
 					$linksEnabled = true;
@@ -1047,6 +1068,9 @@ function handleDeleteLink(button) {
 				type: 'GET',
 				data: {
 					getIgnore_isAjax: true
+				},
+				beforeSend: function(xhr){
+					xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
 				},
 				success: function(data) {
 					//console.error(data);
@@ -1164,6 +1188,9 @@ function getAjaxContent(button, href, loadType, objectsContainer) {
 			getIgnore_isAjax: true
 		},
 		type: "GET",
+		beforeSend: function(xhr){
+			xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+		},
 		success: function(data) {
 			if (data.success) {
 				var historyLinks = "";
@@ -1360,6 +1387,9 @@ function setLoginHandling() {
 					url: getCmsPrefix(true, true) + 'login',
 					type: 'POST',
 					data: form.serialize() + "&getIgnore_isAjax=true",
+					beforeSend: function(xhr){
+						xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+					},
 					success: function (data) {
 						if (data) {
 							if (data.success) {
@@ -1474,6 +1504,9 @@ function setFormHandling() {
 			type: "POST",
 			url: href,
 			data: form.serialize() + "&getIgnore_isAjax=true",
+			beforeSend: function(xhr){
+				xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+			},
 			success: function (data) {
 				if (data) {
 					//console.error(data, "data");
@@ -1752,7 +1785,11 @@ function setEditors() {
 				resize_dir: 'vertical',
 				tabSpaces: 4,
 				skin: "gtcms,/gtcms/ckeditor/gtcms-skin/gtcms/",
-				extraPlugins: 'justify,stylesheetparser,webkit-span-fix',
+				extraPlugins: 'justify,stylesheetparser,webkit-span-fix,autogrow',
+				autoGrow_minHeight: 130,
+				autoGrow_maxHeight: 600,
+				autoGrow_bottomSpace: 20,
+				autoGrow_onStartup: true,
 				contentsCss: '/gtcms/css/gtcms-ckeditor.css?v=1.1',
 				entities_latin: false,
 				forcePasteAsPlainText: true,
@@ -1821,6 +1858,9 @@ function setSelectize() {
 							value: input + "_gtcms_selectizejs_newitem",
 							text: input
 						}
+					},
+					createFilter: function(input) {
+						return input.length <= 50;
 					},
 					load: function(query, callback) {
 						if (!jqSelects[i].hasClass('ajax') || !getGtcmsPremium()) {

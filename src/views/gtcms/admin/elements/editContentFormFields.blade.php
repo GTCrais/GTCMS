@@ -107,7 +107,9 @@ foreach ($formFields as $field) {
 			$infoWidthClass = " col-sm-offset-" . $modelConfig->form->labelWidth . " col-sm-" . $modelConfig->form->inputWidth;
 		}
 
-		if ($field->viewField) {
+		$role = \Auth::user()->role;
+
+		if ($field->viewField || ($field->viewFieldForRoles && $field->viewFieldForRoles->$role)) {
 
 			try {
 				$label = AdminHelper::getModelConfigFieldValue($modelConfig, clone $field, $object, $trueCurrentLanguage, true);

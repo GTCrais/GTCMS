@@ -218,7 +218,8 @@ class Front {
 				if ($field->$tableType) {
 					$counter++;
 					$tree .= '
-						<th class="controlButtons ' . ($objectsAreMovable && $counter == 1 ? 'sortablePadding' : '') . '" ' .
+						<th class="controlButtons ' . ($objectsAreMovable && $counter == 1 ? ' sortablePadding ' : '') .
+						$field->responsiveClasses . '" ' .
 						($objectsAreMovable && $counter == 1 ? 'colspan="2"' : '') . '><span>' . $field->label . '</span>';
 
 					if ($field->order && $tableType == 'table') {
@@ -320,7 +321,7 @@ class Front {
 								</td>";
 					}
 
-					$tree .= "<td>";
+					$tree .= "<td class='" . ($field->responsiveClasses) . "'>";
 
 					if (property_exists($field, $tableType.'Link') && !$image) {
 						if ($field->displayProperty && $field->displayProperty->type == 'model') {

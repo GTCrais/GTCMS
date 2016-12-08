@@ -80,14 +80,10 @@ class AdminEntityHandler {
 		foreach ($modelConfig->formFields as $field) {
 			if ($field->type == 'multiSelect' && $field->selectType->type == 'model') {
 				$method = $field->selectType->method;
-				/** @var BaseModel $modelName */
-				$modelName = $field->selectType->modelName;
-				/** @var BaseModel $fullModelName */
-				$fullModelName = ModelConfig::fullEntityName($modelName);
 				$relatedIds = array();
 
 				if (config('gtcms.premium') && $field->create) {
-					GtcmsPremium::manyToManyCreate($relatedIds, $field, $fullModelName, $input);
+					GtcmsPremium::manyToManyCreate($modelConfig, $relatedIds, $field, $input);
 				} else {
 					if (isset($input[$field->property])) {
 						if (config('gtcms.premium')) {
