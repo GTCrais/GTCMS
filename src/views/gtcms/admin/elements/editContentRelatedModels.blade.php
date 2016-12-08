@@ -19,7 +19,10 @@
 		$gets = $prependGets . Tools::getGets([], false, "&");
 
 		$configInParent = $relatedModel;
-		GtcmsPremium::setDisplayRelatedModelBasedOnModelKey($configInParent, $object, $displayModel);
+
+		if (config('gtcms.premium')) {
+			GtcmsPremium::setDisplayRelatedModelBasedOnModelKey($configInParent, $object, $displayModel);
+		}
 
 		?>
 		@if ($displayModel)
