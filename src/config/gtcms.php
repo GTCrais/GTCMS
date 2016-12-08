@@ -12,6 +12,8 @@ return [
 	'adminAutoLogin' => false,
 	'allowDelete' => true,
 	'preventRedirectOnSave' => false,
+	'maxLoginAttempts' => 5,
+	'loginLockoutDuration' => 10,
 	'defaultModel' => 'Page',
 	'defaultNamespace' => 'App',
 	'defaultDateFormat' => "d.m.Y. H:i",
