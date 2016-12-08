@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Classes;
+namespace App\Models;
 
 class ModelFile extends BaseModel {
 
