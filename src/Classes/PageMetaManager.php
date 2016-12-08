@@ -2,6 +2,8 @@
 
 namespace App\Classes;
 
+use App\Models\Page;
+
 class PageMetaManager {
 
 	public static $page = null;
