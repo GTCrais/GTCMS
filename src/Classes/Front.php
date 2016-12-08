@@ -112,7 +112,7 @@ class Front {
 						href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/delete/' . $object->id . '"
 						class="btn btn-default btn-xs deleteButton"
 						data-modelname="' . $modelConfig->name . '"
-						data-objectname="' . $object->$printProperty . '"
+						data-objectname="' . \Html::entities($object->$printProperty) . '"
 					>
 						<i class="fa fa-times"></i>
 					</a>';
@@ -416,7 +416,7 @@ class Front {
 						href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/delete/' . $object->id . $gets . '"
 						class="btn btn-default btn-xs deleteButton"
 						data-modelname="' . $modelConfig->hrName . '"
-						data-objectname="' . $objectName . '"
+						data-objectname="' . \Html::entities($objectName) . '"
 						>
 							<i class="fa fa-times"></i>
 						</a>
