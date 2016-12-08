@@ -128,7 +128,6 @@ return [
 						'type' => 'list',
 						'listMethod' => 'getPageKeyList'
 					),
-					'required' => false,
 					'tab' => 'Common'
 				),
 				array(
@@ -202,7 +201,7 @@ return [
 						'listMethod' => 'getUserRoles'
 					),
 					'rules' => 'required',
-					'required' => true,
+					'default' => 'user',
 					'search' => array(
 						'type' => 'standard',
 						'match' => 'exact'
