@@ -1712,6 +1712,12 @@ function spin(target) {
 		top: '50%', // Top position relative to parent
 		left: '50%' // Left position relative to parent
 	};
+
+	var loginForm = target.parents('form.loginForm');
+	if (loginForm.length) {
+		opts.color = '#f6f6f6';
+	}
+
 	target.spin(opts);
 	return target;
 }
