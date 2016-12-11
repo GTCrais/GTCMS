@@ -446,7 +446,7 @@ class AdminController extends Controller {
 			);
 			try {
 				$class = \Request::get('className');
-				/** @var \App\BaseModel $fullClass */
+				/** @var \App\Models\BaseModel $fullClass */
 				$fullClass = ModelConfig::fullEntityName($class);
 				$objectId = \Request::get('objectId');
 				$property = \Request::get('property');
