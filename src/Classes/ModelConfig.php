@@ -2,6 +2,8 @@
 
 namespace App\Classes;
 
+use Illuminate\Support\Str;
+
 class ModelConfig {
 
 	protected $gtcmsModelParents = null;
@@ -10,6 +12,7 @@ class ModelConfig {
 	protected $excelExportFields = null;
 	protected $excelExportFieldsCount = null;
 	protected $searchPropertiesExist = null;
+	protected static $faIconColors = null;
 
 	public function __get($property) {
 		if (property_exists($this, $property)) {
@@ -55,6 +58,52 @@ class ModelConfig {
 		}
 
 		return $rules;
+	}
+
+	public static function colorStyleForModel($modelConfigOrModelName) {
+		if (!is_a($modelConfigOrModelName, 'ModelConfig')) {
+			$modelConfig = AdminHelper::modelExists($modelConfigOrModelName);
+		} else {
+			$modelConfig = $modelConfigOrModelName;
+		}
+
+		$iconColor = "";
+
+		if ($modelConfig) {
+			$iconColor = $modelConfig->faIconColor;
+
+			if (!$iconColor && $configIconColors = config('gtcms.faIconColors')) {
+				if (is_null(self::$faIconColors)) {
+					$faIconColors = [];
+					$counter = 0;
+					foreach (AdminHelper::modelConfigs() as $cModelConfig) {
+						if ($cModelConfig->standalone !== false &&
+							!$cModelConfig->hiddenInNavigation &&
+							isset($configIconColors[$counter]))
+						{
+							$faIconColors[$cModelConfig->name] = $configIconColors[$counter];
+							$counter++;
+						}
+					}
+
+					self::$faIconColors = $faIconColors;
+				}
+
+				if (isset(self::$faIconColors[$modelConfig->name])) {
+					$iconColor = self::$faIconColors[$modelConfig->name];
+				}
+			}
+
+			if ($iconColor && !Str::startsWith($iconColor, "#")) {
+				$iconColor = "#" . $iconColor;
+			}
+		}
+
+		if ($iconColor) {
+			$iconColor = "style='color: " . $iconColor . ";'";
+		}
+
+		return $iconColor;
 	}
 
 	public function getSearchPropertiesData() {

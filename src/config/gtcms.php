@@ -24,6 +24,15 @@ return [
 	'fromPerson' => 'Site Name',
 	'contactMessageSubject' => '[Site Name] - New message',
 	'ogImage' => false,
-	'skin' => 'dark'
+	'skin' => 'dark',
+	'faIconColors' => [
+		'#0088cc', // blue
+		'#989898', // grey
+		'#983d3b', // red
+		'#2c7b92', // light blue
+		'#cccccc', // light grey
+		'#994869', // purple
+		'#9e6940', // orange
+	],
 
 ];

@@ -1714,7 +1714,7 @@ function spin(target) {
 	};
 
 	var loginForm = target.parents('form.loginForm');
-	if (loginForm.length) {
+	if (loginForm.length && $('body').hasClass('skin-dark')) {
 		opts.color = '#f6f6f6';
 	}
 
