@@ -276,20 +276,31 @@ textarea {
   top: 0
 }
 
-.nav > li > a:hover,
-.nav > li > a:focus {
-  outline: none !important
-}
+.navbar-brand
+  padding 11px 15px
 
-.nav > li > a:focus {
-  color: #337ab7
-  background-color: transparent
-}
+.sidebar
+  .nav
+    li
+      a
+        border-bottom 1px solid #fefefe
+        transition background-color 0.1s linear, border-color 0.1s linear
 
-.nav > li > a:hover {
-  color: #23527c
-  background-color: #eee
-}
+        &.active
+          border-bottom 1px solid #eee
+
+        &:hover
+        &:focus
+          outline none !important
+          border-bottom 1px solid #eee
+
+        &:focus
+          color: #337ab7
+          background-color transparent
+
+        &:hover
+          color: #23527c
+          background-color #eee
 
 .table-responsive
   border none
@@ -898,6 +909,7 @@ darkSkinBlackActive = #484848
 darkSkinBlackLightOne = #2d2d2d
 darkSkinBorder = #464646
 darkSkinBorderLightOne = #827f7f
+darkSkinBorderDark = #1d1d1d
 darkSkinTextColor = #ececec
 darkSkinTextColorActive = #f6f6f6
 
@@ -960,11 +972,19 @@ body.skin-dark
 
         a
           color darkSkinTextColor
+          border-bottom 1px solid darkSkinBorderDark
 
           &.active
           &:hover
             background-color darkSkinBlackActive
             color darkSkinTextColor
+            border-bottom 1px solid darkSkinBlackActive !important
+
+          &:focus
+            border-bottom 1px solid darkSkinBorderDark
+            color darkSkinTextColor
+            &:hover
+              border-bottom 1px solid darkSkinBlackActive
 
           i
             color adminBlue

@@ -52,13 +52,10 @@ class AdminHelper {
 
 	public static function objectToArray($object) {
 		if (is_object($object)) {
-			$object = (array)($object);
+			$object = json_decode(json_encode($object), true);
 		}
-		if (is_array($object)) {
-			return array_map('self::objectToArray', $object);
-		} else {
-			return $object;
-		}
+
+		return $object;
 	}
 
 	public static function validationRules($modelConfig, $object = NULL, $quickEdit = false) {

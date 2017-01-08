@@ -7,7 +7,9 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="{{AdminHelper::getCmsPrefix()}}">{{trans('gtcms.administration')}}</a>
+			<a class="navbar-brand" href="{{AdminHelper::getCmsPrefix()}}">
+				<img src="{{asset('img/gtcms-logo.png')}}" height="28" />
+			</a>
 		</div>
 
 		<ul class="nav navbar-top-links navbar-right">
@@ -45,7 +47,7 @@
 									class="{{$modelConfig->name == $active ? 'active ' : ''}} navigationLink model{{$modelConfig->name}}"
 									href="{{AdminHelper::getCmsPrefix() . $modelConfig->name}}"
 								>
-									<i class="fa {{$modelConfig->faIcon}} fa-fw"></i> <span class="modelName">{{$modelConfig->hrNamePlural}}</span>
+									<i class="fa {{$modelConfig->faIcon}} fa-fw" {!! ModelConfig::colorStyleForModel($modelConfig) !!}></i> <span class="modelName">{{$modelConfig->hrNamePlural}}</span>
 								</a>
 							</li>
 						@endif
