@@ -249,8 +249,8 @@ class AdminController extends Controller {
 							}
 							if ($fileAction == 'uploadImage') {
 								$method = $method ? $method : "image";
-								$fileUrl = $object->$method('url', $fileData[0]['returnFolder']);
-								$fileOriginalUrl = $object->$method('url', 'original');
+								$fileUrl = $object->$method('url', $fileData[0]['returnFolder'], $fileNameField);
+								$fileOriginalUrl = $object->$method('url', 'original', $fileNameField);
 							} else {
 								$method = $method ? $method : "file";
 								$fileUrl = $fileOriginalUrl = $object->$method('url', $fileNameField);

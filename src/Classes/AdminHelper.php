@@ -376,8 +376,16 @@ class AdminHelper {
 
 		if (is_array($input) && !empty($input)) {
 			$formFields = array();
+			$languages = config('gtcmslang.languages');
+
 			foreach ($modelConfig->formFields as $field) {
-				$formFields[$field->property] = $field;
+				if (config('gtcms.premium') && config('gtcmslang.siteIsMultilingual') && $field->langDependent) {
+					foreach ($languages as $language) {
+						$formFields[$field->property . "_" . $language] = $field;
+					}
+				} else {
+					$formFields[$field->property] = $field;
+				}
 			}
 
 			foreach ($input as $property => &$value) {
