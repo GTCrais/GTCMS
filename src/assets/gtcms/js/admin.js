@@ -12,7 +12,6 @@ var $setLinksToFalse;
 var $setUrlChangeThroughJsToFalse;
 var $editFormInputs;
 var $searchSpinner;
-var $editorStylesAdded;
 var $editorPluginsAdded;
 
 var $genericLoginError;
@@ -43,7 +42,6 @@ function setupApp(afterLogin, afterLogout) {
 	$deleteSpinner = false;
 	$setLinksToFalse = false;
 	$setUrlChangeThroughJsToFalse = false;
-	$editorStylesAdded = true;
 	$editorPluginsAdded = false;
 
 	$genericLoginError = "An error has occurred. Please try again.";
@@ -1756,7 +1754,7 @@ function setDatePicker() {
 }
 
 function setEditors() {
-	var editors = $(".simpleEditor");
+	var editors = $("textarea.simpleEditor");
 	var editorObjects = [];
 
 	if (editors.length) {
@@ -1768,29 +1766,39 @@ function setEditors() {
 			$("head").append(editorScripts);
 		}
 
-		if (!$editorStylesAdded) {
-			$editorStylesAdded = true;
-			/*CKEDITOR.stylesSet.add('contactPage', [
-			 {name: 'Title', element: 'h5'},
-			 {name: 'Span', element: 'span'}
-			 ]);*/
-		}
-
 		if (!$editorPluginsAdded) {
 			$editorPluginsAdded = true;
 			CKEDITOR.plugins.addExternal('webkit-span-fix', '/gtcms/ckeditor/webkit-span-fix/', 'plugin.js');
 		}
 
+
+
 		editors.each(function(i){
+			var toolbar = [
+				[ 'Undo' ],
+				[ 'Bold', 'Italic' ],
+				[ 'BulletedList'],
+				//[ 'JustifyLeft', 'JustifyBlock' ],
+				[ 'Link', 'Unlink' ],
+				[ 'Image' ]
+			];
+
+			var styleSet = [];
+			var hasStyles = false;
+
+			if ($(this).hasClass('arbitrary-class-here')) {
+				styleSet.push({ name: 'H2', element: 'h2', attributes: {}, styles: {} });
+				styleSet.push({ name: 'H3', element: 'h3', attributes: {}, styles: {} });
+				hasStyles = true;
+			}
+
+			if (hasStyles) {
+				toolbar.push(['Styles']);
+			}
+
 			editorObjects[i] = $(this).ckeditor({
-				toolbar: [
-					[ 'Undo' ],
-					[ 'Bold', 'Italic' ],
-					[ 'BulletedList'],
-					//[ 'JustifyLeft', 'JustifyBlock' ],
-					[ 'Link', 'Unlink' ],
-					[ 'Image' ]
-				],
+				toolbar: toolbar,
+				stylesSet: styleSet,
 				width: "100%",
 				resize_dir: 'vertical',
 				tabSpaces: 4,
@@ -1803,15 +1811,12 @@ function setEditors() {
 				contentsCss: '/gtcms/css/gtcms-ckeditor.css?v=1.1',
 				entities_latin: false,
 				forcePasteAsPlainText: true,
+
 				filebrowserImageBrowseUrl: '/laravel-filemanager?type=Images',
 				filebrowserImageUploadUrl: '/laravel-filemanager/upload?type=Images&_token=' + $csrf,
 				filebrowserBrowseUrl: '/laravel-filemanager?type=Files',
 				filebrowserUploadUrl: '/laravel-filemanager/upload?type=Files&_token=' + $csrf,
 
-				stylesSet: [
-					{ name: 'H2', element: 'h2', attributes: {}, styles: {} },
-					{ name: 'H3', element: 'h3', attributes: {}, styles: {} }
-				],
 				on: {
 					focus: function() {
 						editors.eq(i).siblings('i.fa').fadeOut(100);

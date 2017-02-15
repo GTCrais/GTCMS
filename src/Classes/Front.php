@@ -627,8 +627,9 @@ class Front {
 			";
 
 			foreach ($searchData as $criteria) {
+				$value = $criteria['type'] == 'checkbox' ? $criteria['value'] : \Html::entities($criteria['value']);
 				$html .= "
-					<li><strong>" . $criteria['label'] . ":</strong> " . \Html::entities($criteria['value']) . "
+					<li><strong>" . $criteria['label'] . ":</strong> " . $value . "
 				";
 			}
 

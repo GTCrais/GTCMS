@@ -153,7 +153,7 @@ class Tools {
 			"Nam imperdiet magna sed luctus mattis. Aliquam faucibus luctus pellentesque. Donec quis nibh quis risus feugiat eleifend. Sed urna nibh, laoreet quis fringilla vel, tempus vel velit. Curabitur malesuada odio ut sapien sodales ullamcorper nec id purus.",
 			"Proin egestas dolor eu dapibus tempor. Nunc in sem quis justo volutpat rutrum. Nam quis est tempus, malesuada ante id, tristique mi. Mauris quis aliquam urna."
 		);
-		$output = "";
+		$output = [];
 		for ($i = 1; $i <= $paragraphsNum; $i++) {
 			$output[] = $paragraphs[$i];
 		}
