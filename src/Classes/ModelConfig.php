@@ -151,6 +151,15 @@ class ModelConfig {
 		return $fieldsWithLabels;
 	}
 
+	public function getPropertyFieldArray() {
+		$fields = [];
+		foreach ($this->formFields as $field) {
+			$fields[$field->property] = $field;
+		}
+
+		return $fields;
+	}
+
 	public function getPropertyValue($property, $value) {
 		$returnValue = "Undefined";
 		$list = array();
