@@ -1,4 +1,4 @@
-@extends('gtcms.admin.templates.admin')
+@extends('gtcms.templates.admin')
 
 @section('content')
 
