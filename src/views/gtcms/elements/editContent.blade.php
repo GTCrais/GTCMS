@@ -76,7 +76,7 @@
 						@foreach ($modelConfig->tabs as $index => $tab)
 							<div class="tab-pane fade {{$index == 0 ? 'active in' : ''}}" id="tab-{{\Illuminate\Support\Str::slug($tab)}}">
 								@if (config('gtcms.premium') && $modelConfig->tabbedLanguageFields)
-									@include('gtcms.admin.elements.tabbedLanguageFields')
+									@include('gtcms.elements.tabbedLanguageFields')
 								@else
 									<?php
 									$fieldType = 'all';
@@ -84,7 +84,7 @@
 									$hideSave = false;
 									$modelConfig = AdminHelper::modelExists($modelConfig->name);
 									?>
-									@include("gtcms.admin.elements.editContentFormFields")
+									@include("gtcms.elements.editContentFormFields")
 								@endif
 							</div>
 						@endforeach
@@ -92,7 +92,7 @@
 				@else
 					<?php $index = 0; ?>
 					@if (config('gtcms.premium') && $modelConfig->tabbedLanguageFields)
-						@include('gtcms.admin.elements.tabbedLanguageFields')
+						@include('gtcms.elements.tabbedLanguageFields')
 					@else
 						<?php
 						$fieldType = 'all';
@@ -100,7 +100,7 @@
 						$hideSave = false;
 						$modelConfig = AdminHelper::modelExists($modelConfig->name);
 						?>
-						@include("gtcms.admin.elements.editContentFormFields")
+						@include("gtcms.elements.editContentFormFields")
 					@endif
 				@endif
 
@@ -112,7 +112,7 @@
 
 	@if (!$quickEdit && !empty($modelConfig->relatedModels))
 
-		@include("gtcms.admin.elements.editContentRelatedModels")
+		@include("gtcms.elements.editContentRelatedModels")
 
 	@endif
 </div>
