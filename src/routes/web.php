@@ -12,7 +12,6 @@
 */
 
 View::share('cPage', false);
-View::share('loggedUser', Auth::user());
 
 //Route::post(trans('routes.login'), array('as' => 'login', 'uses' => 'UserController@login'));
 //Route::get(trans('routes.logout'), array('as' => 'logout', 'uses' => 'UserController@logout'));

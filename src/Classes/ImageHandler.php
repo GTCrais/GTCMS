@@ -95,7 +95,7 @@ class ImageHandler {
 					array_unshift($sizes, $gtcmsSize);
 
 					foreach ($sizes as $size) {
-						$newImg = clone($img);
+						$newImg = \Image::make($basePath . "original/" . $name);
 						$size = AdminHelper::objectToArray($size);
 
 						if (!is_dir($basePath . $size[3])) {

@@ -698,9 +698,9 @@ class AdminHelper {
 
 	public static function setNavigationSize($size = false) {
 		if (in_array($size, array('narrow', 'wide'))) {
-			\Session::set('gtcmsNavSize', $size);
+			\Session::put('gtcmsNavSize', $size);
 		} else {
-			\Session::set('gtcmsNavSize', 'wide');
+			\Session::put('gtcmsNavSize', 'wide');
 		}
 	}
 

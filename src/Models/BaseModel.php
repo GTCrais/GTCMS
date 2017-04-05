@@ -154,7 +154,7 @@ class BaseModel extends \Eloquent {
 			}
 		}
 
-		return parent::create($data);
+		return (new static)->newQuery()->create($data);
 	}
 
 	public static function getPositionPropertyAndValueFromParentData($parentData, $modelConfig) {

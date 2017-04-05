@@ -165,7 +165,7 @@ class AdminController extends Controller {
 		if (config('gtcms.premium')) {
 			return GtcmsPremium::excelExport($modelName);
 		} else {
-			\Session::set('accessDenied', true);
+			\Session::put('accessDenied', true);
 			return self::restricted();
 		}
 	}
@@ -348,7 +348,7 @@ class AdminController extends Controller {
 
 			return \View::make("gtcms.elements.updateLanguages")->with($data);
 		} else {
-			\Session::set('accessDenied', true);
+			\Session::put('accessDenied', true);
 			return self::restricted();
 		}
 	}
@@ -429,7 +429,7 @@ class AdminController extends Controller {
 
 			return \View::make("gtcms.elements.optimizationOptions")->with($data);
 		} else {
-			\Session::set('accessDenied', true);
+			\Session::put('accessDenied', true);
 			return self::restricted();
 		}
 	}

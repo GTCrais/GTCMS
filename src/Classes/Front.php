@@ -330,7 +330,12 @@ class Front {
 								$objectName = $object->$method ? \Html::entities($object->$method->$property) : '';
 							}
 						} else {
-							$tree .= '<a href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id . $gets . '">' . \Html::entities($object->$property) . '</a>';
+							if (in_array($field->type, array('date', 'dateTime'))) {
+								$value = $object->formatDate($object->$property, $field->displayProperty->dateFormat ? $field->displayProperty->dateFormat : $field->dateFormat);
+							} else {
+								$value = $object->$property;
+							}
+							$tree .= '<a href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id . $gets . '">' . \Html::entities($value) . '</a>';
 							if (!$objectName) {
 								$objectName = \Html::entities($object->$property);
 							}
