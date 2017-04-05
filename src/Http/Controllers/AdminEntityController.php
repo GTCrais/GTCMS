@@ -133,7 +133,7 @@ class AdminEntityController extends Controller {
 		);
 
 		if ($ajaxRequest) {
-			$view = \View::make('gtcms.admin.elements.index'.$indexType.'Content')->with($viewData);
+			$view = \View::make('gtcms.elements.index'.$indexType.'Content')->with($viewData);
 
 			if ($loginRedirect) {
 				$data = array(
@@ -158,7 +158,7 @@ class AdminEntityController extends Controller {
 
 			return \Response::json($data);
 		} else {
-			return \View::make('gtcms.admin.elements.index')->with($viewData);
+			return \View::make('gtcms.elements.index')->with($viewData);
 		}
 
 	}
@@ -263,7 +263,7 @@ class AdminEntityController extends Controller {
 		}
 
 		if ($ajaxRequest) {
-			$view = \View::make('gtcms.admin.elements.editContent')->with($viewData);
+			$view = \View::make('gtcms.elements.editContent')->with($viewData);
 			$data = array(
 				'success' => true,
 				'view' => $view->render(),
@@ -276,7 +276,7 @@ class AdminEntityController extends Controller {
 
 			return \Response::json($data);
 		} else {
-			return \View::make('gtcms.admin.elements.edit')->with($viewData);
+			return \View::make('gtcms.elements.edit')->with($viewData);
 		}
 
 	}

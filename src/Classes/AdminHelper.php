@@ -52,13 +52,10 @@ class AdminHelper {
 
 	public static function objectToArray($object) {
 		if (is_object($object)) {
-			$object = (array)($object);
+			$object = json_decode(json_encode($object), true);
 		}
-		if (is_array($object)) {
-			return array_map('self::objectToArray', $object);
-		} else {
-			return $object;
-		}
+
+		return $object;
 	}
 
 	public static function validationRules($modelConfig, $object = NULL, $quickEdit = false) {
@@ -240,8 +237,8 @@ class AdminHelper {
 		return array('orderBy' => $orderBy, 'direction' => $direction);
 	}
 
-	public static function getSearchData($modelConfig, $searchFieldValue = false) {
-		/** @var ModelConfig $modelConfig */
+	public static function getSearchData(ModelConfig $modelConfig, $searchFieldValue = false) {
+
 		if (\Request::isMethod('get')) {
 			$properties = array();
 			$searchPropertiesData = $modelConfig->getSearchPropertiesData();
@@ -250,6 +247,8 @@ class AdminHelper {
 			$fieldsWithLabels = $modelConfig->getFieldsWithLabels(true);
 			$propertiesTables = $modelConfig->getPropertiesTables();
 			$langDependentProperties = $modelConfig->getLangDependentProperties();
+			$propertyFieldArray = $modelConfig->getPropertyFieldArray();
+
 			foreach(\Request::all() as $property => $value) {
 				if (strpos($property, 'search_') === 0 && $value) {
 					$property = explode("search_", $property);
@@ -287,9 +286,9 @@ class AdminHelper {
 								'value' => $value,
 								'searchConfig' => $searchConfig[$property],
 								'fieldFrom' => $fieldFrom,
-								'fieldTo' => $fieldTo
+								'fieldTo' => $fieldTo,
+								'type' => isset($propertyFieldArray[$trueProperty]) ? $propertyFieldArray[$trueProperty]->type : null
 							);
-
 						}
 					}
 				}
@@ -379,8 +378,16 @@ class AdminHelper {
 
 		if (is_array($input) && !empty($input)) {
 			$formFields = array();
+			$languages = config('gtcmslang.languages');
+
 			foreach ($modelConfig->formFields as $field) {
-				$formFields[$field->property] = $field;
+				if (config('gtcms.premium') && config('gtcmslang.siteIsMultilingual') && $field->langDependent) {
+					foreach ($languages as $language) {
+						$formFields[$field->property . "_" . $language] = $field;
+					}
+				} else {
+					$formFields[$field->property] = $field;
+				}
 			}
 
 			foreach ($input as $property => &$value) {
@@ -414,13 +421,13 @@ class AdminHelper {
 								}
 							}
 
+							if (!is_array($value) && !is_null($value)) {
+								$value = trim($value);
+							}
+
 							//set null when empty
 							if ($field->setNullWhenEmpty && !$value && $value !== 0 && $value !== "0") {
 								$value = null;
-							}
-
-							if (!is_array($value)) {
-								$value = trim($value);
 							}
 						}
 					} else {

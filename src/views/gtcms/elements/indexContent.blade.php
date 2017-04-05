@@ -1,5 +1,5 @@
 @if (isset($loginRedirect) && $loginRedirect)
-@include("gtcms.admin.elements.navigation")
+@include("gtcms.elements.navigation")
 <div id="page-wrapper">
 @endif
 

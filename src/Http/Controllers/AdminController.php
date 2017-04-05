@@ -92,7 +92,7 @@ class AdminController extends Controller {
 			}
 		}
 
-		return \View::make('gtcms.admin.templates.adminLogin')->with(array('active' => false));
+		return \View::make('gtcms.templates.adminLogin')->with(array('active' => false));
 	}
 
 	public static function getDefaultModelForUser($user = null) {
@@ -185,7 +185,7 @@ class AdminController extends Controller {
 				return \Response::json($data);
 			} else {
 				$modelConfig = new ModelConfig();
-				return \View::make('gtcms.admin.elements.restricted')->with(array('active' => false, 'modelConfig' => $modelConfig));
+				return \View::make('gtcms.elements.restricted')->with(array('active' => false, 'modelConfig' => $modelConfig));
 			}
 		} else {
 			return \Redirect::to(AdminHelper::getCmsPrefix());
@@ -249,8 +249,8 @@ class AdminController extends Controller {
 							}
 							if ($fileAction == 'uploadImage') {
 								$method = $method ? $method : "image";
-								$fileUrl = $object->$method('url', $fileData[0]['returnFolder']);
-								$fileOriginalUrl = $object->$method('url', 'original');
+								$fileUrl = $object->$method('url', $fileData[0]['returnFolder'], $fileNameField);
+								$fileOriginalUrl = $object->$method('url', 'original', $fileNameField);
 							} else {
 								$method = $method ? $method : "file";
 								$fileUrl = $fileOriginalUrl = $object->$method('url', $fileNameField);
@@ -346,7 +346,7 @@ class AdminController extends Controller {
 				'modelConfig' => new ModelConfig()
 			);
 
-			return \View::make("gtcms.admin.elements.updateLanguages")->with($data);
+			return \View::make("gtcms.elements.updateLanguages")->with($data);
 		} else {
 			\Session::set('accessDenied', true);
 			return self::restricted();
@@ -427,7 +427,7 @@ class AdminController extends Controller {
 				'modelConfig' => new ModelConfig()
 			);
 
-			return \View::make("gtcms.admin.elements.optimizationOptions")->with($data);
+			return \View::make("gtcms.elements.optimizationOptions")->with($data);
 		} else {
 			\Session::set('accessDenied', true);
 			return self::restricted();

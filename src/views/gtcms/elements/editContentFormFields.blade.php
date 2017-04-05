@@ -415,7 +415,7 @@ foreach ($formFields as $field) {
 			}
 
 			?>
-			@include("gtcms.admin.elements.imageUpload")
+			@include("gtcms.elements.imageUpload")
 			<?php
 
 			// ----------- FILE ------------
@@ -429,7 +429,7 @@ foreach ($formFields as $field) {
 			}
 
 			?>
-			@include("gtcms.admin.elements.fileUpload")
+			@include("gtcms.elements.fileUpload")
 			<?php
 
 			// ----------- DATE / DATETIME ------------
