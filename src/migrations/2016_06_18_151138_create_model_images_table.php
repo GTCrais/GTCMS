@@ -16,8 +16,7 @@ class CreateModelImagesTable extends Migration
             $table->increments('id');
 			$table->string('imagename')->nullable();
 			$table->string('caption')->nullable();
-			$table->dateTime('created_at')->nullable();
-			$table->dateTime('updated_at')->nullable();
+			$table->timestamps();
         });
     }
 

@@ -697,7 +697,7 @@ class BaseModel extends \Eloquent {
 		return $modelConfig;
 	}
 
-	public function isDeletable() {
+	public function isAddable() {
 		return true;
 	}
 
@@ -705,7 +705,11 @@ class BaseModel extends \Eloquent {
 		return true;
 	}
 
-	public function runMutators() {
+	public function isDeletable() {
+		return true;
+	}
+
+	public function runMutators($action) {
 		// Implement this method per model, if needed
 	}
 

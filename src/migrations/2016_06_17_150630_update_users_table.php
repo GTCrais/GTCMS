@@ -13,7 +13,7 @@ class UpdateUsersTable extends Migration
     public function up()
     {
 		Schema::table('users', function ($table) {
-			$table->dropColumn(['name', 'created_at', 'updated_at']);
+			$table->dropColumn(['name']);
 		});
 
 		Schema::table('users', function ($table) {
@@ -23,8 +23,6 @@ class UpdateUsersTable extends Migration
 			$table->string('first_name')->nullable()->after('role');
 			$table->string('last_name')->nullable()->after('first_name');
 			$table->boolean('is_superadmin')->nullable()->default('0')->after('last_name');
-			$table->dateTime('created_at')->nullable();
-			$table->dateTime('updated_at')->nullable();
 		});
     }
 
@@ -36,12 +34,11 @@ class UpdateUsersTable extends Migration
     public function down()
     {
 		Schema::table('users', function ($table) {
-			$table->dropColumn(['role', 'first_name', 'last_name', 'is_superadmin', 'created_at', 'updated_at']);
+			$table->dropColumn(['role', 'first_name', 'last_name', 'is_superadmin']);
 		});
 
 		Schema::table('users', function ($table) {
 			$table->string('name');
-			$table->timestamps();
 		});
     }
 }

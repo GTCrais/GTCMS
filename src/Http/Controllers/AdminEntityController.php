@@ -203,6 +203,11 @@ class AdminEntityController extends Controller {
 			$quickEdit = GtcmsPremium::getQuickEditVar();
 		}
 
+		if ($action == 'add' && !$object->isAddable()) {
+			\Session::put('accessDenied', true);
+			return \Redirect::route('restricted', ['getIgnore_isAjax' => \Request::get('getIgnore_isAjax')]);
+		}
+
 		if ($action == 'edit' && !$object->isEditable()) {
 			\Session::put('accessDenied', true);
 			return \Redirect::route('restricted', ['getIgnore_isAjax' => \Request::get('getIgnore_isAjax')]);

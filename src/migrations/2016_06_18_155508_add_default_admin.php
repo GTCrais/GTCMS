@@ -19,8 +19,8 @@ class AddDefaultAdmin extends Migration
 			'last_name' => 'Admin',
 			'is_superadmin' => 1,
 			'role' => 'admin',
-			'created_at' => date('Y-m-d H:i:s'),
-			'updated_at' => date('Y-m-d H:i:s')
+			'created_at' => \Carbon\Carbon::now(),
+			'updated_at' => \Carbon\Carbon::now()
 		));
     }
 

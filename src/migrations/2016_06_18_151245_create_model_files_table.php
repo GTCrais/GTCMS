@@ -16,8 +16,7 @@ class CreateModelFilesTable extends Migration
             $table->increments('id');
 			$table->string('filename')->nullable();
 			$table->string('title')->nullable();
-			$table->dateTime('created_at')->nullable();
-			$table->dateTime('updated_at')->nullable();
+			$table->timestamps();
         });
     }
 

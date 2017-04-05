@@ -35,7 +35,7 @@ class AdminEntityHandler {
 			AdminEntityHandler::generateSlug($modelConfig, $object, null, false, $originalObject, 0, $action);
 			AdminEntityHandler::manyToMany($modelConfig, $input, $object);
 
-			$object->runMutators();
+			$object->runMutators($action);
 
 			// Set correct positions when adding entry
 			if ($action == 'add') {
