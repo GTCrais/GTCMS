@@ -16,7 +16,7 @@
 		$relatedModelConfig = AdminHelper::modelExists($relatedModel->name);
 
 		$prependGets = "?" . $modelConfig->id . "=" . ($object->id ? $object->id : "new_gtcms_entry");
-		$gets = $prependGets . Tools::getGets([], false, "&");
+		$gets = $prependGets . Tools::getGets([$modelConfig->id => null], false, "&");
 
 		$configInParent = $relatedModel;
 

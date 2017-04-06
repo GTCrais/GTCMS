@@ -2,6 +2,7 @@
 
 namespace App\Classes;
 
+use Illuminate\Support\Str;
 use Monolog\ErrorHandler;
 
 class AdminHistoryManager {
@@ -30,6 +31,8 @@ class AdminHistoryManager {
 			$link = (array_shift($url)) . Tools::getGets();
 		}
 
+		$link = self::cleanLink($link);
+
 		$subtract = config('gtcms.cmsPrefix') ? 0 : 1;
 
 		if (!$modelName) {
@@ -38,7 +41,7 @@ class AdminHistoryManager {
 
 		$linkSegments = explode("/", $link);
 		$action = isset($linkSegments[3 - $subtract]) ? $linkSegments[3 - $subtract] : false;
-		$addLink = isset($linkSegments[4 - $subtract]) && $linkSegments[4 - $subtract] == "new" ? true : false;
+		$addLink = isset($linkSegments[4 - $subtract]) && ($linkSegments[4 - $subtract] == "new" || Str::startsWith($linkSegments[4 - $subtract], "new?"))  ? true : false;
 
 		$modelConfig = AdminHelper::modelExists($modelName);
 
@@ -109,6 +112,8 @@ class AdminHistoryManager {
 			$links = array();
 		}
 
+		$link = self::cleanLink($link);
+
 		$setLinks = false;
 		if (count($links)) {
 			foreach ($links as $index => $cLink) {
@@ -128,6 +133,16 @@ class AdminHistoryManager {
 
 	public static function clearHistory() {
 		\Session::forget('adminHistoryLinks');
+	}
+
+	private static function cleanLink($link) {
+		$baseUrl = \URL::to(AdminHelper::getCmsPrefix());
+
+		if (Str::startsWith($link, $baseUrl)) {
+			return substr($link, strlen($baseUrl));
+		}
+
+		return $link;
 	}
 
 }

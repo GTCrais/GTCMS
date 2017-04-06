@@ -18,8 +18,8 @@ class AddHomepage extends Migration
 			'name' => 'Homepage',
 			'title' => 'Homepage',
 			'model_key' => 'standard',
-			'created_at' => date('Y-m-d H:i:s'),
-			'updated_at' => date('Y-m-d H:i:s')
+			'created_at' => \Carbon\Carbon::now(),
+			'updated_at' => \Carbon\Carbon::now()
 		));
     }
 

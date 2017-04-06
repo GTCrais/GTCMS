@@ -69,19 +69,10 @@ return [
 				),
 				array(
 					'property' => 'filename',
-					'displayProperty' => array(
-						'type' => 'file',
-						'display' => 'url',
-						'method' => 'file'
-					),
 					'label' => 'File',
-					'info' => 'Leave empty to keep current file.',
 					'type' => 'file',
 					'rules' => 'mimes:pdf',
-					'sideTable' => true,
-					'hiddenInfo' => array(
-						'add' => true
-					)
+					'sideTable' => true
 				),
 			),
 		),
@@ -159,7 +150,10 @@ return [
 				array(
 					'property' => 'meta_keywords',
 					'label' => 'Meta Keywords',
-					'type' => 'text',
+					'type' => 'textarea',
+					'options' => array(
+						'class' => 'autosize'
+					),
 					'tab' => 'Meta'
 				),
 				array(
@@ -167,7 +161,7 @@ return [
 					'label' => 'Meta Description',
 					'type' => 'textarea',
 					'options' => array(
-						'class' => 'shortTextarea'
+						'class' => 'autosize'
 					),
 					'tab' => 'Meta'
 				)

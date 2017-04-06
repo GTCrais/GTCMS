@@ -2,6 +2,8 @@
 /public/storage
 /vendor
 /public/components
+/public/img/modelImages
+/public/file/modelFiles
 /.idea
 Homestead.json
 Homestead.yaml

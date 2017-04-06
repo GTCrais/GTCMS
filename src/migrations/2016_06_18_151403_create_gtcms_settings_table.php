@@ -16,8 +16,7 @@ class CreateGtcmsSettingsTable extends Migration
             $table->increments('id');
 			$table->string('setting_key')->nullable();
 			$table->string('setting_value')->nullable();
-			$table->dateTime('created_at')->nullable();
-			$table->dateTime('updated_at')->nullable();
+			$table->timestamps();
         });
     }
 
