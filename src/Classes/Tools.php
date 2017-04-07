@@ -108,16 +108,16 @@ class Tools {
 			$thisparents = "(" . $thisparents . ") ";
 			if ($thisparents == "() ") $thisparents = "";
 
-			$items[$item->$params['arrayKey']] = $thisparents.$keyValue.$spaces.($item->$params['itemName']);
+			$items[$item->{$params['arrayKey']}] = $thisparents.$keyValue.$spaces.($item->{$params['itemName']});
 
 			$subItems = new Collection();
 			if ($params['subItemName']) {
-				$subItems = $item->$params['subItemName'];
+				$subItems = $item->{$params['subItemName']};
 			}
 			if ($params['subItemName'] && ($subItems->count())) {
 				$params['depth'] = $params['depth'] + 1;
 				if ($params['parent']) {
-					$params['parent'] = $item->$params['itemName'];
+					$params['parent'] = $item->{$params['itemName']};
 				} else {
 					$params['parents'] = array();
 				}
@@ -128,6 +128,7 @@ class Tools {
 			$params['parent'] = $originalParent;
 
 		}
+
 		return $items;
 	}
 
