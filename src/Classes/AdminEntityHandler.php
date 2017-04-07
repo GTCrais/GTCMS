@@ -38,6 +38,9 @@ class AdminEntityHandler {
 			$object->runMutators($action);
 
 			// Set correct positions when adding entry
+			// This will only apply to table-index because for tree-index
+			// $parentData['allParents'] will be empty, as intended
+
 			if ($action == 'add') {
 				$parentData = (new BaseModel())->getParentData($modelConfig);
 				/** @var BaseModel $entity */

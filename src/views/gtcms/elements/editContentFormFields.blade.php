@@ -1,7 +1,7 @@
 <?php
 if ($modelConfig->index == 'tree' && $object->id) {
 	$parentIdProperty = $modelConfig->parent->property;
-	echo Form::hidden($parentIdProperty, $object->$parentIdProperty, array());
+	//echo Form::hidden($parentIdProperty, $object->$parentIdProperty, array());
 }
 
 if ($quickEdit) {

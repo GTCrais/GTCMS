@@ -138,7 +138,7 @@ class BaseModel extends \Eloquent {
 				$depth = ($parentData['parentObject']->depth) + 1;
 			}
 
-			$maxPos = static::getMaxPos('position', $parentData);
+			$maxPos = static::getMaxPositionInTree('position', $parentData);
 			$data['depth'] = $depth;
 			$data['position'] = $maxPos + 1;
 
@@ -149,12 +149,50 @@ class BaseModel extends \Eloquent {
 			}
 		} else {
 			if ($modelConfig->position) {
-				$maxPos = static::getMaxPos('position', false);
-				$data['position'] = $maxPos + 1;
+				$data['position'] = static::getNextTablePosition();
 			}
 		}
 
 		return (new static)->newQuery()->create($data);
+	}
+
+	public static function getMaxPositionInTree($positionProperty = 'position', $parentData = NULL)
+	{
+		/** @var BaseModel $model */
+		$model = get_called_class();
+		$object = new static;
+		$parentId = false;
+		if (is_null($parentData)) {
+			$parentData = $object->getParentData();
+		}
+
+		$parentIdProperty = NULL;
+		if ($parentData) {
+			$parentId = $parentData['parentId'];
+			$parentIdProperty = $parentData['parentIdProperty'];
+		}
+
+		if ($parentIdProperty) {
+			$object = $model::where($parentIdProperty, $parentId)->orderBy($positionProperty, 'desc')->first();
+			if ($object) {
+				return $object->$positionProperty;
+			} else {
+				return 0;
+			}
+		} else {
+			$object = $model::where('id', '>', 0)->orderBy($positionProperty, 'desc')->first();
+			if ($object) {
+				return $object->$positionProperty;
+			} else {
+				return 0;
+			}
+		}
+
+	}
+
+	private static function getNextTablePosition()
+	{
+		return number_format(microtime(true), 3, "", "");
 	}
 
 	public static function getPositionPropertyAndValueFromParentData($parentData, $modelConfig) {
@@ -166,13 +204,8 @@ class BaseModel extends \Eloquent {
 					foreach ($parentModelConfig->relatedModels as $relatedModel) {
 						if ($relatedModel->name == $modelConfig->name) {
 							if ($relatedModel->position) {
-								$maxPosData = array(
-									'parentIdProperty' => $parentIdProperty,
-									'parentId' => $parentId
-								);
 								$positionProperty = $relatedModel->positionProperty;
-								$maxPos = static::getMaxPos($positionProperty, $maxPosData);
-								$positionProperties[$positionProperty] = $maxPos + 1;
+								$positionProperties[$positionProperty] = static::getNextTablePosition();
 							}
 							break;
 						}
@@ -192,80 +225,10 @@ class BaseModel extends \Eloquent {
 			if ($modelConfig->index == 'tree') {
 				$parentIdProperty = $modelConfig->parent->property;
 				\DB::table($this->table)->where($parentIdProperty, $this->$parentIdProperty)->where('position', '>', $this->position)->decrement('position');
-			} else {
-				if ($modelConfig->position) {
-					\DB::table($this->table)->where('position', '>', $this->position)->decrement('position');
-				}
 			}
 
-			if ($modelConfig->getModelParents()) {
-				foreach ($modelConfig->getModelParents() as $parentIdProperty) {
-					if ($this->$parentIdProperty) {
-						$parentModelConfig = AdminHelper::modelExists($parentIdProperty, 'id');
-						$relatedData = $this->relatedModelConfiguration($modelConfig->name, $parentModelConfig);
-						if ($relatedData->position) {
-							$positionProperty = $relatedData->positionProperty;
-							\DB::table($this->table)->where($parentIdProperty, $this->$parentIdProperty)->where($positionProperty, '>', $this->$positionProperty)->decrement($positionProperty);
-						}
-					}
-				}
-			}
-
-			$relatedModelData = array();
-			if ($modelConfig->relatedModels) {
-				foreach ($modelConfig->relatedModels as $relatedModel) {
-					$method = $relatedModel->method;
-					if ($this->$method->count()) {
-						/** @var ModelConfig $relatedModelConfig */
-						$relatedModelConfig = AdminHelper::modelExists($relatedModel->name);
-						if ($relatedModelConfig->position) {
-							$relatedIds = $this->$method()->orderBy('position', 'asc')->pluck('position', 'id');
-							$relatedModelData[] = array(
-								'fullEntityName' => $relatedModelConfig->myFullEntityName(),
-								'relatedIds' => $relatedIds->toArray()
-							);
-						}
-					}
-				}
-			}
-
-			$deleteResult = parent::delete();
-
-			if ($relatedModelData) {
-				foreach ($relatedModelData as $dataSet) {
-					BaseModel::fixPositions($dataSet['fullEntityName'], $dataSet['relatedIds']);
-				}
-			}
-
-			return $deleteResult;
+			return parent::delete();
 		});
-
-	}
-
-	public static function fixPositions($modelName, $relatedIdData) {
-
-		$relatedIds = array_keys($relatedIdData);
-		$positions = array_values($relatedIdData);
-
-		// First make sure that all of the related objects have actually been deleted
-
-		/** @var BaseModel $modelName */
-		if (!$modelName::whereIn('id', $relatedIds)->count('id')) {
-
-			// Fix positioning of the remaining objects
-			foreach ($positions as $counter => $position) {
-				$currentPosition = $position;
-				if (isset($positions[$counter + 1])) {
-					$nextPosition = $positions[$counter + 1];
-					$modelName::where('position', '>', $currentPosition)
-						->where('position', '<', $nextPosition)
-						->decrement('position', $counter + 1);
-				} else {
-					$modelName::where('position', '>', $currentPosition)
-						->decrement('position', $counter + 1);
-				}
-			}
-		}
 
 	}
 
@@ -505,45 +468,6 @@ class BaseModel extends \Eloquent {
 		return $mb . " MB";
 	}
 
-	public static function getMaxPos($positionProperty = 'position', $parentData = NULL, $object = NULL, $tableType = 'table') {
-		/** @var BaseModel $model */
-		$model = get_called_class();
-		$object = $object ? $object : new static;
-		$parentId = false;
-		if (is_null($parentData)) {
-			$parentData = $object->getParentData();
-		}
-
-		$parentIdProperty = NULL;
-		if ($parentData) {
-			$parentId = $parentData['parentId'];
-			$parentIdProperty = $parentData['parentIdProperty'];
-		}
-
-		if ($tableType == 'sideTable') {
-			$sideTableData = $object->getSideTableParentModelData();
-			$parentIdProperty = $sideTableData['parentIdProperty'];
-			$parentId = $sideTableData['parentId'];
-		}
-
-		if ($parentIdProperty) {
-			$object = $model::where($parentIdProperty, $parentId)->orderBy($positionProperty, 'desc')->first();
-			if ($object) {
-				return $object->$positionProperty;
-			} else {
-				return 0;
-			}
-		} else {
-			$object = $model::where('id', '>', 0)->orderBy($positionProperty, 'desc')->first();
-			if ($object) {
-				return $object->$positionProperty;
-			} else {
-				return 0;
-			}
-		}
-
-	}
-
 	public function getParentData($modelConfig = NULL) {
 
 		$parentIdProperty = NULL;
@@ -578,6 +502,13 @@ class BaseModel extends \Eloquent {
 						if ($parentObject) {
 							$parentId = $id;
 							$parentFound = true;
+
+							// We don't want to set $allParents for tree-index Models
+							// because we don't want don't want AdminEntityHandler to set
+							// position for tree-index objects when adding them,
+							// so we check for Standalone, or presence of addToParent
+							// which is not present for tree-index operations
+
 							if ($modelConfig->standalone === false || isset($_GET['addToParent'])) {
 								$allParents[$parentIdProperty] = $id;
 							}
@@ -614,6 +545,9 @@ class BaseModel extends \Eloquent {
 		if (!$parentFound && $modelConfig->index == 'tree') {
 			$parentIdProperty = $modelConfig->parent->property;
 			$parentId = $this->$parentIdProperty;
+
+			// Intentionally don't set $allParents
+
 		}
 
 		$data = array(
