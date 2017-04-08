@@ -203,7 +203,7 @@ class BaseModel extends \Eloquent
 		return number_format(microtime(true), 3, "", "");
 	}
 
-	public static function getPositionPropertyAndValueFromParentData($parentData, $modelConfig)
+	public static function getPositionPropertyDataFromParentData($parentData, $modelConfig)
 	{
 		$positionProperties = array();
 		if ($parentData['allParents']) {
@@ -214,7 +214,10 @@ class BaseModel extends \Eloquent
 						if ($relatedModel->name == $modelConfig->name) {
 							if ($relatedModel->position) {
 								$positionProperty = $relatedModel->positionProperty;
-								$positionProperties[$positionProperty] = static::getNextTablePosition();
+								$positionProperties[$positionProperty] = [
+									'value' => static::getNextTablePosition(),
+									'parentIdProperty' => $parentIdProperty
+								];
 							}
 							break;
 						}

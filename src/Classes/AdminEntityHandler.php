@@ -37,25 +37,29 @@ class AdminEntityHandler
 
 			$object->runMutators($action);
 
-			// Set correct positions when adding entry
+			// Set correct position_in_parent values when adding
+			// an entry or changing entry's parent(s).
 			// This will only apply to table-index because for tree-index
 			// $parentData['allParents'] will be empty, as intended
 
-			if ($action == 'add') {
-				$parentData = (new BaseModel())->getParentData($modelConfig);
-				/** @var BaseModel $entity */
-				/** @var ModelConfig $modelConfig */
-				$entity = $modelConfig->myFullEntityName();
-				$positionProperties = $entity::getPositionPropertyAndValueFromParentData($parentData, $modelConfig);
-				if ($positionProperties) {
-					foreach ($positionProperties as $positionProperty => $value) {
+			$parentData = (new BaseModel())->getParentData($modelConfig);
+			/** @var BaseModel $entity */
+			/** @var ModelConfig $modelConfig */
+			$entity = $modelConfig->myFullEntityName();
+			$positionProperties = $entity::getPositionPropertyDataFromParentData($parentData, $modelConfig);
+			if ($positionProperties) {
+				foreach ($positionProperties as $positionProperty => $data) {
+					$value = $data['value'];
+					$parentIdProperty = $data['parentIdProperty'];
+
+					// If new parentId is NULL, the old position will remain,
+					// but that doesn't really matter
+
+					if ($action == 'add' || $object->$parentIdProperty != $originalObject->$parentIdProperty) {
 						$object->$positionProperty = $value;
 					}
 				}
 			}
-
-			// Set correct position when changing entries parent:
-			// Basically...don't allow this to be done through the CMS.
 
 			$object->save();
 		});

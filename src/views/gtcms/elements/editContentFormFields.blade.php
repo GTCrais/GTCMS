@@ -328,13 +328,13 @@ foreach ($formFields as $field) {
 					echo Form::hidden($field->property, $_GET[$field->property]);
 					echo Form::text('dummy', $list[$_GET[$field->property]], $options);
 				} else {
-					Throw new Exception("You are not allowed to add ".$modelConfig->hrNamePlural." for this model, or non-existing parent model.");
+					throw new \Exception("You are not allowed to add " . $modelConfig->hrNamePlural . " for this model, or non-existing parent model.");
 				}
 			} else {
 				$options['placeholder'] = is_string($field->selectablePlaceholder) ? $field->selectablePlaceholder : " - ";
 				$options['class'] .= $field->create ? ' doSelectize selectizeCreate ' : ' doSelectize selectizeNoCreate ';
 				$options['class'] .= $field->selectablePlaceholder ? " selectablePlaceholder " : '';
-				echo Form::select($field->property, $list, \Request::old($field->property) ? \Request::old($field->property) : $originalValue, $options);
+				echo Form::select($field->property, $list, $originalValue, $options);
 			}
 
 			// ----------- MULTISELECT ------------
