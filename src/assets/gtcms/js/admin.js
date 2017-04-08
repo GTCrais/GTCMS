@@ -1347,10 +1347,18 @@ function loadLoginForm() {
 		}
 
 		var form = $("form.entityForm.loginForm");
+		var loginLogo = $("img.login-logo");
+
 		setTimeout(function () {
 			form.animate({
 				opacity: 1
 			}, 500);
+
+			if (loginLogo.length) {
+				loginLogo.animate({
+					opacity: 1
+				}, 500);
+			}
 		}, 500);
 	}
 }

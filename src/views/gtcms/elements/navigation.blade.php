@@ -7,9 +7,12 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="{{AdminHelper::getCmsPrefix()}}">
-				<img src="{{asset('img/gtcms-logo.png')}}" height="28" />
-			</a>
+
+			@if (config('gtcms.navigationLogo'))
+				<a class="navbar-brand" href="{{AdminHelper::getCmsPrefix()}}">
+					<img src="{{asset('img/' . config('gtcms.navigationLogo'))}}" height="22" />
+				</a>
+			@endif
 		</div>
 
 		<ul class="nav navbar-top-links navbar-right">

@@ -277,7 +277,8 @@ textarea {
 }
 
 .navbar-brand
-  padding 11px 15px
+  padding 14px 15px
+  height 44px
 
 .sidebar
   .nav
@@ -497,9 +498,16 @@ body.loginBody
   background-color white
 
 .login-panel.panel
-  margin-top 200px
+  margin-top 0
+  padding-top calc(50vh - 330px)
   box-shadow none
   border none
+
+  .login-logo
+    opacity 0
+    max-width 100%
+    margin 0 auto 40px
+    display block
 
 form.loginForm
   opacity 0

@@ -25,6 +25,8 @@ return [
 	'contactMessageSubject' => '[Site Name] - New message',
 	'ogImage' => false,
 	'skin' => 'dark',
+	'loginLogo' => 'gtcms-login-logo.png',
+	'navigationLogo' => 'gtcms-nav-logo.png',
 	'faIconColors' => [
 		'#0088cc', // blue
 		'#989898', // grey
