@@ -17,9 +17,9 @@ class PageController extends Controller
 			$homepage = Page::where('depth', 0)->first();
 			PageMetaManager::setPage($homepage);
 
-			$data = array(
+			$data = [
 				'cPage' => $homepage
-			);
+			];
 
 			return view()->make('front.elements.homepage')->with($data);
 
@@ -33,9 +33,9 @@ class PageController extends Controller
 			$cPage = Page::where($slugString, $slug)->first();
 			if ($cPage) {
 				PageMetaManager::setPage($cPage);
-				$data = array(
+				$data = [
 					'cPage' => $cPage
-				);
+				];
 
 				return view()->make('front.elements.page')->with($data);
 			}
@@ -46,7 +46,7 @@ class PageController extends Controller
 
 	public function compose(View $view)
 	{
-		$navPages = Page::where('depth', 1)->orderBy('position')->with(array('pages'))->get();
+		$navPages = Page::where('depth', 1)->orderBy('position')->with(['pages'])->get();
 		//$home = Page::where('model_key', 'home')->first();
 
 		$view->with(compact('navPages'));

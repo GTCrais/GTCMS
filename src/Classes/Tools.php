@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Collection;
 
 class Tools
 {
-	public static function getGets(array $currentGets = array(), $array = false, $qMark = "?")
+	public static function getGets(array $currentGets = [], $array = false, $qMark = "?")
 	{
 		$gets = "";
-		$getsArray = array();
-		$added = array();
+		$getsArray = [];
+		$added = [];
 
 		if (isset($_GET)) {
-			foreach($_GET as $key=>$value) {
+			foreach ($_GET as $key => $value) {
 				if (strpos($key, "getIgnore") === false) {
 					if (!array_key_exists($key, $currentGets)) {
 						$gets .= "&" . $key . "=" . $value;
@@ -28,7 +28,7 @@ class Tools
 			}
 		}
 
-		foreach ($currentGets as $key=>$getValue) {
+		foreach ($currentGets as $key => $getValue) {
 			if (!isset($added[$key]) && $getValue !== NULL) {
 				$gets .= "&" . $key . "=" . $getValue;
 				$getsArray[$key] = $getValue;
@@ -36,7 +36,7 @@ class Tools
 		}
 
 		if ($gets != "") {
-			$gets = ltrim ($gets,'&');
+			$gets = ltrim($gets, '&');
 			if ($qMark) {
 				$gets = $qMark . $gets;
 			}
@@ -53,8 +53,8 @@ class Tools
 	{
 		$gets = "";
 		if (isset($_GET)) {
-			foreach($_GET as $key=>$value) {
-				if (in_array($key, array('orderBy', 'direction', 'page')) && !$skipOrderGets) {
+			foreach ($_GET as $key => $value) {
+				if (in_array($key, ['orderBy', 'direction', 'page']) && !$skipOrderGets) {
 					$gets .= "&" . $key . "=" . $value;
 				}
 				if (strpos($key, "search_") === 0 && $value && !$skipSearchGets) {
@@ -64,7 +64,7 @@ class Tools
 		}
 
 		if ($gets != "") {
-			$gets = ltrim ($gets,'&');
+			$gets = ltrim($gets, '&');
 			if ($qMark) {
 				$gets = "?" . $gets;
 			} else if ($ampersand) {
@@ -75,15 +75,15 @@ class Tools
 		return $gets;
 	}
 
-	public static function createItemList($itemTree = NULL, &$items, array $params = array())
+	public static function createItemList($itemTree = null, &$items, array $params = [])
 	{
 		if (!isset($params['depth'])) $params['depth'] = 0;
 		if (!isset($params['itemName'])) $params['itemName'] = 'name';
-		if (!isset($params['subItemName'])) $params['subItemName'] = NULL;
-		if (!isset($params['showSpaces'])) $params['showSpaces'] = TRUE;
-		if (!isset($params['parent'])) $params['parent'] = FALSE;
-		if (!isset($params['parents'])) $params['parents'] = array();
-		if (!isset($params['key'])) $params['key'] = NULL;
+		if (!isset($params['subItemName'])) $params['subItemName'] = null;
+		if (!isset($params['showSpaces'])) $params['showSpaces'] = true;
+		if (!isset($params['parent'])) $params['parent'] = false;
+		if (!isset($params['parents'])) $params['parents'] = [];
+		if (!isset($params['key'])) $params['key'] = null;
 		if (!isset($params['arrayKey'])) $params['arrayKey'] = 'id';
 
 		$spaces = "";
@@ -112,11 +112,11 @@ class Tools
 			}
 
 			$thisparents = $params['parents'];
-			$thisparents = implode(", ",$thisparents);
+			$thisparents = implode(", ", $thisparents);
 			$thisparents = "(" . $thisparents . ") ";
 			if ($thisparents == "() ") $thisparents = "";
 
-			$items[$item->{$params['arrayKey']}] = $thisparents.$keyValue.$spaces.($item->{$params['itemName']});
+			$items[$item->{$params['arrayKey']}] = $thisparents . $keyValue . $spaces . ($item->{$params['itemName']});
 
 			$subItems = new Collection();
 			if ($params['subItemName']) {
@@ -127,7 +127,7 @@ class Tools
 				if ($params['parent']) {
 					$params['parent'] = $item->{$params['itemName']};
 				} else {
-					$params['parents'] = array();
+					$params['parents'] = [];
 				}
 				self::createItemList($subItems, $items, $params);
 			}
@@ -143,10 +143,11 @@ class Tools
 	public static function createMultiSelectList($itemList)
 	{
 		if (is_array($itemList)) {
-			$msItemList = array();
+			$msItemList = [];
 			foreach ($itemList as $key => $value) {
 				$msItemList[] = $key;
 			}
+
 			return $msItemList;
 		}
 
@@ -160,11 +161,11 @@ class Tools
 
 	public static function lorem($paragraphsNum = 1)
 	{
-		$paragraphs = array(
+		$paragraphs = [
 			"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pharetra luctus mattis. Sed facilisis, enim eget blandit tincidunt, mi mi pharetra enim, rutrum dictum enim mi in turpis.",
 			"Nam imperdiet magna sed luctus mattis. Aliquam faucibus luctus pellentesque. Donec quis nibh quis risus feugiat eleifend. Sed urna nibh, laoreet quis fringilla vel, tempus vel velit. Curabitur malesuada odio ut sapien sodales ullamcorper nec id purus.",
 			"Proin egestas dolor eu dapibus tempor. Nunc in sem quis justo volutpat rutrum. Nam quis est tempus, malesuada ante id, tristique mi. Mauris quis aliquam urna."
-		);
+		];
 		$output = [];
 
 		for ($i = 1; $i <= $paragraphsNum; $i++) {
@@ -199,10 +200,10 @@ class Tools
 			return false;
 		}
 
-		return array(
+		return [
 			'sourceKey' => $sourceKey,
 			'originalId' => $originalId
-		);
+		];
 	}
 
 	public static function appendToFilename($filename, $string, $glue = "-")
@@ -213,6 +214,7 @@ class Tools
 		$filename = implode(".", $parts);
 
 		$newFilename = $filename . $glue . $string . "." . $ext;
+
 		return $newFilename;
 	}
 

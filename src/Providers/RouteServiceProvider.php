@@ -7,35 +7,35 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 
 class RouteServiceProvider extends ServiceProvider
 {
-    /**
-     * This namespace is applied to your controller routes.
-     *
-     * In addition, it is set as the URL generator's root namespace.
-     *
-     * @var string
-     */
-    protected $namespace = 'App\Http\Controllers';
+	/**
+	 * This namespace is applied to your controller routes.
+	 *
+	 * In addition, it is set as the URL generator's root namespace.
+	 *
+	 * @var string
+	 */
+	protected $namespace = 'App\Http\Controllers';
 
-    /**
-     * Define your route model bindings, pattern filters, etc.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        //
+	/**
+	 * Define your route model bindings, pattern filters, etc.
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+		//
 
-        parent::boot();
-    }
+		parent::boot();
+	}
 
-    /**
-     * Define the routes for the application.
-     *
-     * @return void
-     */
-    public function map()
-    {
-        //$this->mapApiRoutes();
+	/**
+	 * Define the routes for the application.
+	 *
+	 * @return void
+	 */
+	public function map()
+	{
+		//$this->mapApiRoutes();
 
 		$adminRoute = $this->mapAdminRoutes();
 
@@ -53,7 +53,7 @@ class RouteServiceProvider extends ServiceProvider
 
 			\Route::match(['post', 'get'], '{segments}', $this->namespace . '\AdminController@redirectToAdmin')->where('segments', '(.*)');
 		}
-    }
+	}
 
 	protected function mapAdminRoutes()
 	{
@@ -70,15 +70,15 @@ class RouteServiceProvider extends ServiceProvider
 		return (!config('gtcms.cmsPrefix') || request()->segment(1) == config('gtcms.cmsPrefix')) ? true : false;
 	}
 
-    /**
-     * Define the "web" routes for the application.
-     *
-     * These routes all receive session state, CSRF protection, etc.
-     *
-     * @return void
-     */
-    protected function mapWebRoutes()
-    {
+	/**
+	 * Define the "web" routes for the application.
+	 *
+	 * These routes all receive session state, CSRF protection, etc.
+	 *
+	 * @return void
+	 */
+	protected function mapWebRoutes()
+	{
 		$languages = config('gtcmslang.languages');
 		$defaultLocale = config('gtcmslang.defaultLocale');
 		$siteIsMultilingual = config('gtcms.premium') && config('gtcmslang.siteIsMultilingual');
@@ -91,30 +91,30 @@ class RouteServiceProvider extends ServiceProvider
 			$locale = null;
 		}
 
-        \Route::group([
+		\Route::group([
 			'prefix' => $locale,
-            'middleware' => 'web',
-            'namespace' => $this->namespace,
-        ], function ($router) {
-            require base_path('routes/web.php');
-        });
-    }
+			'middleware' => 'web',
+			'namespace' => $this->namespace,
+		], function ($router) {
+			require base_path('routes/web.php');
+		});
+	}
 
-    /**
-     * Define the "api" routes for the application.
-     *
-     * These routes are typically stateless.
-     *
-     * @return void
-     */
-    protected function mapApiRoutes()
-    {
-        \Route::group([
-            'middleware' => 'api',
-            'namespace' => $this->namespace,
-            'prefix' => 'api',
-        ], function ($router) {
-            require base_path('routes/api.php');
-        });
-    }
+	/**
+	 * Define the "api" routes for the application.
+	 *
+	 * These routes are typically stateless.
+	 *
+	 * @return void
+	 */
+	protected function mapApiRoutes()
+	{
+		\Route::group([
+			'middleware' => 'api',
+			'namespace' => $this->namespace,
+			'prefix' => 'api',
+		], function ($router) {
+			require base_path('routes/api.php');
+		});
+	}
 }

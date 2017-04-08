@@ -2,8 +2,8 @@
 
 // HRV
 
-return array(
+return [
 	'login' => 'prijava',
 	'logout' => 'odjava',
 	'register' => 'registracija'
-);
+];

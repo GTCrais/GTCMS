@@ -18,13 +18,13 @@ class UserController extends Controller
 		$remember = $request->has('remember_me') && $request->get('remember_me') ? true : false;
 
 		if (!$email || !$password) {
-			return redirect()->route('home')->with(array('loginError' => trans('t.emptyLoginField')))->withInput();
+			return redirect()->route('home')->with(['loginError' => trans('t.emptyLoginField')])->withInput();
 		}
 
-		if (auth()->attempt(array('email' => $email, 'password' => $password), $remember)) {
+		if (auth()->attempt(['email' => $email, 'password' => $password], $remember)) {
 			return redirect()->route('home');
 		} else {
-			return redirect()->route('home')->with(array('loginError' => trans('t.incorrectLoginField')))->withInput();
+			return redirect()->route('home')->with(['loginError' => trans('t.incorrectLoginField')])->withInput();
 		}
 	}
 
@@ -44,7 +44,7 @@ class UserController extends Controller
 		}
 
 		if ($request->all()) {
-			$rules = array();
+			$rules = [];
 			$rules['email'] = "required|email|unique:users,email";
 			$rules['password'] = 'required|min:7|confirmed';
 			$rules['firstName'] = "required";

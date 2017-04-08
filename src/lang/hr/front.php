@@ -2,7 +2,7 @@
 
 // HRV
 
-return array(
+return [
 
 	'langAttribute' => 'en-US',
 
@@ -54,7 +54,7 @@ return array(
 	'contactErrorTitle' => 'Greška',
 	'contactErrorMessage' => 'Došlo je do greške. Osvježite stranicu i pokušajte ponovo.',
 
-);
+];
 
 
 

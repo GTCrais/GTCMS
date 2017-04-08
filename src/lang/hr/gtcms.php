@@ -2,7 +2,7 @@
 
 // HRV
 
-return array(
+return [
 
 	'minimumDimensions' => 'Minimalne dimenzije',
 	'save' => 'Spremi',
@@ -44,4 +44,4 @@ return array(
 	// Exceptions
 	'createOnTheFlyTooLong' => 'Svaki zapis može imati najviše 50 znakova.',
 
-);
+];

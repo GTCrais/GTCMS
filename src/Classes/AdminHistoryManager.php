@@ -12,7 +12,7 @@ class AdminHistoryManager
 		if (session('adminHistoryLinks')) {
 			$links = session('adminHistoryLinks');
 		} else {
-			$links = array();
+			$links = [];
 		}
 
 		if ($removeLast && $links) {
@@ -27,7 +27,7 @@ class AdminHistoryManager
 		if (session('adminHistoryLinks')) {
 			$links = session('adminHistoryLinks');
 		} else {
-			$links = array();
+			$links = [];
 		}
 
 		if (!$link) {
@@ -45,7 +45,7 @@ class AdminHistoryManager
 
 		$linkSegments = explode("/", $link);
 		$action = isset($linkSegments[3 - $subtract]) ? $linkSegments[3 - $subtract] : false;
-		$addLink = isset($linkSegments[4 - $subtract]) && ($linkSegments[4 - $subtract] == "new" || Str::startsWith($linkSegments[4 - $subtract], "new?"))  ? true : false;
+		$addLink = isset($linkSegments[4 - $subtract]) && ($linkSegments[4 - $subtract] == "new" || Str::startsWith($linkSegments[4 - $subtract], "new?")) ? true : false;
 
 		$modelConfig = AdminHelper::modelExists($modelName);
 
@@ -55,14 +55,14 @@ class AdminHistoryManager
 			$returnModelName = $modelConfig ? (count(request()->segments()) > (2 - $subtract) && request()->segment(3 - $subtract) == 'edit' ? $modelConfig->hrName : $modelConfig->hrNamePlural) : $modelName;
 		}
 
-		$currentLinkData = array(
+		$currentLinkData = [
 			'link' => $link,
 			'action' => $action,
 			'addLink' => $addLink,
 			'modelConfigName' => $modelConfig ? $modelConfig->name : $modelName,
 			'modelName' => $returnModelName,
 			'modelIcon' => $modelConfig && $modelConfig->faIcon ? $modelConfig->faIcon : 'fa-circle'
-		);
+		];
 
 		$tempLinks = $links;
 		if (count($links)) {
@@ -116,7 +116,7 @@ class AdminHistoryManager
 		if (session('adminHistoryLinks')) {
 			$links = session('adminHistoryLinks');
 		} else {
-			$links = array();
+			$links = [];
 		}
 
 		$link = self::cleanLink($link);

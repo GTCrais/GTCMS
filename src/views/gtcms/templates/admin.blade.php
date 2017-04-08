@@ -3,16 +3,16 @@
 
 	@include("gtcms.templates.adminTemplateHead")
 
-<body class="nav-{{AdminHelper::getNavigationSize()}} skin-{{config('gtcms.skin', 'dark')}}">
-	<div class="quickEditContainer"></div>
+	<body class="nav-{{AdminHelper::getNavigationSize()}} skin-{{config('gtcms.skin', 'dark')}}">
+		<div class="quickEditContainer"></div>
 
-	@include("gtcms.elements.navigation")
+		@include("gtcms.elements.navigation")
 
-	<div id="page-wrapper">
-		@yield('content')
-	</div>
+		<div id="page-wrapper">
+			@yield('content')
+		</div>
 
-	@include("gtcms.elements.modalDelete")
+		@include("gtcms.elements.modalDelete")
 
-</body>
+	</body>
 </html>

@@ -11,7 +11,7 @@ class AdminEntityHandler
 	public static function edit($object, ModelConfig $modelConfig)
 	{
 		/** @var BaseModel $object */
-		\DB::transaction(function() use (&$object, $modelConfig) {
+		\DB::transaction(function () use (&$object, $modelConfig) {
 			$originalObject = clone $object;
 
 			if ($object->id) {
@@ -71,7 +71,7 @@ class AdminEntityHandler
 	{
 		$input = AdminHelper::input($modelConfig, 'edit');
 
-		\DB::transaction(function() use ($input, $modelConfig){
+		\DB::transaction(function () use ($input, $modelConfig) {
 			foreach ($input as $settingKey => $settingValue) {
 				if ($settingKey != "_token") {
 					$setting = GtcmsSetting::where('setting_key', $settingKey)->first();
@@ -89,7 +89,7 @@ class AdminEntityHandler
 		foreach ($modelConfig->formFields as $field) {
 			if ($field->type == 'multiSelect' && $field->selectType->type == 'model') {
 				$method = $field->selectType->method;
-				$relatedIds = array();
+				$relatedIds = [];
 
 				if (config('gtcms.premium') && $field->create) {
 					GtcmsPremium::manyToManyCreate($modelConfig, $relatedIds, $field, $input);
@@ -128,7 +128,7 @@ class AdminEntityHandler
 			}
 
 			$iterations = 1;
-			$languages = array();
+			$languages = [];
 			if (config('gtcms.premium') && $modelConfig->langDependentSlug) {
 				$languages = config('gtcmslang.languages');
 				$iterations = count($languages);
@@ -182,7 +182,7 @@ class AdminEntityHandler
 						$counter++;
 					}
 
-				// Edit
+					// Edit
 				} else {
 					while ($modelName::where($slugProperty, $finalSlug)->where('id', '!=', $object->id)->count()) {
 						$finalSlug = $slug . "-" . $counter;

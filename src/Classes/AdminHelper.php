@@ -9,7 +9,7 @@ class AdminHelper
 	public static function modelConfigs()
 	{
 		$modelsArray = config('gtcmsmodels.models');
-		$models = array();
+		$models = [];
 		foreach ($modelsArray as $modelName => $model) {
 			$models[$modelName] = self::arrayToObject($model);
 		}
@@ -66,9 +66,9 @@ class AdminHelper
 		return $object;
 	}
 
-	public static function validationRules($modelConfig, $object = NULL, $quickEdit = false)
+	public static function validationRules($modelConfig, $object = null, $quickEdit = false)
 	{
-		$rules = array();
+		$rules = [];
 		/** @var ModelConfig $modelConfig */
 		$formFields = $quickEdit ? $modelConfig->getQuickEditFields('all') : $modelConfig->formFields;
 		if ($formFields) {
@@ -76,8 +76,8 @@ class AdminHelper
 			$user = auth()->user();
 
 			foreach ($formFields as $field) {
-				if ($field->rules && !in_array($field->type, array('file', 'image'))) {
-					$editRules = array();
+				if ($field->rules && !in_array($field->type, ['file', 'image'])) {
+					$editRules = [];
 					$addRules = ModelConfig::rulesToArray($field->rules);
 					if ($field->editRules) {
 						$editRules = ModelConfig::rulesToArray($field->editRules);
@@ -108,7 +108,7 @@ class AdminHelper
 
 					if (config('gtcms.premium') && $field->langDependent) {
 						foreach (config('gtcmslang.languages') as $lang) {
-							$property = $field->property."_".$lang;
+							$property = $field->property . "_" . $lang;
 							$rules[$property] = $fieldRules;
 						}
 					} else {
@@ -123,7 +123,7 @@ class AdminHelper
 
 	public static function getValidatorAttributes()
 	{
-		$validatorAttributes = array();
+		$validatorAttributes = [];
 		foreach (self::modelConfigs() as $modelConfig) {
 			foreach ($modelConfig->formFields as $field) {
 				if (config('gtcms.premium') && $field->langDependent) {
@@ -142,7 +142,7 @@ class AdminHelper
 
 	public static function modelConfigHasImage($modelConfig)
 	{
-		$imageFields = array();
+		$imageFields = [];
 		foreach ($modelConfig->formFields as $field) {
 			if ($field->type == 'image') {
 				$imageFields[] = $field;
@@ -158,7 +158,7 @@ class AdminHelper
 
 	public static function modelConfigHasFile($modelConfig)
 	{
-		$fileFields = array();
+		$fileFields = [];
 		foreach ($modelConfig->formFields as $field) {
 			if ($field->type == 'file') {
 				$fileFields[] = $field;
@@ -210,13 +210,13 @@ class AdminHelper
 		}
 
 		if ($size) {
-			$data = array(
+			$data = [
 				'minWidth' => $size[0],
 				'minHeight' => $size[1],
 				'transformMethod' => $size[2],
 				'folder' => $size[3],
 				'quality' => $size[4]
-			);
+			];
 
 			return $data;
 		}
@@ -248,20 +248,20 @@ class AdminHelper
 
 		if (request()->has('direction')) {
 			$direction = request()->get('direction');
-			if (!in_array($direction, array('asc', 'desc'))) {
+			if (!in_array($direction, ['asc', 'desc'])) {
 				$direction = $modelConfig->direction;
 			}
 		} else {
 			$direction = $modelConfig->direction;
 		}
 
-		return array('orderBy' => $orderBy, 'direction' => $direction);
+		return ['orderBy' => $orderBy, 'direction' => $direction];
 	}
 
 	public static function getSearchData(ModelConfig $modelConfig, $searchFieldValue = false)
 	{
 		if (request()->isMethod('get')) {
-			$properties = array();
+			$properties = [];
 			$searchPropertiesData = $modelConfig->getSearchPropertiesData();
 			$searchProperties = $searchPropertiesData['properties'];
 			$searchConfig = $searchPropertiesData['searchConfig'];
@@ -270,7 +270,7 @@ class AdminHelper
 			$langDependentProperties = $modelConfig->getLangDependentProperties();
 			$propertyFieldArray = $modelConfig->getPropertyFieldArray();
 
-			foreach(request()->all() as $property => $value) {
+			foreach (request()->all() as $property => $value) {
 				if (strpos($property, 'search_') === 0 && $value) {
 					$property = explode("search_", $property);
 					if (isset($property[1])) {
@@ -298,10 +298,10 @@ class AdminHelper
 								}
 							}
 
-							$properties[] = array(
+							$properties[] = [
 								'property' => $property,
 								'trueProperty' => $trueProperty,
-								'dbProperty' => $propertiesTables[$trueProperty].".".$trueProperty,
+								'dbProperty' => $propertiesTables[$trueProperty] . "." . $trueProperty,
 								'langDependent' => config('gtcms.premium') && in_array($trueProperty, $langDependentProperties) ? true : false,
 								'label' => isset($fieldsWithLabels[$property]) ? $fieldsWithLabels[$property] : 'Undefined',
 								'value' => $value,
@@ -309,7 +309,7 @@ class AdminHelper
 								'fieldFrom' => $fieldFrom,
 								'fieldTo' => $fieldTo,
 								'type' => isset($propertyFieldArray[$trueProperty]) ? $propertyFieldArray[$trueProperty]->type : null
-							);
+							];
 						}
 					}
 				}
@@ -318,10 +318,10 @@ class AdminHelper
 			return $properties;
 		}
 
-		return array();
+		return [];
 	}
 
-	public static function standaloneCheck($modelConfig, $action, &$input, $object = NULL)
+	public static function standaloneCheck($modelConfig, $action, &$input, $object = null)
 	{
 		if ($modelConfig->standalone === false) {
 			if (empty($_GET)) {
@@ -334,7 +334,7 @@ class AdminHelper
 			if ($action == 'add') {
 
 				// Check only first get parameter, because that has to be the parent
-				$requiredParent = $parentId =  false;
+				$requiredParent = $parentId = false;
 				foreach ($_GET as $requiredParent => $parentId) {
 					if (!in_array($requiredParent, $requiredParents) || !is_numeric($parentId)) {
 						throw new \Exception("Wrong parent or parent ID.");
@@ -420,7 +420,7 @@ class AdminHelper
 		$user = auth()->user();
 
 		if (is_array($input) && !empty($input)) {
-			$formFields = array();
+			$formFields = [];
 			$languages = config('gtcmslang.languages');
 
 			foreach ($modelConfig->formFields as $field) {
@@ -438,7 +438,7 @@ class AdminHelper
 				//set parent IDs to NULL if no value was selected from dropdown
 				foreach (AdminHelper::modelConfigs() as $currentModelConfig) {
 					if (!is_array($property) && $property == $currentModelConfig->id && !$value) {
-						$value = NULL;
+						$value = null;
 					}
 				}
 
@@ -450,7 +450,7 @@ class AdminHelper
 							unset($input[$property]);
 						} else {
 							//format DateTime / Date
-							if (in_array($field->type, array('date', 'dateTime'))) {
+							if (in_array($field->type, ['date', 'dateTime'])) {
 								if (Tools::validateDate($value)) {
 									if ($field->type == "date") {
 										$value = date("Y-m-d", strtotime($value));
@@ -566,7 +566,8 @@ class AdminHelper
 						$minWidth = $size[0];
 						$minHeight = $size[1];
 						$manipulationType = $size[2];
-						return array($minWidth, $minHeight, $manipulationType);
+
+						return [$minWidth, $minHeight, $manipulationType];
 					} else {
 						return false;
 					}
@@ -581,7 +582,7 @@ class AdminHelper
 		return false;
 	}
 
-	public static function getModelConfigFieldValue($modelConfig, $originalField, BaseModel $object, $currentLanguage = NULL, $returnLabel = false, $export = false)
+	public static function getModelConfigFieldValue($modelConfig, $originalField, BaseModel $object, $currentLanguage = null, $returnLabel = false, $export = false)
 	{
 		$languages = config('gtcmslang.languages');
 		if (is_numeric($currentLanguage)) {
@@ -643,16 +644,16 @@ class AdminHelper
 						$value = $object->$method('name');
 					}
 				} else {
-					$value = "This ".$modelConfig->hrName." has no ".$field->label.".";
+					$value = "This " . $modelConfig->hrName . " has no " . $field->label . ".";
 				}
-			} else if (in_array($displayProperty->type, array('date', 'dateTime'))) {
+			} else if (in_array($displayProperty->type, ['date', 'dateTime'])) {
 				$property = $field->property;
 				$value = $object->formatDate($object->$property, $displayProperty->dateFormat ? $displayProperty->dateFormat : $property->dateFormat);
 			} else if ($displayProperty->type == 'file') {
 				$method = $displayProperty->method;
 				if ($object->$method('name')) {
 					if ($displayProperty->display == 'url' && !$export) {
-						$value = "<a href='".$object->$method() . "' target='_blank'>" . $object->$method('name') . "</a>";
+						$value = "<a href='" . $object->$method() . "' target='_blank'>" . $object->$method('name') . "</a>";
 					} else if ($displayProperty->display == 'name' || $export) {
 						$value = $object->$method('name');
 					}
@@ -674,7 +675,7 @@ class AdminHelper
 		if ($modelConfig->getModelParents() || $modelConfig->parent) {
 			$parentIdProperties = AdminHelper::objectToArray($modelConfig->getModelParents());
 			if (!$parentIdProperties) {
-				$parentIdProperties = array($modelConfig->parent->property);
+				$parentIdProperties = [$modelConfig->parent->property];
 			}
 			if (!empty($_GET)) {
 				foreach ($_GET as $parentIdProperty => $id) {
@@ -682,6 +683,7 @@ class AdminHelper
 						if ($returnParentIdValue) {
 							return $id;
 						}
+
 						return $parentIdProperty;
 					}
 
@@ -697,7 +699,7 @@ class AdminHelper
 
 	public static function getFieldsByParam($modelConfig, $paramName, $paramValue, $returnFirst = false)
 	{
-		$fields = array();
+		$fields = [];
 		foreach ($modelConfig->formFields as $field) {
 			if (config('gtcms.premium') && $field->langDependent) {
 				foreach (config('gtcmslang.languages') as $lang) {
@@ -725,7 +727,7 @@ class AdminHelper
 	public static function getValidatorErrors($validator)
 	{
 		$messages = $validator->getMessageBag()->toArray();
-		$finalMessages = array();
+		$finalMessages = [];
 		foreach ($messages as $field => $fieldMessages) {
 			foreach ($fieldMessages as $fieldMessage) {
 				$finalMessages[] = $fieldMessage;
@@ -737,7 +739,7 @@ class AdminHelper
 
 	public static function getLangDependentFields($modelConfig)
 	{
-		$fields = array();
+		$fields = [];
 		foreach ($modelConfig->formFields as $field) {
 			if (config('gtcms.premium') && $field->langDependent) {
 				$fields[] = $field->property;
@@ -753,7 +755,7 @@ class AdminHelper
 
 	public static function setNavigationSize($size = false)
 	{
-		if (in_array($size, array('narrow', 'wide'))) {
+		if (in_array($size, ['narrow', 'wide'])) {
 			session(['gtcmsNavSize' => $size]);
 		} else {
 			session(['gtcmsNavSize' => 'wide']);
@@ -763,11 +765,12 @@ class AdminHelper
 	public static function getNavigationSize()
 	{
 		$size = session('gtcmsNavSize');
-		if (in_array($size, array('narrow', 'wide'))) {
+		if (in_array($size, ['narrow', 'wide'])) {
 			return $size;
 		}
 
 		self::setNavigationSize();
+
 		return 'wide';
 	}
 
@@ -786,10 +789,11 @@ class AdminHelper
 			if ($requestIsAjax) {
 				Dbar::error($e->getMessage());
 				Dbar::critical($e);
-				$data = array(
+				$data = [
 					'success' => false,
 					$messageType => is_null($message) ? "Error: " . $e->getMessage() : $message
-				);
+				];
+
 				return response()->json($data);
 			} else {
 				$message = is_null($message) ? "Error: " . $e->getMessage() : $message;

@@ -2,7 +2,7 @@
 
 // ENG
 
-return array(
+return [
 
 	'minimumDimensions' => 'Minimum dimensions',
 	'save' => 'Save',
@@ -44,4 +44,4 @@ return array(
 	// Exceptions
 	'createOnTheFlyTooLong' => 'Each item may not be greater than 50 characters.',
 
-);
+];

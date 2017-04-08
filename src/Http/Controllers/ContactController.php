@@ -9,20 +9,20 @@ use Illuminate\Http\Request;
 class ContactController extends Controller
 {
 	protected static $requestType = 'ajax';
-	protected static $rules = array(
+	protected static $rules = [
 		'name' => 'required',
 		'email' => 'required|email',
 		'subject' => 'required',
 		'message' => 'required'
-	);
+	];
 
 	public function handler(Request $request)
 	{
-		$data = array(
+		$data = [
 			'success' => false,
 			'title' => trans('t.contactErrorTitle'),
 			'message' => trans('t.contactErrorMessage')
-		);
+		];
 
 		$requestAllowed = true;
 		if (self::$requestType == 'ajax') {
@@ -34,7 +34,7 @@ class ContactController extends Controller
 			$validator = \Validator::make($request->all(), self::$rules);
 			if ($validator->fails()) {
 				$messages = $validator->getMessageBag()->toArray();
-				$finalMessages = array();
+				$finalMessages = [];
 				foreach ($messages as $field => $fieldMessages) {
 					foreach ($fieldMessages as $fieldMessage) {
 						$finalMessages[] = $fieldMessage;
@@ -42,6 +42,7 @@ class ContactController extends Controller
 				}
 				$message = implode("\n", $finalMessages);
 				$data['message'] = $message;
+
 				return $this->returnData($data);
 			} else {
 				try {
@@ -50,7 +51,7 @@ class ContactController extends Controller
 					$data['title'] = trans('t.contactSuccessTitle');
 					$data['message'] = trans('t.contactSuccessMessage');
 				} catch (\Exception $e) {
-					Dbar::error("Error while sending message: ".$e->getMessage());
+					Dbar::error("Error while sending message: " . $e->getMessage());
 				}
 			}
 
@@ -60,7 +61,8 @@ class ContactController extends Controller
 		abort(404);
 	}
 
-	protected function returnData($data) {
+	protected function returnData($data)
+	{
 		if (self::$requestType == 'ajax') {
 			return response()->json($data);
 		} else {

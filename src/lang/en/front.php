@@ -2,7 +2,7 @@
 
 // ENG
 
-return array(
+return [
 
 	'langAttribute' => 'hr-HR',
 
@@ -55,4 +55,4 @@ return array(
 	'contactErrorMessage' => 'An error has occurred. Please refresh the page and try again.',
 
 
-);
+];

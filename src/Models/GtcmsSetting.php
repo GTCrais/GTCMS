@@ -5,7 +5,7 @@ namespace App\Models;
 class GtcmsSetting extends BaseModel
 {
 	protected $table = 'gtcms_settings';
-	protected $fillable = array('setting_value');
+	protected $fillable = ['setting_value'];
 
 	public static function createSettingsObject()
 	{

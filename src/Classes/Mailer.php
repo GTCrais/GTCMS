@@ -14,7 +14,7 @@ class Mailer
 			Message: <br>" . \Html::entities($inputData['message']) . "<br>
 		";
 
-		\Mail::send('front.templates.email.simple', array('body' => $body), function($message) {
+		\Mail::send('front.templates.email.simple', ['body' => $body], function ($message) {
 			$message->to(config('gtcms.adminEmail'))->subject(config('gtcms.contactMessageSubject'));
 		});
 	}
@@ -29,7 +29,7 @@ class Mailer
 			$subject = "[Testing email functionality]";
 		}
 
-		\Mail::send('front.templates.email.simple', array('body' => $body), function($message) use ($email, $subject){
+		\Mail::send('front.templates.email.simple', ['body' => $body], function ($message) use ($email, $subject) {
 			$message->to($email)->from(config('gtcms.fromEmail'), config('gtcms.fromPerson'))->subject($subject);
 		});
 	}

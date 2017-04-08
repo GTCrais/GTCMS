@@ -18,8 +18,8 @@ class User extends BaseModel implements
 	use Authenticatable, Authorizable, CanResetPassword, Notifiable;
 
 	protected $table = 'users';
-	protected $hidden = array('password', 'remember_token');
-	protected $fillable = array('email', 'password', 'first_name', 'last_name', 'role', 'is_superadmin');
+	protected $hidden = ['password', 'remember_token'];
+	protected $fillable = ['email', 'password', 'first_name', 'last_name', 'role', 'is_superadmin'];
 
 	public static function userList()
 	{
@@ -38,10 +38,10 @@ class User extends BaseModel implements
 
 	public static function getUserRoles()
 	{
-		return array(
+		return [
 			'user' => 'User',
 			'admin' => 'Administrator'
-		);
+		];
 	}
 
 	public function getFullNameAttribute()
@@ -57,6 +57,7 @@ class User extends BaseModel implements
 		if (!$this->is_superadmin) {
 			return true;
 		}
+
 		return false;
 	}
 
@@ -68,6 +69,7 @@ class User extends BaseModel implements
 		if (!$this->is_superadmin) {
 			return true;
 		}
+
 		return false;
 	}
 

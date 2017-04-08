@@ -31,14 +31,14 @@ class AdminAuth
 
 		$allowedUserRoles = config('gtcms.allowedUserRoles');
 
-		if(auth()->guest() || !in_array(auth()->user()->role, $allowedUserRoles)) {
+		if (auth()->guest() || !in_array(auth()->user()->role, $allowedUserRoles)) {
 			if (\Route::currentRouteName() != "adminLogin") {
 				if (request()->ajax() && request()->get('getIgnore_isAjax')) {
-					$data = array(
+					$data = [
 						'success' => false,
 						'message' => "Session timeout",
 						'redirectToLogin' => true
-					);
+					];
 
 					return response()->json($data);
 				} else {
@@ -61,15 +61,17 @@ class AdminAuth
 			return redirect()->to(AdminHelper::getCmsPrefix());
 		}
 
-		if(session('accessDenied')) {
+		if (session('accessDenied')) {
 			if (\Route::currentRouteName() != "restricted") {
 				session(['accessDenied' => true]);
+
 				return redirect()->route('restricted', ['getIgnore_isAjax' => request()->get('getIgnore_isAjax')]);
 			}
 		} else {
 			if (\Route::currentRouteName() == "restricted") {
 				MessageManager::setError(trans('gtcms.accessGranted'));
 				session(['accessDenied' => false]);
+
 				return redirect()->to(AdminHelper::getCmsPrefix());
 			}
 		}

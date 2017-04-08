@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
 
 	/*
 	|--------------------------------------------------------------------------
@@ -110,4 +110,4 @@ return array(
 
 	'attributes' => AdminHelper::getValidatorAttributes(),
 
-);
+];
