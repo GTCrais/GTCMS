@@ -4,12 +4,12 @@ namespace App\Classes;
 
 use Illuminate\Support\Str;
 
-class FileHandler {
-
+class FileHandler
+{
 	const INVALID_FILE_ERROR = 99;
 
-	public static function process($modelConfig, $fileFields, $parentProperty) {
-
+	public static function process($modelConfig, $fileFields, $parentProperty)
+	{
 		$fileData = array();
 		$counter = 0;
 		foreach ($fileFields as $fileField) {
@@ -34,8 +34,8 @@ class FileHandler {
 
 			foreach ($inputProperties as $inputProperty) {
 				$fileData[$counter]['property'] = $inputProperty;
-				if (\Request::hasFile($inputProperty)) {
-					$file = \Request::file($inputProperty);
+				if (request()->hasFile($inputProperty)) {
+					$file = request()->file($inputProperty);
 					if ($file->isValid()) {
 						$ext = $file->getClientOriginalExtension();
 						$basePath = public_path()."/file/modelFiles/".$modelConfig->name."/";
@@ -63,7 +63,7 @@ class FileHandler {
 				}
 			}
 		}
+
 		return $fileData;
 	}
-
 }

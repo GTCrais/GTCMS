@@ -5,23 +5,27 @@ namespace App\Classes;
 use Illuminate\Support\Str;
 use Monolog\ErrorHandler;
 
-class AdminHistoryManager {
-
-	public static function getHistory($removeLast = true) {
-		if (\Session::has('adminHistoryLinks')) {
-			$links = \Session::get('adminHistoryLinks');
+class AdminHistoryManager
+{
+	public static function getHistory($removeLast = true)
+	{
+		if (session('adminHistoryLinks')) {
+			$links = session('adminHistoryLinks');
 		} else {
 			$links = array();
 		}
+
 		if ($removeLast && $links) {
 			array_pop($links);
 		}
-		return $links ? $links : false;
+
+		return $links ?: false;
 	}
 
-	public static function addHistoryLink($link = false, $modelName = false, $ignoreRequestForModelName = false, $sideTablePaginating = false) {
-		if (\Session::has('adminHistoryLinks')) {
-			$links = \Session::get('adminHistoryLinks');
+	public static function addHistoryLink($link = false, $modelName = false, $ignoreRequestForModelName = false, $sideTablePaginating = false)
+	{
+		if (session('adminHistoryLinks')) {
+			$links = session('adminHistoryLinks');
 		} else {
 			$links = array();
 		}
@@ -36,7 +40,7 @@ class AdminHistoryManager {
 		$subtract = config('gtcms.cmsPrefix') ? 0 : 1;
 
 		if (!$modelName) {
-			$modelName = \Request::segment(2 - $subtract);
+			$modelName = request()->segment(2 - $subtract);
 		}
 
 		$linkSegments = explode("/", $link);
@@ -48,7 +52,7 @@ class AdminHistoryManager {
 		if ($ignoreRequestForModelName) {
 			$returnModelName = $modelConfig ? $modelConfig->hrName : $modelName;
 		} else {
-			$returnModelName = $modelConfig ? (count(\Request::segments()) > (2 - $subtract) && \Request::segment(3 - $subtract) == 'edit' ? $modelConfig->hrName : $modelConfig->hrNamePlural) : $modelName;
+			$returnModelName = $modelConfig ? (count(request()->segments()) > (2 - $subtract) && request()->segment(3 - $subtract) == 'edit' ? $modelConfig->hrName : $modelConfig->hrNamePlural) : $modelName;
 		}
 
 		$currentLinkData = array(
@@ -64,6 +68,7 @@ class AdminHistoryManager {
 		if (count($links)) {
 			$delete = false;
 			$currentIndex = null;
+
 			foreach ($links as $index => $cLink) {
 
 				// If ModelName and Action already exist in history, it means we're
@@ -83,6 +88,7 @@ class AdminHistoryManager {
 					unset($tempLinks[$index]);
 				}
 			}
+
 			if ($delete) {
 				if ($sideTablePaginating) {
 					// If side-table paginating then replace last link with current link
@@ -92,7 +98,7 @@ class AdminHistoryManager {
 					}
 				}
 
-				\Session::put('adminHistoryLinks', $tempLinks);
+				session(['adminHistoryLinks' => $tempLinks]);
 
 				// There is no need to insert the current link because it already exists
 				// so just return
@@ -102,12 +108,13 @@ class AdminHistoryManager {
 
 		$links[] = $currentLinkData;
 
-		\Session::put('adminHistoryLinks', $links);
+		session(['adminHistoryLinks' => $links]);
 	}
 
-	public static function replaceAddLink($link, $modelName) {
-		if (\Session::has('adminHistoryLinks')) {
-			$links = \Session::get('adminHistoryLinks');
+	public static function replaceAddLink($link, $modelName)
+	{
+		if (session('adminHistoryLinks')) {
+			$links = session('adminHistoryLinks');
 		} else {
 			$links = array();
 		}
@@ -127,16 +134,18 @@ class AdminHistoryManager {
 		}
 
 		if ($setLinks) {
-			\Session::put('adminHistoryLinks', $links);
+			session(['adminHistoryLinks' => $links]);
 		}
 	}
 
-	public static function clearHistory() {
+	public static function clearHistory()
+	{
 		\Session::forget('adminHistoryLinks');
 	}
 
-	private static function cleanLink($link) {
-		$baseUrl = \URL::to(AdminHelper::getCmsPrefix());
+	private static function cleanLink($link)
+	{
+		$baseUrl = url()->to("/");
 
 		if (Str::startsWith($link, $baseUrl)) {
 			return substr($link, strlen($baseUrl));
@@ -144,5 +153,4 @@ class AdminHistoryManager {
 
 		return $link;
 	}
-
 }

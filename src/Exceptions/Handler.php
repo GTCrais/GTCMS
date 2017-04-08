@@ -55,9 +55,9 @@ class Handler extends ExceptionHandler
 					'tokenMismatch' => true
 				];
 
-				return \Response::json($data);
+				return response()->json($data);
 			} else {
-				return \Redirect::back()->withInput()->with(['message' => $message]);
+				return redirect()->back()->withInput()->with(['message' => $message]);
 			}
 		}
 

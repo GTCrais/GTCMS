@@ -523,14 +523,14 @@ function setupRepositioning() {
 					disableRepositioning();
 
 					$.ajax({
-						url: getCmsPrefix(true, true) +  + modelName + "/ajaxMove",
+						url: getCmsPrefix(true, true) + modelName + "/ajaxMove",
 						type: "GET",
 						data: {
 							objectId: objectId,
 							parentId: parentId,
 							position: position,
 							treeStructure: true,
-							getIgnore_isAjax: true,
+							getIgnore_isAjax: true
 						},
 						beforeSend: function(xhr){
 							xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);

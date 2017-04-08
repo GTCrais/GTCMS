@@ -4,8 +4,8 @@ namespace App\Classes;
 
 use Illuminate\Support\Str;
 
-class ModelConfig {
-
+class ModelConfig
+{
 	protected $gtcmsModelParents = null;
 	public    $quickEditFields = null;
 	protected $langDependentProperties = null;
@@ -14,20 +14,23 @@ class ModelConfig {
 	protected $searchPropertiesExist = null;
 	protected static $faIconColors = null;
 
-	public function __get($property) {
+	public function __get($property)
+	{
 		if (property_exists($this, $property)) {
 			return $this->$property;
-		} else {
-			return NULL;
 		}
+
+		return null;
 	}
 
-	public function myFullEntityName() {
+	public function myFullEntityName()
+	{
 		$namespace = $this->namespace ? $this->namespace : config('gtcms.defaultNamespace');
 		return $namespace . "\\Models\\" . $this->name;
 	}
 
-	public static function fullEntityName($entity, $namespace = false) {
+	public static function fullEntityName($entity, $namespace = false)
+	{
 		if ($namespace) {
 			return $namespace . "\\Models\\" . $entity;
 		} else {
@@ -41,18 +44,21 @@ class ModelConfig {
 		return "";
 	}
 
-	public static function rulesToArray($rules) {
+	public static function rulesToArray($rules)
+	{
 		if (is_object($rules)) {
 			return AdminHelper::objectToArray($rules);
-		} else {
-			return explode("|", $rules);
 		}
+
+		return explode("|", $rules);
 	}
 
-	public static function rulesToString($rules) {
+	public static function rulesToString($rules)
+	{
 		if (is_object($rules)) {
 			$rules = AdminHelper::objectToArray($rules);
 		}
+
 		if (is_array($rules)) {
 			return implode("|", $rules);
 		}
@@ -60,7 +66,8 @@ class ModelConfig {
 		return $rules;
 	}
 
-	public static function colorStyleForModel($modelConfigOrModelName) {
+	public static function colorStyleForModel($modelConfigOrModelName)
+	{
 		if (!is_a($modelConfigOrModelName, 'ModelConfig')) {
 			$modelConfig = AdminHelper::modelExists($modelConfigOrModelName);
 		} else {
@@ -106,23 +113,28 @@ class ModelConfig {
 		return $iconColor;
 	}
 
-	public function getSearchPropertiesData() {
+	public function getSearchPropertiesData()
+	{
 		$properties = array();
 		$searchConfig = array();
+
 		foreach ($this->getFormFields('all', true) as $field) {
 			if ($field->search) {
 				$properties[] = $field->property;
 				$searchConfig[$field->property] = AdminHelper::objectToArray($field->search);
 			}
 		}
+
 		$data = array(
 			'properties' => $properties,
 			'searchConfig' => $searchConfig
 		);
+
 		return $data;
 	}
 
-	public function searchPropertiesExist() {
+	public function searchPropertiesExist()
+	{
 		if (!is_null($this->searchPropertiesExist)) {
 			return $this->searchPropertiesExist;
 		}
@@ -137,7 +149,8 @@ class ModelConfig {
 		return false;
 	}
 
-	public function getFieldsWithLabels($search = false) {
+	public function getFieldsWithLabels($search = false)
+	{
 		$fieldsWithLabels = array();
 		foreach ($this->formFields as $field) {
 			if ($search) {
@@ -148,10 +161,12 @@ class ModelConfig {
 				$fieldsWithLabels[$field->property] = $field->label;
 			}
 		}
+
 		return $fieldsWithLabels;
 	}
 
-	public function getPropertyFieldArray() {
+	public function getPropertyFieldArray()
+	{
 		$fields = [];
 		foreach ($this->formFields as $field) {
 			$fields[$field->property] = $field;
@@ -160,9 +175,11 @@ class ModelConfig {
 		return $fields;
 	}
 
-	public function getPropertyValue($property, $value) {
+	public function getPropertyValue($property, $value)
+	{
 		$returnValue = "Undefined";
 		$list = array();
+
 		foreach ($this->formFields as $field) {
 			if ($field->property == $property) {
 				if (in_array($field->type, array('select', 'multiSelect'))) {
@@ -186,6 +203,7 @@ class ModelConfig {
 						$entity = $this->myFullEntityName();
 						$list = $entity::$listMethod();
 					}
+
 					foreach ($list as $actualValue => $frontValue) {
 						if ($actualValue == $value) {
 							$returnValue = $frontValue;
@@ -202,10 +220,12 @@ class ModelConfig {
 				break;
 			}
 		}
+
 		return $returnValue;
 	}
 
-	public function getDatabasePropertyValue($property, $value) {
+	public function getDatabasePropertyValue($property, $value)
+	{
 		foreach ($this->formFields as $field) {
 			if ($field->property == $property) {
 				if (in_array($field->type, array('date', 'dateTime'))) {
@@ -219,12 +239,15 @@ class ModelConfig {
 				}
 			}
 		}
+
 		return $value;
 	}
 
-	public function getPropertiesTables() {
+	public function getPropertiesTables()
+	{
 		$propertiesTables = array();
 		$model = $this->name;
+
 		foreach ($this->formFields as $field) {
 			if ($field->type == 'multiSelect' && $field->selectType->type == 'model') {
 				$relatedModel = $field->selectType->modelName;
@@ -237,10 +260,12 @@ class ModelConfig {
 				$propertiesTables[$field->property] = (new $fullModel)->getTable();
 			}
 		}
+
 		return $propertiesTables;
 	}
 
-	public function getManyToManyRelationData() {
+	public function getManyToManyRelationData()
+	{
 		$data = array();
 		$model = $this->name;
 		$fullModel = $this->myFullEntityName();
@@ -266,10 +291,12 @@ class ModelConfig {
 												'relatedModelId' => $relatedModelId);
 			}
 		}
+
 		return $data;
 	}
 
-	public function getLangDependentProperties() {
+	public function getLangDependentProperties()
+	{
 		if (!is_null($this->langDependentProperties)) {
 			return $this->langDependentProperties;
 		}
@@ -285,7 +312,8 @@ class ModelConfig {
 		return $properties;
 	}
 
-	public function getExcelExportFields($returnCount = false) {
+	public function getExcelExportFields($returnCount = false)
+	{
 		if (!is_null($this->excelExportFields)) {
 			if ($returnCount) {
 				return $this->excelExportFieldsCount;
@@ -307,13 +335,16 @@ class ModelConfig {
 
 		$this->excelExportFields = $fields;
 		$this->excelExportFieldsCount = $count;
+
 		if ($returnCount) {
 			return $count;
 		}
+
 		return $fields;
 	}
 
-	public function getFormFields($fieldType, $parseFromTo = false) {
+	public function getFormFields($fieldType, $parseFromTo = false)
+	{
 		if ($parseFromTo && !$this->fromToParsed) {
 			$formFields = array();
 			foreach ($this->formFields as $field) {
@@ -353,6 +384,7 @@ class ModelConfig {
 					$formFields[] = $field;
 				}
 			}
+
 			$this->fromToParsed = true;
 			$this->formFields = $formFields;
 		}
@@ -382,7 +414,8 @@ class ModelConfig {
 		return false;
 	}
 
-	public function getQuickEditFields($fieldType) {
+	public function getQuickEditFields($fieldType)
+	{
 		$quickEditFields = array();
 
 		if (config('gtcms.premium')) {
@@ -392,7 +425,8 @@ class ModelConfig {
 		return $quickEditFields;
 	}
 
-	public function getModelParents() {
+	public function getModelParents()
+	{
 		if (!is_null($this->gtcmsModelParents)) {
 			return $this->gtcmsModelParents;
 		}
@@ -411,5 +445,4 @@ class ModelConfig {
 		$this->gtcmsModelParents = $parents;
 		return $parents;
 	}
-
 }

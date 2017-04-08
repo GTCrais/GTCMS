@@ -5,10 +5,10 @@ namespace App\Classes;
 use Collective\Html\FormFacade as Form;
 use Illuminate\Database\Eloquent\Collection;
 
-class Front {
-
-	public static function drawObjectTree($objects, ModelConfig $modelConfig, $parentModelConfig, $depth = 0) {
-
+class Front
+{
+	public static function drawObjectTree($objects, ModelConfig $modelConfig, $parentModelConfig, $depth = 0)
+	{
 		$tree = "";
 		if ($depth == 0) {
 			$tree = "
@@ -171,8 +171,8 @@ class Front {
 
 	}
 
-	public static function drawObjectTable($objects, ModelConfig $modelConfig, $tableType = 'table', $parent = "", $searchDataWithFieldValues = false, $ordering = false, $quickEdit = false, $loadSideTablePaginationResults = false) {
-
+	public static function drawObjectTable($objects, ModelConfig $modelConfig, $tableType = 'table', $parent = "", $searchDataWithFieldValues = false, $ordering = false, $quickEdit = false, $loadSideTablePaginationResults = false)
+	{
 		$hasPositionInParent = false;
 		$parentModelName = false;
 		$hidePositionControls = $modelConfig->hidePositionControls;
@@ -465,10 +465,10 @@ class Front {
 		}
 
 		return $tree;
-
 	}
 
-	public static function getHistoryLinks() {
+	public static function getHistoryLinks()
+	{
 		$links = AdminHistoryManager::getHistory();
 		$returnLinks = "";
 		if ($links) {
@@ -477,13 +477,13 @@ class Front {
 					'<a data-loadtype="moveRight" href="' . $link['link'] . '"><i class="fa ' . $link['modelIcon'] . '"></i> ' . $link['modelName'] . '</a> <i class="fa fa-caret-right"></i>';
 			}
 			return $returnLinks;
-		} else {
-			return "";
 		}
+
+		return "";
 	}
 
-	public static function drawSearch(ModelConfig $modelConfig, $searchParams = false) {
-
+	public static function drawSearch(ModelConfig $modelConfig, $searchParams = false)
+	{
 		$html = \Form::open(
 			array(
 				'method' => 'get',
@@ -541,10 +541,10 @@ class Front {
 					}
 
 					if ($field->type == 'text' || $field->type == 'textarea') {
-						$html .= \Form::text("search_" . $field->property, \Request::get("search_" . $field->property), $options);
+						$html .= \Form::text("search_" . $field->property, request()->get("search_" . $field->property), $options);
 					} else if ($field->type == 'checkbox') {
 						$html .= "<div class='checkbox'><label>";
-						$html .= \Form::checkbox("search_" . $field->property, 1, \Request::get("search_" . $field->property));
+						$html .= \Form::checkbox("search_" . $field->property, 1, request()->get("search_" . $field->property));
 						$html .= " " . $label . "</label></div>";
 					} else if (in_array($field->type, array('select', 'multiSelect'))) {
 						$listMethod = $field->selectType->listMethod;
@@ -555,7 +555,7 @@ class Front {
 							$selectModel = ModelConfig::fullEntityName($field->selectType->modelName);
 							if ($field->selectType->ajax) {
 								$list = array();
-								if ($value = \Request::get('search_' . $field->property)) {
+								if ($value = request()->get('search_' . $field->property)) {
 									$valueProperty = $field->selectType->ajax->valueProperty;
 									$list = $selectModel::where('id', $value)->get()->pluck($valueProperty, 'id');
 								}
@@ -589,14 +589,14 @@ class Front {
 
 						$options['placeholder'] = " - ";
 						$options['class'] .= ' selectizeNoCreate doSelectize';
-						$html .= \Form::select("search_".$field->property, $list, \Request::get("search_".$field->property), $options);
+						$html .= \Form::select("search_".$field->property, $list, request()->get("search_".$field->property), $options);
 					} else if (in_array($field->type, array('date', 'dateTime'))) {
 						if ($field->type == 'date') {
 							$options['class'] .= ' datePicker ';
 						} else if ($field->type == 'dateTime') {
 							$options['class'] .= ' dateTimePicker ';
 						}
-						$html .= \Form::text("search_" . $field->property, \Request::get("search_".$field->property), $options);
+						$html .= \Form::text("search_" . $field->property, request()->get("search_".$field->property), $options);
 					}
 				} else if ($field->search->type == 'exception') {
 					//custom code here
@@ -623,7 +623,8 @@ class Front {
 		return $html;
 	}
 
-	public static function drawSearchCriteria($searchData) {
+	public static function drawSearchCriteria($searchData)
+	{
 		$html = "";
 		if ($searchData) {
 			$html .= "
@@ -642,10 +643,12 @@ class Front {
 				</ul>
 			";
 		}
+
 		return $html;
 	}
 
-	public static function showMessages() {
+	public static function showMessages()
+	{
 		$messages = "";
 		if ($msg = MessageManager::getException()) {
 			$messages .=
@@ -672,7 +675,8 @@ class Front {
 		return $messages;
 	}
 
-	public static function embedVideo($url, $params = array()) {
+	public static function embedVideo($url, $params = array())
+	{
 		$data = Tools::parseMediaUrl($url);
 
 		$class = isset($params['class']) ? $params['class'] : "";
@@ -706,7 +710,8 @@ class Front {
 		return $embedCode;
 	}
 
-	public static function drawCheckboxIcon($success = true, $return = true) {
+	public static function drawCheckboxIcon($success = true, $return = true)
+	{
 		if ($success) {
 			$icon = '<i class="fa fa-check adminBlue"></i>';
 		} else {
@@ -715,9 +720,8 @@ class Front {
 
 		if ($return) {
 			return $icon;
-		} else {
-			echo $icon;
 		}
-	}
 
+		echo $icon;
+	}
 }

@@ -2,19 +2,19 @@
 
 namespace App\Classes;
 
-class ImageHandler {
-
+class ImageHandler
+{
 	const DIM_ERROR = 99;
 
-	public static function process($modelConfig, $imageFields, $parentProperty) {
-
+	public static function process($modelConfig, $imageFields, $parentProperty)
+	{
 		$imageData = array();
 		$counter = 0;
 
 		foreach ($imageFields as $imageField) {
 			$imageData[$counter]['property'] = $imageField->property;
-			if (\Request::hasFile($imageField->property)) {
-				$ext = \Request::file($imageField->property)->getClientOriginalExtension();
+			if (request()->hasFile($imageField->property)) {
+				$ext = request()->file($imageField->property)->getClientOriginalExtension();
 				if (!in_array(strtolower($ext), array('jpg', 'jpeg', 'gif', 'png'))) {
 					throw new \Exception ("File is not an image");
 				} else {
@@ -41,7 +41,7 @@ class ImageHandler {
 					//end check
 
 					//copy the image to the original folder
-					\Image::make(\Request::file($imageField->property)->getRealPath())->save($basePath . "original/" . $name);
+					\Image::make(request()->file($imageField->property)->getRealPath())->save($basePath . "original/" . $name);
 					$img = \Image::make($basePath . "original/" . $name);
 
 					if ($parentProperty && $modelConfig->name == 'ModelImage') {
@@ -136,7 +136,7 @@ class ImageHandler {
 				}
 			}
 		}
+
 		return $imageData;
 	}
-
 }

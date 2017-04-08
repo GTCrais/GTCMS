@@ -2,30 +2,34 @@
 
 namespace App\Models;
 
-class Page extends BaseModel {
-
+class Page extends BaseModel
+{
 	protected $table = 'pages';
 	protected $fillable = array('name', 'page_id', 'model_key', 'depth', 'slug', 'position', 'title', 'content', 'meta_description', 'meta_keywords');
 
-	public function parentPage() {
-		return $this->belongsTo('App\Models\Page', 'page_id');
+	public function parentPage()
+	{
+		return $this->belongsTo(Page::class, 'page_id');
 	}
 
-	public function pages() {
-		return $this->hasMany('App\Models\Page', 'page_id')->orderBy('position', 'asc');
+	public function pages()
+	{
+		return $this->hasMany(Page::class, 'page_id')->orderBy('position', 'asc');
 	}
 
-	public function getUrlAttribute() {
+	public function getUrlAttribute()
+	{
 		$defaultLocale = config('gtcmslang.defaultLocale');
-		$propertyName = config('gtcms.premium') && config('gtcmslang.siteIsMultilingual') ? "slug_" . \App::getLocale() : "slug";
-		$langPrefix = \App::getLocale() == $defaultLocale ? '' : "/" . \App::getLocale();
-		return \Request::root() . $langPrefix . "/" . $this->$propertyName;
+		$propertyName = config('gtcms.premium') && config('gtcmslang.siteIsMultilingual') ? "slug_" . app()->getLocale() : "slug";
+		$langPrefix = app()->getLocale() == $defaultLocale ? '' : "/" . app()->getLocale();
+
+		return request()->root() . $langPrefix . "/" . $this->$propertyName;
 	}
 
-	public static function getPageKeyList() {
+	public static function getPageKeyList()
+	{
 		return array(
 			'standard' => 'Standard'
 		);
 	}
-
 }
