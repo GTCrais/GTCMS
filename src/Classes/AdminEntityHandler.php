@@ -6,10 +6,10 @@ use App\Models\BaseModel;
 use App\Models\GtcmsSetting;
 use Illuminate\Support\Str;
 
-class AdminEntityHandler {
-
-	public static function edit($object, ModelConfig $modelConfig) {
-
+class AdminEntityHandler
+{
+	public static function edit($object, ModelConfig $modelConfig)
+	{
 		/** @var BaseModel $object */
 		\DB::transaction(function() use (&$object, $modelConfig) {
 			$originalObject = clone $object;
@@ -63,7 +63,8 @@ class AdminEntityHandler {
 		return $object;
 	}
 
-	public static function editSettings($modelConfig) {
+	public static function editSettings($modelConfig)
+	{
 		$input = AdminHelper::input($modelConfig, 'edit');
 
 		\DB::transaction(function() use ($input, $modelConfig){
@@ -79,7 +80,8 @@ class AdminEntityHandler {
 		});
 	}
 
-	public static function manyToMany($modelConfig, &$input, &$object) {
+	public static function manyToMany($modelConfig, &$input, &$object)
+	{
 		foreach ($modelConfig->formFields as $field) {
 			if ($field->type == 'multiSelect' && $field->selectType->type == 'model') {
 				$method = $field->selectType->method;
@@ -97,18 +99,20 @@ class AdminEntityHandler {
 					}
 				}
 
-				if (\Request::get($field->property . "_exists_in_gtcms_form")) {
+				if (request()->get($field->property . "_exists_in_gtcms_form")) {
 					$object->$method()->sync($relatedIds);
 				}
 			}
 		}
 	}
 
-	public static function oneToMany($modelConfig, &$input) {
+	public static function oneToMany($modelConfig, &$input)
+	{
 		GtcmsPremium::oneToMany($modelConfig, $input);
 	}
 
-	public static function generateSlug($modelConfig, &$object, $parentId = null, $recursiveGeneration = false, $originalObject = null, $depth = 0, $action = 'edit') {
+	public static function generateSlug($modelConfig, &$object, $parentId = null, $recursiveGeneration = false, $originalObject = null, $depth = 0, $action = 'edit')
+	{
 		if ($modelConfig->generateSlug) {
 
 			if ($modelConfig->skipFirstLevelSlug && $object->depth == 0) {
@@ -137,6 +141,7 @@ class AdminEntityHandler {
 				}
 
 				$parent = NULL;
+
 				if ($modelConfig->parent) {
 					$parentIdProperty = $modelConfig->parent->property;
 					/** @var BaseModel $parentName */
@@ -144,16 +149,19 @@ class AdminEntityHandler {
 
 					if ($parentId) {
 						$parent = $parentName::find($parentId);
-					} else if (\Request::has($parentIdProperty)) {
-						$parent = $parentName::find(\Request::get($parentIdProperty));
+					} else if (request()->has($parentIdProperty)) {
+						$parent = $parentName::find(request()->get($parentIdProperty));
 					}
 				}
+
 				$slug = $parent && $parent->$slugProperty ? $parent->$slugProperty : "";
-				if (\Request::get($modelConfigSlugProperty) && $depth == 0) {
-					$slugAddon = (Str::slug(\Request::get($modelConfigSlugProperty)));
+
+				if (request()->get($modelConfigSlugProperty) && $depth == 0) {
+					$slugAddon = (Str::slug(request()->get($modelConfigSlugProperty)));
 				} else {
 					$slugAddon = Str::slug($object->$modelConfigSlugProperty);
 				}
+
 				$slug .= $slug ? "/" . $slugAddon : $slugAddon;
 				$finalSlug = $slug;
 
@@ -199,10 +207,8 @@ class AdminEntityHandler {
 					}
 				}
 			}
-
 		}
 
 		return false;
 	}
-
 }

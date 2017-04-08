@@ -158,10 +158,9 @@ class AdminEntityController extends Controller
 			);
 
 			return response()->json($data);
-		} else {
-			return view()->make('gtcms.elements.index')->with($viewData);
 		}
 
+		return view()->make('gtcms.elements.index')->with($viewData);
 	}
 
 	private function add(Request $request)
@@ -180,7 +179,7 @@ class AdminEntityController extends Controller
 
 	private function edit(Request $request, $id, $historyLink = false, $settings = false)
 	{
-		$ajaxRequest = \Request::ajax() && \Request::get('getIgnore_isAjax') ? true : false;
+		$ajaxRequest = $request->ajax() && $request->get('getIgnore_isAjax') ? true : false;
 
 		/** @var \App\Models\BaseModel $entity */
 		$entity = self::$entity;
@@ -207,12 +206,12 @@ class AdminEntityController extends Controller
 
 		if ($action == 'add' && !$object->isAddable()) {
 			session(['accessDenied' => true]);
-			return redirect()->route('restricted', ['getIgnore_isAjax' => \Request::get('getIgnore_isAjax')]);
+			return redirect()->route('restricted', ['getIgnore_isAjax' => $request->get('getIgnore_isAjax')]);
 		}
 
 		if ($action == 'edit' && !$object->isEditable()) {
 			session(['accessDenied' => true]);
-			return redirect()->route('restricted', ['getIgnore_isAjax' => \Request::get('getIgnore_isAjax')]);
+			return redirect()->route('restricted', ['getIgnore_isAjax' => $request->get('getIgnore_isAjax')]);
 		}
 
 		$sideTablePaginationResults =
@@ -282,10 +281,9 @@ class AdminEntityController extends Controller
 			);
 
 			return response()->json($data);
-		} else {
-			return view()->make('gtcms.elements.edit')->with($viewData);
 		}
 
+		return view()->make('gtcms.elements.edit')->with($viewData);
 	}
 
 	private function sideTablePaginationResults(Request $request, $object)
@@ -319,7 +317,7 @@ class AdminEntityController extends Controller
 
 		if (!$object->isDeletable()) {
 			session(['accessDenied' => true]);
-			return redirect()->route('restricted', ['getIgnore_isAjax' => \Request::get('getIgnore_isAjax')]);
+			return redirect()->route('restricted', ['getIgnore_isAjax' => $request->get('getIgnore_isAjax')]);
 		}
 
 		$ajaxRequest = $request->ajax() && $request->get('getIgnore_isAjax') ? true : false;
@@ -456,5 +454,4 @@ class AdminEntityController extends Controller
 
 		return response()->json($data);
 	}
-
 }

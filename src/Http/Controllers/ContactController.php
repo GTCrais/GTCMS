@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Classes\Dbar;
 use App\Classes\Mailer;
+use Illuminate\Http\Request;
 
-class ContactController extends Controller {
-
+class ContactController extends Controller
+{
 	protected static $requestType = 'ajax';
 	protected static $rules = array(
 		'name' => 'required',
@@ -15,8 +16,8 @@ class ContactController extends Controller {
 		'message' => 'required'
 	);
 
-	public static function handler() {
-
+	public function handler(Request $request)
+	{
 		$data = array(
 			'success' => false,
 			'title' => trans('t.contactErrorTitle'),
@@ -25,12 +26,12 @@ class ContactController extends Controller {
 
 		$requestAllowed = true;
 		if (self::$requestType == 'ajax') {
-			$requestAllowed = \Request::ajax() && \Request::get('getIgnore_isAjax');
+			$requestAllowed = $request->ajax() && $request->get('getIgnore_isAjax');
 		}
 
 		if ($requestAllowed) {
 
-			$validator = \Validator::make(\Request::all(), self::$rules);
+			$validator = \Validator::make($request->all(), self::$rules);
 			if ($validator->fails()) {
 				$messages = $validator->getMessageBag()->toArray();
 				$finalMessages = array();
@@ -41,10 +42,10 @@ class ContactController extends Controller {
 				}
 				$message = implode("\n", $finalMessages);
 				$data['message'] = $message;
-				return self::returnData($data);
+				return $this->returnData($data);
 			} else {
 				try {
-					Mailer::sendMessage(\Request::all());
+					Mailer::sendMessage($request->all());
 					$data['success'] = true;
 					$data['title'] = trans('t.contactSuccessTitle');
 					$data['message'] = trans('t.contactSuccessMessage');
@@ -53,20 +54,17 @@ class ContactController extends Controller {
 				}
 			}
 
-			return self::returnData($data);
+			return $this->returnData($data);
 		}
 
-		\App::abort(404);
-
+		abort(404);
 	}
 
-	protected static function returnData($data) {
+	protected function returnData($data) {
 		if (self::$requestType == 'ajax') {
-			return \Response::json($data);
+			return response()->json($data);
 		} else {
 			// Custom code
-
 		}
 	}
-
 }

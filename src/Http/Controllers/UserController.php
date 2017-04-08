@@ -3,62 +3,64 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\Request;
 
-class UserController extends Controller {
-
-	public static function login() {
-
+class UserController extends Controller
+{
+	public function login(Request $request)
+	{
 		if (\Auth::user()) {
-			return \Redirect::route('home');
+			return redirect()->route('home');
 		}
 
-		$email = \Request::get('email');
-		$password = \Request::get('password');
-		$remember = \Request::has('remember_me') && \Request::get('remember_me') ? true : false;
+		$email = $request->get('email');
+		$password = $request->get('password');
+		$remember = $request->has('remember_me') && $request->get('remember_me') ? true : false;
 
 		if (!$email || !$password) {
-			return \Redirect::route('home')->with(array('loginError' => trans('t.emptyLoginField')))->withInput();
+			return redirect()->route('home')->with(array('loginError' => trans('t.emptyLoginField')))->withInput();
 		}
 
 		if (\Auth::attempt(array('email' => $email, 'password' => $password), $remember)) {
-			return \Redirect::route('home');
+			return redirect()->route('home');
 		} else {
-			return \Redirect::route('home')->with(array('loginError' => trans('t.incorrectLoginField')))->withInput();
+			return redirect()->route('home')->with(array('loginError' => trans('t.incorrectLoginField')))->withInput();
 		}
-
 	}
 
-	public static function logout() {
+	public function logout(Request $request)
+	{
 		if (\Auth::user()) {
 			\Auth::logout();
 		}
-		return \Redirect::route('home');
+
+		return redirect()->route('home');
 	}
 
-	public static function register() {
+	public function register(Request $request)
+	{
 		if (\Auth::user()) {
-			\Redirect::route('home');
+			redirect()->route('home');
 		}
 
-		if (\Request::all()) {
+		if ($request->all()) {
 			$rules = array();
 			$rules['email'] = "required|email|unique:users,email";
 			$rules['password'] = 'required|min:7|confirmed';
 			$rules['firstName'] = "required";
 			$rules['lastName'] = "required";
 
-			$validator = \Validator::make(\Request::all(), $rules);
+			$validator = \Validator::make($request->all(), $rules);
 			if ($validator->fails()) {
-				return \Redirect::route('register')->withErrors($validator)->withInput();
+				return redirect()->route('register')->withErrors($validator)->withInput();
 			} else {
-				$user = User::create(\Request::all());
+				$user = User::create($request->all());
 				\Auth::login($user);
 
-				return \Redirect::route('home');
+				return redirect()->route('home');
 			}
 		}
 
-		return \View::make('elements.register');
+		return view()->make('elements.register');
 	}
-
 }

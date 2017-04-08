@@ -18,9 +18,9 @@
 					<i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
 				</a>
 				<ul class="dropdown-menu dropdown-user">
-					@if (\Auth::user()->is_superadmin)
+					@if (auth()->user()->is_superadmin)
 						<li>
-							<a href="{{\URL::route('optimize')}}" class="standardLink"><i class="fa fa-wrench fa-fw"></i> {{trans('gtcms.optimization')}}</a>
+							<a href="{{url()->route('optimize')}}" class="standardLink"><i class="fa fa-wrench fa-fw"></i> {{trans('gtcms.optimization')}}</a>
 						</li>
 					@endif
 
@@ -34,16 +34,16 @@
 		<div class="navbar-default sidebar" role="navigation">
 			<div class="sidebar-nav navbar-collapse">
 				<ul class="nav" id="side-menu">
-					<?php $userRole = Auth::user() ? Auth::user()->role : false; ?>
+					<?php $userRole = auth()->user() ? auth()->user()->role : false; ?>
 					@foreach (AdminHelper::modelConfigs() as $modelConfig)
 						@if ($userRole && $modelConfig->standalone !== false &&
 							!$modelConfig->hiddenInNavigation &&
 							(!$modelConfig->restrictedAccess || $modelConfig->restrictedAccess->$userRole) &&
 							(!$modelConfig->hiddenInNavigationForRoles || !$modelConfig->hiddenInNavigationForRoles->$userRole) &&
-							(!$modelConfig->restrictedToSuperadmin || (Auth::check() && Auth::user()->is_superadmin)))
+							(!$modelConfig->restrictedToSuperadmin || (auth()->check() && auth()->user()->is_superadmin)))
 							<li>
 								<a
-									data-loadtype="{{count(Request::segments()) == 2 ? 'moveLeft' : 'moveRight'}}"
+									data-loadtype="{{count(request()->segments()) == 2 ? 'moveLeft' : 'moveRight'}}"
 									class="{{$modelConfig->name == $active ? 'active ' : ''}} navigationLink model{{$modelConfig->name}}"
 									href="{{AdminHelper::getCmsPrefix() . $modelConfig->name}}"
 								>

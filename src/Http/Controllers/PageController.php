@@ -6,15 +6,14 @@ use App\Classes\AdminHelper;
 use App\Classes\Dbar;
 use App\Models\Page;
 use App\Classes\PageMetaManager;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
-class PageController extends Controller {
-
-	public static function showPage($slug = "") {
-
-		self::shareViews();
-
+class PageController extends Controller
+{
+	public function showPage(Request $request, $slug = "")
+	{
 		if (!$slug) {
-			//homepage
 			$homepage = Page::where('depth', 0)->first();
 			PageMetaManager::setPage($homepage);
 
@@ -22,11 +21,11 @@ class PageController extends Controller {
 				'cPage' => $homepage
 			);
 
-			return \View::make('front.elements.homepage')->with($data);
+			return view()->make('front.elements.homepage')->with($data);
 
 		} else {
 			if (config('gtcms.premium') && config('gtcmslang.siteIsMultilingual')) {
-				$slugString = "slug_" . \App::getLocale();
+				$slugString = "slug_" . app()->getLocale();
 			} else {
 				$slugString = "slug";
 			}
@@ -37,24 +36,19 @@ class PageController extends Controller {
 				$data = array(
 					'cPage' => $cPage
 				);
-				return \View::make('front.elements.page')->with($data);
-			} else {
-				\App::abort(404);
-			}
-		}
 
+				return view()->make('front.elements.page')->with($data);
+			}
+
+			abort(404);
+		}
 	}
 
-	public static function shareViews() {
+	public function compose(View $view)
+	{
 		$navPages = Page::where('depth', 1)->orderBy('position')->with(array('pages'))->get();
 		//$home = Page::where('model_key', 'home')->first();
 
-		\View::share('navPages', $navPages);
-		//View::share('home', $home);
+		$view->with(compact('navPages'));
 	}
-
-	public static function show404() {
-		\App::abort(404);
-	}
-
 }

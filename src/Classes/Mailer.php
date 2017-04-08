@@ -2,9 +2,10 @@
 
 namespace App\Classes;
 
-class Mailer {
-
-	public static function sendMessage($inputData) {
+class Mailer
+{
+	public static function sendMessage($inputData)
+	{
 		$body = "
 			<br>
 			Name: " . \Html::entities($inputData['name']) . "<br>
@@ -18,16 +19,18 @@ class Mailer {
 		});
 	}
 
-	public static function sendEmail($body, $email = false, $subject = false) {
+	public static function sendEmail($body, $email = false, $subject = false)
+	{
 		if (!$email) {
 			$email = config('gtcms.adminEmail');
 		}
+
 		if (!$subject) {
 			$subject = "[Testing email functionality]";
 		}
+
 		\Mail::send('front.templates.email.simple', array('body' => $body), function($message) use ($email, $subject){
 			$message->to($email)->from(config('gtcms.fromEmail'), config('gtcms.fromPerson'))->subject($subject);
 		});
 	}
-
 }

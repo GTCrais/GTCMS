@@ -57,7 +57,7 @@ class RouteServiceProvider extends ServiceProvider
 
 	protected function mapAdminRoutes()
 	{
-		\App::setLocale(config('gtcmslang.defaultAdminLocale'));
+		app()->setLocale(config('gtcmslang.defaultAdminLocale'));
 
 		\Route::group([
 			'prefix' => config('gtcms.cmsPrefix'),
@@ -67,7 +67,7 @@ class RouteServiceProvider extends ServiceProvider
 			require base_path('routes/admin.php');
 		});
 
-		return (!config('gtcms.cmsPrefix') || \Request::segment(1) == config('gtcms.cmsPrefix')) ? true : false;
+		return (!config('gtcms.cmsPrefix') || request()->segment(1) == config('gtcms.cmsPrefix')) ? true : false;
 	}
 
     /**
@@ -83,11 +83,11 @@ class RouteServiceProvider extends ServiceProvider
 		$defaultLocale = config('gtcmslang.defaultLocale');
 		$siteIsMultilingual = config('gtcms.premium') && config('gtcmslang.siteIsMultilingual');
 
-		$locale = \Request::segment(1);
+		$locale = request()->segment(1);
 		if (in_array($locale, $languages) && $locale != $defaultLocale && $siteIsMultilingual) {
-			\App::setLocale($locale);
+			app()->setLocale($locale);
 		} else {
-			\App::setLocale($defaultLocale);
+			app()->setLocale($defaultLocale);
 			$locale = null;
 		}
 

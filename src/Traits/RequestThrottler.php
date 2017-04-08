@@ -5,8 +5,8 @@ namespace App\Traits;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
 
-trait RequestThrottler {
-
+trait RequestThrottler
+{
 	use ThrottlesLogins;
 
 	protected function hasTooManyAttempts($requestOrKey, $maxAttempts, $lockoutDuration)
@@ -49,7 +49,8 @@ trait RequestThrottler {
 		$this->limiter()->resetAttempts($key);
 	}
 
-	protected function clear($key) {
+	protected function clear($key)
+	{
 		$this->limiter()->clear($key);
 	}
 
@@ -63,11 +64,13 @@ trait RequestThrottler {
 		return $retriesLeft;
 	}
 
-	protected function availableIn($key) {
+	protected function availableIn($key)
+	{
 		return $this->limiter()->availableIn($key);
 	}
 
-	protected function lock($key, $maxAttempts, $lockoutDuration) {
+	protected function lock($key, $maxAttempts, $lockoutDuration)
+	{
 		$retriesLeft = $this->retriesLeft($key, $maxAttempts);
 
 		if ($retriesLeft) {
@@ -77,8 +80,8 @@ trait RequestThrottler {
 		}
 	}
 
-	protected function attemptsWord($attemptsLeft) {
+	protected function attemptsWord($attemptsLeft)
+	{
 		return $attemptsLeft == 1 ? "attempt" : "attempts";
 	}
-
 }
