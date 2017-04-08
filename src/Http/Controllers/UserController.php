@@ -9,7 +9,7 @@ class UserController extends Controller
 {
 	public function login(Request $request)
 	{
-		if (\Auth::user()) {
+		if (auth()->user()) {
 			return redirect()->route('home');
 		}
 
@@ -21,7 +21,7 @@ class UserController extends Controller
 			return redirect()->route('home')->with(array('loginError' => trans('t.emptyLoginField')))->withInput();
 		}
 
-		if (\Auth::attempt(array('email' => $email, 'password' => $password), $remember)) {
+		if (auth()->attempt(array('email' => $email, 'password' => $password), $remember)) {
 			return redirect()->route('home');
 		} else {
 			return redirect()->route('home')->with(array('loginError' => trans('t.incorrectLoginField')))->withInput();
@@ -30,8 +30,8 @@ class UserController extends Controller
 
 	public function logout(Request $request)
 	{
-		if (\Auth::user()) {
-			\Auth::logout();
+		if (auth()->user()) {
+			auth()->logout();
 		}
 
 		return redirect()->route('home');
@@ -39,7 +39,7 @@ class UserController extends Controller
 
 	public function register(Request $request)
 	{
-		if (\Auth::user()) {
+		if (auth()->user()) {
 			redirect()->route('home');
 		}
 
@@ -55,7 +55,7 @@ class UserController extends Controller
 				return redirect()->route('register')->withErrors($validator)->withInput();
 			} else {
 				$user = User::create($request->all());
-				\Auth::login($user);
+				auth()->login($user);
 
 				return redirect()->route('home');
 			}

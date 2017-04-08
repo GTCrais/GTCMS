@@ -62,12 +62,12 @@ class AdminController extends Controller
 					// Trigger countdown here
 					$this->hasTooManyAttempts($request, $maxAttempts, $lockoutDuration);
 
-					if (\Auth::attempt(array('email' => $email, 'password' => $password))) {
+					if (auth()->attempt(array('email' => $email, 'password' => $password))) {
 
 						$this->clear($key);
 
 						$allowedUserRoles = config('gtcms.allowedUserRoles');
-						$user = \Auth::user();
+						$user = auth()->user();
 						$userRole = $user->role;
 						if (in_array($userRole, $allowedUserRoles)) {
 							$defaultModel = self::getDefaultModelForUser($user);
@@ -75,7 +75,7 @@ class AdminController extends Controller
 								return redirect()->to(AdminHelper::getCmsPrefix() . $defaultModel . "?getIgnore_loginRedirect=true&getIgnore_isAjax=true");
 							}
 						} else {
-							\Auth::logout();
+							auth()->logout();
 						}
 					}
 
@@ -103,7 +103,7 @@ class AdminController extends Controller
 		$defaultModel = config('gtcms.defaultModel');
 
 		if (!$user) {
-			$user = \Auth::user();
+			$user = auth()->user();
 		}
 
 		if ($user) {
@@ -129,7 +129,7 @@ class AdminController extends Controller
 
 	public function logout(Request $request)
 	{
-		\Auth::logout();
+		auth()->logout();
 		return redirect()->to(AdminHelper::getCmsPrefix() . "login");
 	}
 
@@ -335,41 +335,15 @@ class AdminController extends Controller
 		return response()->json($data);
 	}
 
-	public function updateLanguages(Request $request)
-	{
-		if (config('gtcms.premium') && \Auth::user()->is_superadmin) {
-			if (!empty($_POST)) {
-				if ($request->get('updateLanguages') == "Proceed") {
-					foreach (AdminHelper::modelConfigs() as $modelConfig) {
-						GtcmsPremium::updateLanguages($modelConfig);
-					}
-					MessageManager::setSuccess("Languages updated");
-				}
-
-				return redirect()->to(AdminHelper::getCmsPrefix());
-			}
-
-			$data = array(
-				'active' => false,
-				'modelConfig' => new ModelConfig()
-			);
-
-			return view()->make("gtcms.elements.updateLanguages")->with($data);
-		}
-
-		session(['accessDenied' => true]);
-		return $this->restricted($request);
-	}
-
 	public function optimize(Request $request)
 	{
-		if (\Auth::user()->is_superadmin) {
+		if (auth()->user()->is_superadmin) {
 
 			$requestData = $request->all();
 
 			if (!empty($_POST)) {
 
-				$redirectUrl = redirect()->to(AdminHelper::getCmsPrefix() . "optimize")->getTargetUrl();
+				$redirectUrl = redirect()->route('gtcmsOptimize')->getTargetUrl();
 
 				if ($requestData['formSubmit'] == "Proceed") {
 
@@ -427,7 +401,7 @@ class AdminController extends Controller
 
 			if (isset($requestData['optimizationMessages'])) {
 				MessageManager::setSuccess($requestData['optimizationMessages']);
-				return redirect()->to(AdminHelper::getCmsPrefix() . 'optimize');
+				return redirect()->route('gtcmsOptimize');
 			}
 
 			$data = array(
@@ -436,6 +410,74 @@ class AdminController extends Controller
 			);
 
 			return view()->make("gtcms.elements.optimizationOptions")->with($data);
+		}
+
+		session(['accessDenied' => true]);
+		return $this->restricted($request);
+	}
+
+	public function database(Request $request)
+	{
+		if (auth()->user()->is_superadmin) {
+
+			$requestData = $request->all();
+
+			if (!empty($_POST)) {
+
+				$redirectUrl = redirect()->route('gtcmsDatabase')->getTargetUrl();
+
+				if ($requestData['formSubmit'] == "Proceed") {
+
+					$messages = [];
+					$additionalRedirectRequired = false;
+
+					try {
+						if (isset($requestData['migrate'])) {
+							$message = \Artisan::call('migrate', array('--force' => true));
+							$messages[] = $message;
+						}
+					} catch (\Exception $e) {
+						\Log::error($e);
+						$messages[] = "Error while running migrations: " . $e->getMessage();
+					}
+
+					try {
+						if (isset($requestData['updateLanguages'])) {
+							foreach (AdminHelper::modelConfigs() as $modelConfig) {
+								GtcmsPremium::updateLanguages($modelConfig);
+							}
+							$messages[] = "Languages updated";
+						}
+					} catch (\Exception $e) {
+						\Log::error($e);
+						$messages[] = "Error while updating languages: " . $e->getMessage();
+					}
+
+					if ($messages) {
+						$messages = implode("<br>", $messages);
+
+						if ($additionalRedirectRequired) {
+							$redirectUrl .= "?databaseMessages=" . $messages;
+						}
+
+						MessageManager::setSuccess($messages);
+					}
+				}
+
+				return redirect()->to($redirectUrl);
+			}
+
+			if (isset($requestData['databaseMessages'])) {
+				MessageManager::setSuccess($requestData['databaseMessages']);
+				return redirect()->route('gtcmsDatabase');
+			}
+
+			$data = array(
+				'active' => false,
+				'modelConfig' => new ModelConfig()
+			);
+
+			return view()->make("gtcms.elements.databaseOptions")->with($data);
 		}
 
 		session(['accessDenied' => true]);

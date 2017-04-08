@@ -8,17 +8,12 @@
 
 Route::get('/', array('uses' => 'AdminController@index'));
 
-/* -------- EXCEPTIONS -------- */
-
-
-/* -------- END EXCEPTIONS -------- */
-
 Route::match(array('get', 'post'), "/login", array('as' => 'adminLogin', 'uses' => 'AdminController@login'));
 Route::get("/logout", array('as' => 'adminLogout', 'uses' => 'AdminController@logout'));
 Route::get("/excelExport/{modelName}", array('as' => 'excelExport', 'uses' => 'AdminController@excelExport'));
 Route::get("/access-denied", array('as' => 'restricted', 'uses' => 'AdminController@restricted'));
-Route::match(array('get', 'post'), "/update-languages", array('as' => 'updateLanguages', 'uses' => 'AdminController@updateLanguages'));
-Route::match(array('get', 'post'), "/optimize", array('as' => 'optimize', 'uses' => 'AdminController@optimize'));
+Route::match(array('get', 'post'), "/gtcms-database", array('as' => 'gtcmsDatabase', 'uses' => 'AdminController@database'));
+Route::match(array('get', 'post'), "/gtcms-optimize", array('as' => 'gtcmsOptimize', 'uses' => 'AdminController@optimize'));
 Route::get('/setNavigationSize', array('as' => 'setNavigationSize', 'uses' => 'AdminController@setNavigationSize'));
 Route::post('/ajaxUpdate', array('as' => 'ajaxUpdate', 'uses' => 'AdminController@ajaxUpdate'));
 

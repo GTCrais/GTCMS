@@ -73,7 +73,7 @@ class AdminHelper
 		$formFields = $quickEdit ? $modelConfig->getQuickEditFields('all') : $modelConfig->formFields;
 		if ($formFields) {
 
-			$user = \Auth::user();
+			$user = auth()->user();
 
 			foreach ($formFields as $field) {
 				if ($field->rules && !in_array($field->type, array('file', 'image'))) {
@@ -417,7 +417,7 @@ class AdminHelper
 	public static function input($modelConfig, $action)
 	{
 		$input = request()->all();
-		$user = \Auth::user();
+		$user = auth()->user();
 
 		if (is_array($input) && !empty($input)) {
 			$formFields = array();
@@ -500,7 +500,7 @@ class AdminHelper
 			}
 		}
 
-		if ($modelConfig->name == "User" && isset($input['is_superadmin']) && !\Auth::user()->is_superadmin) {
+		if ($modelConfig->name == "User" && isset($input['is_superadmin']) && !auth()->user()->is_superadmin) {
 			$input['is_superadmin'] = 0;
 		}
 
@@ -519,7 +519,7 @@ class AdminHelper
 		}
 
 		if (!$user) {
-			$user = \Auth::user();
+			$user = auth()->user();
 		}
 
 		// unset property if it's restricted to superadmin and user isn't superadmin

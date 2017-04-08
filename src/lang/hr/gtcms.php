@@ -22,6 +22,7 @@ return array(
 	'administration' => 'Administracija',
 	'logout' => 'Odjava',
 	'optimization' => 'Optimizacija',
+	'database' => 'Baza podataka',
 	'adminTitle' => 'Administracija',
 	'unauthorizedAccess' => 'Neovlašten pristup',
 	'incorrectUsernameOrPassword' => 'Netočno korisničko ime ili lozinka',

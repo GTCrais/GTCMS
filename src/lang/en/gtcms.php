@@ -22,6 +22,7 @@ return array(
 	'administration' => 'Administration',
 	'logout' => 'Logout',
 	'optimization' => 'Optimizations',
+	'database' => 'Database',
 	'adminTitle' => 'Administration',
 	'unauthorizedAccess' => 'Unauthorized access',
 	'incorrectUsernameOrPassword' => 'Incorrect username or password',

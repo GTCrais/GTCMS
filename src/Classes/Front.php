@@ -206,11 +206,11 @@ class Front
 				<tr>';
 			$counter = 0;
 			foreach ($modelConfig->formFields as $field) {
-				if ($field->restrictedToSuperadmin && !\Auth::user()->is_superadmin) {
+				if ($field->restrictedToSuperadmin && !auth()->user()->is_superadmin) {
 					continue;
 				}
 
-				$userRole = \Auth::user()->role;
+				$userRole = auth()->user()->role;
 				if ($field->restrictedAccess && !$field->restrictedAccess->$userRole) {
 					continue;
 				}
@@ -264,11 +264,11 @@ class Front
 			//regular fields
 			$counter = 0;
 			foreach ($modelConfig->formFields as $index => $field) {
-				if ($field->restrictedToSuperadmin && !\Auth::user()->is_superadmin) {
+				if ($field->restrictedToSuperadmin && !auth()->user()->is_superadmin) {
 					continue;
 				}
 
-				$userRole = \Auth::user()->role;
+				$userRole = auth()->user()->role;
 				if ($field->restrictedAccess && !$field->restrictedAccess->$userRole) {
 					continue;
 				}
@@ -498,11 +498,11 @@ class Front
 		}
 
 		foreach ($modelConfig->getFormFields('all', true) as $field) {
-			if ($field->restrictedToSuperadmin && !\Auth::user()->is_superadmin) {
+			if ($field->restrictedToSuperadmin && !auth()->user()->is_superadmin) {
 				continue;
 			}
 
-			$userRole = \Auth::user()->role;
+			$userRole = auth()->user()->role;
 			if ($field->restrictedAccess && !$field->restrictedAccess->$userRole) {
 				continue;
 			}

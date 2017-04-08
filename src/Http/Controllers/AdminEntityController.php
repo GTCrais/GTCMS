@@ -26,7 +26,7 @@ class AdminEntityController extends Controller
 		try {
 			if (self::$modelConfig = AdminHelper::modelExists($entity)) {
 
-				$user = \Auth::user();
+				$user = auth()->user();
 				$role = $user->role;
 
 				if ((self::$modelConfig->restrictedAccess && $action != 'ajaxSearch' && !self::$modelConfig->restrictedAccess->$role) ||
@@ -106,7 +106,7 @@ class AdminEntityController extends Controller
 			$orderAndDirection = AdminHelper::getOrderParams(self::$modelConfig);
 			$objects = $fullEntity::searchResultsEntities(self::$modelConfig)
 				->where(function($query) {
-					if (self::$modelConfig->name == 'User' && !\Auth::user()->is_superadmin) {
+					if (self::$modelConfig->name == 'User' && !auth()->user()->is_superadmin) {
 						$query->where('is_superadmin', 0);
 					}
 				})->orderBy($orderAndDirection['orderBy'], $orderAndDirection['direction'])

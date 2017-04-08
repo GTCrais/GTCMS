@@ -23,7 +23,10 @@
 				<ul class="dropdown-menu dropdown-user">
 					@if (auth()->user()->is_superadmin)
 						<li>
-							<a href="{{url()->route('optimize')}}" class="standardLink"><i class="fa fa-wrench fa-fw"></i> {{trans('gtcms.optimization')}}</a>
+							<a href="{{url()->route('gtcmsOptimize')}}" class="standardLink"><i class="fa fa-wrench fa-fw"></i> {{trans('gtcms.optimization')}}</a>
+						</li>
+						<li>
+							<a href="{{url()->route('gtcmsDatabase')}}" class="standardLink"><i class="fa fa-database fa-fw"></i> {{trans('gtcms.database')}}</a>
 						</li>
 					@endif
 
