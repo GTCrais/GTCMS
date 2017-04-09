@@ -20,9 +20,9 @@ Route::get(trans('routes.logout'), ['as' => 'logout', 'uses' => 'Auth\LoginContr
 Route::get(trans('routes.register'), ['as' => 'register', 'uses' => 'Auth\RegisterController@showRegistrationForm']);
 Route::post('submit-registration', ['as' => 'submitRegistration', 'uses' => 'Auth\RegisterController@register']);
 
-Route::get('password-reset', ['as' => 'passwordReset', 'uses' => 'Auth\ForgotPasswordController@showLinkRequestForm']);
+Route::get(trans('routes.passwordReset'), ['as' => 'passwordReset', 'uses' => 'Auth\ForgotPasswordController@showLinkRequestForm']);
 Route::post('password-reset/email', ['as' => 'sendPasswordResetEmail', 'uses' => 'Auth\ForgotPasswordController@sendResetLinkEmail']);
-Route::get('password-reset/{token}', ['as' => 'passwordResetToken', 'uses' => 'Auth\ResetPasswordController@showResetForm']);
+Route::get(trans('routes.passwordReset') . '/{token}', ['as' => 'passwordResetToken', 'uses' => 'Auth\ResetPasswordController@showResetForm']);
 Route::post('password-reset/new-password', ['as' => 'submitNewPassword', 'uses' => 'Auth\ResetPasswordController@reset']);
 
 Route::post('/send-message', ['as' => 'sendQuery', 'uses' => 'ContactController@handler']);

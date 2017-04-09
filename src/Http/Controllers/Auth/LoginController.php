@@ -21,7 +21,7 @@ class LoginController extends Controller
 
     use RequestThrottler;
 
-	protected $throttleLogins = true;
+	protected $throttleRequests = true;
 
     /**
      * Create a new controller instance.
@@ -42,7 +42,10 @@ class LoginController extends Controller
 
 	public function showLoginForm()
 	{
-		return view()->make('front.pages.auth.login')->with(['errorMessage' => session('errorMessage', false)]);
+		return view()->make('front.pages.auth.login')->with([
+			'errorMessage' => session('errorMessage', false),
+			'passwordResetSuccess' => session('passwordResetSuccess', false)
+		]);
 	}
 
 	public function login(Request $request)
@@ -53,7 +56,7 @@ class LoginController extends Controller
 
 		$errorMessage = false;
 
-		if ($this->throttleLogins) {
+		if ($this->throttleRequests) {
 			$errorMessage = $this->processRequest($request);
 
 			if ($request->hasTooManyAttempts) {
@@ -65,10 +68,11 @@ class LoginController extends Controller
 
 		if (auth()->attempt(['email' => $email, 'password' => $password], $remember)) {
 			$this->clear($this->throttleKey($request));
+
 			return redirect()->route('home');
 		}
 
-		return back()->with(compact('errorMessage'))->withInput();
+		return back()->withInput()->with(compact('errorMessage'));
 	}
 
 	public function logout()

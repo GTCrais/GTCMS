@@ -17,6 +17,12 @@
 			top: calc(50% - 80px);
 		}
 
+		@media screen and (max-width: 480px) {
+			.gtcms {
+				font-size: 80px;
+			}
+		}
+
 		.gtcms .links {
 			font-family: 'Roboto', sans-serif;
 			font-size: 16px;

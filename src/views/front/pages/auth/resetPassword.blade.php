@@ -29,21 +29,19 @@
 			margin-bottom: 30px;
 		}
 
-		a {
-			text-decoration: none !important;
-			color: #424242 !important;
-			font-size: 14px;
-			position: relative;
-			top: 8px;
-			float: right;
-		}
-
 		label {
 			font-weight: 300;
 		}
 
 		.btn {
 			font-weight: 300;
+		}
+
+		a {
+			text-decoration: none !important;
+			position: relative;
+			top: 8px;
+			float: right;
 		}
 
 		.footer {
@@ -62,19 +60,21 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<div class="auth-form-container">
-					<h2>Login</h2>
+					<h2>Password reset</h2>
 
-					@if ($passwordResetSuccess)
-						<div class="alert alert-success" role="alert">
-							{!! $passwordResetSuccess !!}
-						</div>
-					@elseif ($errorMessage)
+					@if ($errors->count() || $errorMessage)
 						<div class="alert alert-warning" role="alert">
-							{!! $errorMessage !!}
+							{!! implode("<br>", $errors->all()) !!}
+							@if ($errorMessage)
+								{!! $errors->count() ? '<br>' : '' !!}
+								{!! $errorMessage !!}
+							@endif
 						</div>
 					@endif
 
-					{{Form::open(['method' => 'post', 'url' => url()->route('submitLogin')])}}
+					{{Form::open(['method' => 'post', 'url' => url()->route('submitNewPassword')])}}
+
+					{{Form::hidden('token', $token)}}
 
 					<div class="form-group">
 						{{Form::label('email', 'Email')}}
@@ -86,9 +86,12 @@
 						{{Form::password('password', ['class' => 'form-control', 'id' => 'password'])}}
 					</div>
 
-					{{Form::submit('SUBMIT', ['class' => 'btn btn-default'])}}
+					<div class="form-group">
+						{{Form::label('password_confirmation', 'Confirm password')}}
+						{{Form::password('password_confirmation', ['class' => 'form-control', 'id' => 'password_confirmation'])}}
+					</div>
 
-					<a href="{{url()->route('passwordReset')}}">Forgot password?</a>
+					{{Form::submit('SUBMIT', ['class' => 'btn btn-default'])}}
 
 					{{Form::close()}}
 

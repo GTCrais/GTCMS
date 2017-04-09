@@ -5,5 +5,6 @@
 return [
 	'login' => 'login',
 	'logout' => 'logout',
-	'register' => 'register'
+	'register' => 'register',
+	'passwordReset' => 'password-reset'
 ];

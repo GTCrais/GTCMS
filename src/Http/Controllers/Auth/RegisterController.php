@@ -24,7 +24,7 @@ class RegisterController extends Controller
 
 	use RequestThrottler;
 
-	protected $throttleRegistrations = true;
+	protected $throttleRequests = true;
 
 	/**
 	 * Create a new controller instance.
@@ -52,7 +52,7 @@ class RegisterController extends Controller
 	{
 		$errorMessage = false;
 
-		if ($this->throttleRegistrations) {
+		if ($this->throttleRequests) {
 			$errorMessage = $this->processRequest($request);
 
 			if ($request->hasTooManyAttempts) {

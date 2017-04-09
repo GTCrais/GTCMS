@@ -23,7 +23,7 @@ class ForgotPasswordController extends Controller
 
     use SendsPasswordResetEmails, RequestThrottler;
 
-	protected $throttleLinkRequests = true;
+	protected $throttleRequests = true;
 
     /**
      * Create a new controller instance.
@@ -38,8 +38,8 @@ class ForgotPasswordController extends Controller
 
 	public function setThrottlingParameters()
 	{
-		$this->maxAttempts = 55;
-		$this->lockoutDuration = 1; // In minutes
+		$this->maxAttempts = 5;
+		$this->lockoutDuration = 2; // In minutes
 	}
 
 	public function showLinkRequestForm()
@@ -53,7 +53,7 @@ class ForgotPasswordController extends Controller
 	public function sendResetLinkEmail(Request $request)
 	{
 		$attemptsMessage = false;
-		if ($this->throttleLinkRequests) {
+		if ($this->throttleRequests) {
 			$attemptsMessage = $this->processRequest($request);
 
 			if ($request->hasTooManyAttempts) {
@@ -83,6 +83,7 @@ class ForgotPasswordController extends Controller
 
 		if ($response === Password::RESET_LINK_SENT) {
 			$this->lock($this->throttleKey($request), $this->maxAttempts, $this->lockoutDuration);
+
 			return back()->with([
 				'message' => trans($response),
 				'success' => true
@@ -95,7 +96,7 @@ class ForgotPasswordController extends Controller
 		$message = trans($response);
 
 		if ($attemptsMessage) {
-			$message = trans($response) . "<br>" . $attemptsMessage;
+			$message .= "<br>" . $attemptsMessage;
 		}
 
 		return back()->with(compact('message'));

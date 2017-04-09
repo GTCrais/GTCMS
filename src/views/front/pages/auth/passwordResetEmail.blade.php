@@ -36,6 +36,24 @@
 		.btn {
 			font-weight: 300;
 		}
+
+		a {
+			text-decoration: none !important;
+			position: relative;
+			top: 8px;
+			float: right;
+		}
+
+		.footer {
+			margin-top: 40px;
+			border-top: 1px solid #ccc;
+		}
+
+		.footer a {
+			text-transform: uppercase;
+			color: #a3a3a3 !important;
+			font-size: 13px;
+		}
 	</style>
 
 	<div class="container">
@@ -62,6 +80,10 @@
 
 						{{Form::close()}}
 					@endif
+
+					<div class="footer">
+						<a href="/">Home</a>
+					</div>
 				</div>
 			</div>
 		</div>
