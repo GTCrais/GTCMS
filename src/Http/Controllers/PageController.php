@@ -21,7 +21,7 @@ class PageController extends Controller
 				'cPage' => $homepage
 			];
 
-			return view()->make('front.elements.homepage')->with($data);
+			return view()->make('front.pages.homepage')->with($data);
 
 		} else {
 			if (config('gtcms.premium') && config('gtcmslang.siteIsMultilingual')) {
@@ -37,7 +37,7 @@ class PageController extends Controller
 					'cPage' => $cPage
 				];
 
-				return view()->make('front.elements.page')->with($data);
+				return view()->make('front.pages.page')->with($data);
 			}
 
 			abort(404);

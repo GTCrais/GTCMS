@@ -16,7 +16,7 @@ return [
 	'rememberMe' => 'Remember me',
 	'forgotPassword' => 'Forgot your password?',
 	'emptyLoginField' => 'Both fields must be filled out',
-	'incorrectLoginField' => 'Incorrect email or password',
+	'incorrectLoginField' => 'Incorrect email or password.',
 	'hi' => 'Hi',
 	'next' => 'Next',
 	'back' => 'Back',
