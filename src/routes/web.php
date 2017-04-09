@@ -17,7 +17,8 @@ Route::get(trans('routes.login'), array('as' => 'login', 'uses' => 'Auth\LoginCo
 Route::post('submit-login', array('as' => 'submitLogin', 'uses' => 'Auth\LoginController@login'));
 Route::get(trans('routes.logout'), array('as' => 'logout', 'uses' => 'Auth\LoginController@logout'));
 
-Route::match(array('GET', 'POST'), trans('routes.register'), array('as' => 'register', 'uses' => 'UserController@register'));
+Route::get(trans('routes.register'), array('as' => 'register', 'uses' => 'Auth\RegisterController@showRegistrationForm'));
+Route::post('submit-registration', array('as' => 'submitRegistration', 'uses' => 'Auth\RegisterController@register'));
 
 Route::post('/send-message', ['as' => 'sendQuery', 'uses' => 'ContactController@handler']);
 

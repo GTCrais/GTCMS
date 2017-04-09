@@ -42,15 +42,24 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<div class="auth-form-container">
-					<h2>Login</h2>
+					<h2>Registration</h2>
 
-					@if ($errorMessage)
+					@if ($errors->count() || $errorMessage)
 						<div class="alert alert-warning" role="alert">
-							{!! $errorMessage !!}
+							{!! implode("<br>", $errors->all()) !!}
+							@if ($errorMessage)
+								{!! $errors->count() ? '<br>' : '' !!}
+								{!! $errorMessage !!}
+							@endif
 						</div>
 					@endif
 
-					{{Form::open(['method' => 'post', 'url' => url()->route('submitLogin')])}}
+					{{Form::open(['method' => 'post', 'url' => url()->route('submitRegistration')])}}
+
+					<div class="form-group">
+						{{Form::label('first_name', 'First name')}}
+						{{Form::text('first_name', null, ['class' => 'form-control', 'id' => 'first_name'])}}
+					</div>
 
 					<div class="form-group">
 						{{Form::label('email', 'Email')}}
@@ -60,6 +69,11 @@
 					<div class="form-group">
 						{{Form::label('password', 'Password')}}
 						{{Form::password('password', ['class' => 'form-control', 'id' => 'password'])}}
+					</div>
+
+					<div class="form-group">
+						{{Form::label('password_confirmation', 'Confirm password')}}
+						{{Form::password('password_confirmation', ['class' => 'form-control', 'id' => 'password_confirmation'])}}
 					</div>
 
 					{{Form::submit('SUBMIT', ['class' => 'btn btn-default'])}}

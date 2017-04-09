@@ -2,70 +2,123 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\User;
+use App\Traits\RequestThrottler;
+use App\Models\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\RegistersUsers;
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
+	/*
+	|--------------------------------------------------------------------------
+	| Register Controller
+	|--------------------------------------------------------------------------
+	|
+	| This controller handles the registration of new users as well as their
+	| validation and creation. By default this controller uses a trait to
+	| provide this functionality without requiring any additional code.
+	|
+	*/
 
-    use RegistersUsers;
+	use RequestThrottler;
 
-    /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
+	protected $throttleRegistrations = true;
+	protected $maxAttempts = 2;
+	protected $lockoutDuration = 1; // In minutes
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest');
-    }
+	/**
+	 * Create a new controller instance.
+	 *
+	 * @return void
+	 */
+	public function __construct()
+	{
+		$this->middleware('guest');
+	}
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
-            'name' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|min:6|confirmed',
-        ]);
-    }
+	public function showRegistrationForm()
+	{
+		return view()->make('front.pages.auth.register')->with(['errorMessage' => session('errorMessage', false)]);
+	}
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return User
-     */
-    protected function create(array $data)
-    {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-        ]);
-    }
+	public function register(Request $request)
+	{
+		$errorMessage = false;
+
+		if ($this->throttleRegistrations) {
+			if ($this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration)) {
+				$errorMessage = trans('auth.throttle', ['seconds' => $this->availableIn($this->throttleKey($request))]);
+
+				return back()->with(compact('errorMessage'));
+			}
+
+			$this->incrementAttempts($request, $this->lockoutDuration);
+
+			$retriesLeft = $this->retriesLeft($this->throttleKey($request), $this->maxAttempts);
+			if ($retriesLeft <= 0) {
+				$retriesLeft = 0;
+			}
+
+			if (!$retriesLeft) {
+				$errorMessage = trans('auth.throttle', ['seconds' => $this->lockoutDuration * 60]);
+			} else {
+				$errorMessage = trans_choice('auth.attemptsLeft', $retriesLeft, ['attemptsLeft' => $retriesLeft]);
+			}
+
+			// Trigger countdown here
+			$this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration);
+		}
+
+		$validator = $this->validator($request->all());
+		if ($validator->fails()) {
+			return back()->withErrors($validator)->withInput()->with(compact('errorMessage'));
+		}
+
+		try {
+			event(new Registered($user = $this->create($request)));
+			auth()->login($user);
+			$this->clear($this->throttleKey($request));
+
+			return redirect()->route('home');
+		} catch (\Exception $e) {
+			\Log::error("User registration error: " . $e->getMessage());
+			\Log::error($e);
+
+			$errorMessage = trans('front.errorHasOccurred');
+
+			return back()->withInput()->with(compact('errorMessage'));
+		}
+	}
+
+	/**
+	 * Get a validator for an incoming registration request.
+	 *
+	 * @param  array  $data
+	 * @return \Illuminate\Contracts\Validation\Validator
+	 */
+	protected function validator(array $data)
+	{
+		return Validator::make($data, [
+			'first_name' => 'required|max:255',
+			'email' => 'required|email|max:255|unique:users',
+			'password' => 'required|min:6|confirmed',
+		]);
+	}
+
+	/**
+	 * Create a new user instance after a valid registration.
+	 *
+	 * @param  array  $data
+	 * @return User
+	 */
+	protected function create(Request $request)
+	{
+		return User::create([
+			'first_name' => $request->get('first_name'),
+			'email' => $request->get('email'),
+			'password' => bcrypt($request->get('password')),
+		]);
+	}
 }

@@ -22,7 +22,7 @@ class LoginController extends Controller
     use RequestThrottler;
 
 	protected $throttleLogins = true;
-	protected $maxLoginAttempts = 5;
+	protected $maxAttempts = 2;
 	protected $lockoutDuration = 1; // In minutes
 
     /**
@@ -46,27 +46,23 @@ class LoginController extends Controller
 		$password = $request->get('password');
 		$remember = $request->get('remember_me') ? true : false;
 
+		$errorMessage = false;
+
 		if ($this->throttleLogins) {
-			if ($this->hasTooManyAttempts($request, $this->maxLoginAttempts, $this->lockoutDuration)) {
+			if ($this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration)) {
 				$errorMessage = trans('auth.throttle', ['seconds' => $this->availableIn($this->throttleKey($request))]);
 
 				return back()->with(compact('errorMessage'));
 			}
 
 			$this->incrementAttempts($request, $this->lockoutDuration);
-		}
 
-		if (auth()->attempt(['email' => $email, 'password' => $password], $remember)) {
-			return redirect()->route('home');
-		}
-
-		$errorMessage = trans('front.incorrectLoginField');
-
-		if ($this->throttleLogins) {
-			$retriesLeft = $this->retriesLeft($this->throttleKey($request), $this->maxLoginAttempts);
+			$retriesLeft = $this->retriesLeft($this->throttleKey($request), $this->maxAttempts);
 			if ($retriesLeft <= 0) {
 				$retriesLeft = 0;
 			}
+
+			$errorMessage = trans('front.incorrectLoginField');
 
 			if (!$retriesLeft) {
 				$errorMessage .= "<br>" . trans('auth.throttle', ['seconds' => $this->lockoutDuration * 60]);
@@ -74,9 +70,13 @@ class LoginController extends Controller
 				$errorMessage .= "<br>" . trans_choice('auth.attemptsLeft', $retriesLeft, ['attemptsLeft' => $retriesLeft]);
 			}
 
-			// We need to add this line to start the lockout timer here
-			// instead of on the next login attempt
-			$this->hasTooManyAttempts($request, $this->maxLoginAttempts, $this->lockoutDuration);
+			// Trigger countdown here
+			$this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration);
+		}
+
+		if (auth()->attempt(['email' => $email, 'password' => $password], $remember)) {
+			$this->clear($this->throttleKey($request));
+			return redirect()->route('home');
 		}
 
 		return back()->with(compact('errorMessage'))->withInput();
