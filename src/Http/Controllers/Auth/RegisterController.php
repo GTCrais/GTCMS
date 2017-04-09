@@ -25,8 +25,6 @@ class RegisterController extends Controller
 	use RequestThrottler;
 
 	protected $throttleRegistrations = true;
-	protected $maxAttempts = 2;
-	protected $lockoutDuration = 1; // In minutes
 
 	/**
 	 * Create a new controller instance.
@@ -36,6 +34,13 @@ class RegisterController extends Controller
 	public function __construct()
 	{
 		$this->middleware('guest');
+		$this->setThrottlingParameters();
+	}
+
+	public function setThrottlingParameters()
+	{
+		$this->maxAttempts = 5;
+		$this->lockoutDuration = 1; // In minutes
 	}
 
 	public function showRegistrationForm()
@@ -48,27 +53,11 @@ class RegisterController extends Controller
 		$errorMessage = false;
 
 		if ($this->throttleRegistrations) {
-			if ($this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration)) {
-				$errorMessage = trans('auth.throttle', ['seconds' => $this->availableIn($this->throttleKey($request))]);
+			$errorMessage = $this->processRequest($request);
 
+			if ($request->hasTooManyAttempts) {
 				return back()->with(compact('errorMessage'));
 			}
-
-			$this->incrementAttempts($request, $this->lockoutDuration);
-
-			$retriesLeft = $this->retriesLeft($this->throttleKey($request), $this->maxAttempts);
-			if ($retriesLeft <= 0) {
-				$retriesLeft = 0;
-			}
-
-			if (!$retriesLeft) {
-				$errorMessage = trans('auth.throttle', ['seconds' => $this->lockoutDuration * 60]);
-			} else {
-				$errorMessage = trans_choice('auth.attemptsLeft', $retriesLeft, ['attemptsLeft' => $retriesLeft]);
-			}
-
-			// Trigger countdown here
-			$this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration);
 		}
 
 		$validator = $this->validator($request->all());

@@ -4,6 +4,12 @@ namespace App\Classes;
 
 class Mailer
 {
+	public static function sendPasswordResetLink($user, $token) {
+		\Mail::send('front.emails.auth.passwordReset', ['user' => $user, 'token' => $token], function ($message) use ($user) {
+			$message->to($user->email)->subject(config('gtcms.siteName') . " - Password reset request");
+		});
+	}
+
 	public static function sendMessage($inputData)
 	{
 		$body = "
@@ -14,8 +20,8 @@ class Mailer
 			Message: <br>" . \Html::entities($inputData['message']) . "<br>
 		";
 
-		\Mail::send('front.templates.email.simple', ['body' => $body], function ($message) {
-			$message->to(config('gtcms.adminEmail'))->subject(config('gtcms.contactMessageSubject'));
+		\Mail::send('front.emails.simple', ['body' => $body], function ($message) {
+			$message->to(config('gtcms.adminEmail'))->subject(config('gtcms.siteName') . " - New message");
 		});
 	}
 
@@ -29,8 +35,8 @@ class Mailer
 			$subject = "[Testing email functionality]";
 		}
 
-		\Mail::send('front.templates.email.simple', ['body' => $body], function ($message) use ($email, $subject) {
-			$message->to($email)->from(config('gtcms.fromEmail'), config('gtcms.fromPerson'))->subject($subject);
+		\Mail::send('front.emails.simple', ['body' => $body], function ($message) use ($email, $subject) {
+			$message->to($email)->subject($subject);
 		});
 	}
 }

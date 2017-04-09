@@ -22,8 +22,6 @@ class LoginController extends Controller
     use RequestThrottler;
 
 	protected $throttleLogins = true;
-	protected $maxAttempts = 2;
-	protected $lockoutDuration = 1; // In minutes
 
     /**
      * Create a new controller instance.
@@ -33,7 +31,14 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest', ['except' => 'logout']);
+		$this->setThrottlingParameters();
     }
+
+	public function setThrottlingParameters()
+	{
+		$this->maxAttempts = 5;
+		$this->lockoutDuration = 1; // In minutes
+	}
 
 	public function showLoginForm()
 	{
@@ -49,29 +54,13 @@ class LoginController extends Controller
 		$errorMessage = false;
 
 		if ($this->throttleLogins) {
-			if ($this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration)) {
-				$errorMessage = trans('auth.throttle', ['seconds' => $this->availableIn($this->throttleKey($request))]);
+			$errorMessage = $this->processRequest($request);
 
+			if ($request->hasTooManyAttempts) {
 				return back()->with(compact('errorMessage'));
 			}
 
-			$this->incrementAttempts($request, $this->lockoutDuration);
-
-			$retriesLeft = $this->retriesLeft($this->throttleKey($request), $this->maxAttempts);
-			if ($retriesLeft <= 0) {
-				$retriesLeft = 0;
-			}
-
-			$errorMessage = trans('front.incorrectLoginField');
-
-			if (!$retriesLeft) {
-				$errorMessage .= "<br>" . trans('auth.throttle', ['seconds' => $this->lockoutDuration * 60]);
-			} else {
-				$errorMessage .= "<br>" . trans_choice('auth.attemptsLeft', $retriesLeft, ['attemptsLeft' => $retriesLeft]);
-			}
-
-			// Trigger countdown here
-			$this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration);
+			$errorMessage = trans('front.incorrectLoginField') . "<br>" . $errorMessage;
 		}
 
 		if (auth()->attempt(['email' => $email, 'password' => $password], $remember)) {

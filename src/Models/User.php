@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Classes\Mailer;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -47,6 +48,16 @@ class User extends BaseModel implements
 	public function getFullNameAttribute()
 	{
 		return $this->first_name . " " . $this->last_name;
+	}
+
+	public function sendPasswordResetNotification($token)
+	{
+		try {
+			Mailer::sendPasswordResetLink($this, $token);
+		} catch (\Exception $e) {
+			\Log::error("Error while sending password reset token: " . $e->getMessage());
+			\Log::error($e);
+		}
 	}
 
 	public function isDeletable()
