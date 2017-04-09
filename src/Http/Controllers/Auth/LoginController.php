@@ -37,7 +37,7 @@ class LoginController extends Controller
 
 	public function showLoginForm()
 	{
-		return view()->make('front.pages.auth.login')->with(['errorMessage' => session('errorMessage')]);
+		return view()->make('front.pages.auth.login')->with(['errorMessage' => session('errorMessage', false)]);
 	}
 
 	public function login(Request $request)
@@ -80,5 +80,14 @@ class LoginController extends Controller
 		}
 
 		return back()->with(compact('errorMessage'))->withInput();
+	}
+
+	public function logout()
+	{
+		if (auth()->check()) {
+			auth()->logout();
+		}
+
+		return redirect()->route('home');
 	}
 }

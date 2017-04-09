@@ -38,7 +38,7 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<div class="auth-form-container">
-					@if (isset($errorMessage) && $errorMessage)
+					@if ($errorMessage)
 						<div class="alert alert-warning" role="alert">
 							{!! $errorMessage !!}
 						</div>
@@ -56,8 +56,7 @@
 						{{Form::password('password', ['class' => 'form-control', 'id' => 'password'])}}
 					</div>
 
-
-						{{Form::submit('SUBMIT', ['class' => 'btn btn-default'])}}
+					{{Form::submit('SUBMIT', ['class' => 'btn btn-default'])}}
 
 					{{Form::close()}}
 				</div>
