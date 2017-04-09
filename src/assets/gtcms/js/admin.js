@@ -1480,6 +1480,7 @@ function setFormHandling() {
 		var errorMsg = form.find('div.formSubmitMessage span.errorMessage');
 		var successCheckmark = form.find('div.formSubmitMessage i.fa');
 		var spinnerTarget = form.find('.formSpinner');
+		var tabs = form.find("ul.nav.nav-tabs > li");
 
 		if(!spinnerTarget.find("div.spinner").length) {
 			$formSpinner = spin(spinnerTarget);
@@ -1520,6 +1521,8 @@ function setFormHandling() {
 						//console.error("success");
 						$("span.errorMsg").slideUp(100).remove();
 						$("div.form-group").removeClass('has-warning');
+						tabs.removeClass('has-warning');
+
 						spinnerTarget.fadeOut(100).promise().done(function(){
 							$formSpinner.stop();
 							successCheckmark.fadeIn(250).promise().done(function(){
@@ -1592,8 +1595,10 @@ function setFormHandling() {
 							displayMessage(data.exception);
 						}
 
+						tabs.removeClass('has-warning');
+
 						if (data.errors) {
-							for (fieldId in data.errors) {
+							for (var fieldId in data.errors) {
 								var formGroup = $("input#"+fieldId).closest("div.form-group");
 								if (!formGroup.length) {
 									formGroup = $("select#"+fieldId).closest("div.form-group");
@@ -1602,6 +1607,12 @@ function setFormHandling() {
 									formGroup = $("textarea#"+fieldId).closest("div.form-group");
 								}
 								if (formGroup.length) {
+									var tabPane = formGroup.closest("div.tab-pane");
+									if (tabPane.length) {
+										var tab = $('a[href="#' + (tabPane.attr('id')) + '"]').parents('li');
+										tab.addClass('has-warning');
+									}
+
 									var infoClass = "";
 									var horizontalForm = form.hasClass('form-horizontal');
 									if (horizontalForm) {
