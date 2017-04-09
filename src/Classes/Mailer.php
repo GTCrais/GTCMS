@@ -14,10 +14,10 @@ class Mailer
 	{
 		$body = "
 			<br>
-			Name: " . \Html::entities($inputData['name']) . "<br>
-			Email: " . \Html::entities($inputData['email']) . "<br>
-			Subject: " . \Html::entities($inputData['subject']) . "<br>
-			Message: <br>" . \Html::entities($inputData['message']) . "<br>
+			<strong>Name:</strong> " . \Html::entities($inputData['name']) . "<br>
+			<strong>Email:</strong> " . \Html::entities($inputData['email']) . "<br>
+			<strong>Subject:</strong> " . \Html::entities($inputData['subject']) . "<br>
+			<strong>Message:</strong><br>" . \Html::entities($inputData['message']) . "<br>
 		";
 
 		\Mail::send('front.emails.simple', ['body' => $body], function ($message) {

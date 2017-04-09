@@ -20,8 +20,8 @@ class ContactController extends Controller
 	{
 		$data = [
 			'success' => false,
-			'title' => trans('t.contactErrorTitle'),
-			'message' => trans('t.contactErrorMessage')
+			'title' => trans('front.contactErrorTitle'),
+			'message' => trans('front.errorHasOccurred')
 		];
 
 		$requestAllowed = true;
@@ -48,8 +48,8 @@ class ContactController extends Controller
 				try {
 					Mailer::sendMessage($request->all());
 					$data['success'] = true;
-					$data['title'] = trans('t.contactSuccessTitle');
-					$data['message'] = trans('t.contactSuccessMessage');
+					$data['title'] = trans('front.contactSuccessTitle');
+					$data['message'] = trans('front.contactSuccessMessage');
 				} catch (\Exception $e) {
 					Dbar::error("Error while sending message: " . $e->getMessage());
 				}
