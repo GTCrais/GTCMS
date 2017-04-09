@@ -140,7 +140,8 @@ return [
 					'label' => 'Content',
 					'type' => 'textarea',
 					'options' => [
-						'class' => 'simpleEditor'
+						'class' => 'editor',
+						'data-editortoolbar' => 'bold-italic|bullet-list|justify|link'
 					],
 					'tab' => 'Common',
 					'modelKey' => [

@@ -1,34 +1,87 @@
 <?php
 
 return [
+	/*
+	|--------------------------------------------------------------------------
+	| Routing
+	|--------------------------------------------------------------------------
+	*/
+
+	// Include to pre-defined routes from package or not. Middlewares
+	'use_package_routes' => true,
+
+	// Middlewares which should be applied to all package routes.
+	// For laravel 5.1 and before, remove 'web' from the array.
+	'middlewares' => ['web', 'adminAuth'],
+
+	// The url to this package. Change it if necessary.
+	'prefix' => 'laravel-filemanager',
+
+	/*
+	|--------------------------------------------------------------------------
+	| Multi-User Mode
+	|--------------------------------------------------------------------------
+	*/
+
+	// If true, private folders will be created for each signed-in user.
+	'allow_multi_user' => false,
+	// If true, share folder will be created when allow_multi_user is true.
+	'allow_share_folder' => false,
+
+	// The database column to identify a user. Make sure the value is unique.
+	// Ex: When set to 'id', the private folder of user will be named as the user id.
+	'user_field' => 'id',
+
+	/*
+	|--------------------------------------------------------------------------
+	| Working Directory
+	|--------------------------------------------------------------------------
+	*/
+
+	// Which folder to store files in project, fill in 'public', 'resources', 'storage' and so on.
+	// You should create routes to serve images if it is not set to public.
+	'base_directory' => 'public',
+
+	'images_folder_name' => 'lfm/images',
+	'files_folder_name'  => 'lfm/files',
+
+	'shared_folder_name' => 'shares',
+	'thumb_folder_name'  => 'thumbs',
+
+	/*
+	|--------------------------------------------------------------------------
+	| Startup Views
+	|--------------------------------------------------------------------------
+	*/
+
+	// The default display type for items.
+	// Supported: "grid", "list"
+	'images_startup_view' => 'grid',
+	'files_startup_view' => 'list',
+
+	/*
+	|--------------------------------------------------------------------------
+	| Upload / Validation
+	|--------------------------------------------------------------------------
+	*/
+
 	// If true, the uploaded file will be renamed to uniqid() + file extension.
 	'rename_file' => false,
 
-	// If rename_file set to false and this set to true, then filter filename characters which are not alphanumeric.
+	// If rename_file set to false and this set to true, then non-alphanumeric characters in filename will be replaced.
 	'alphanumeric_filename' => true,
 
-	'use_package_routes' => true,
+	// If true, non-alphanumeric folder name will be rejected.
+	'alphanumeric_directory' => true,
 
-	// For laravel 5.2, please set to ['web', 'auth']
-	'middlewares' => ['web', 'adminAuth'],
+	// If true, the uploading file's size will be verified for over than max_image_size/max_file_size.
+	'should_validate_size' => false,
 
-	// Allow multi_user mode or not.
-	// If true, laravel-filemanager create private folders for each signed-in user.
-	'allow_multi_user' => false,
+	'max_image_size' => 50000,
+	'max_file_size' => 50000,
 
-	// The database field to identify a user.
-	// When set to 'id', the private folder will be named as the user id.
-	// NOTE: make sure to use an unique field.
-	'user_field' => 'id',
-
-	'shared_folder_name' => '',
-	'thumb_folder_name' => 'thumbs',
-
-	'images_dir' => 'public/lfm/photos/',
-	'images_url' => '/lfm/photos/',
-
-	'files_dir' => 'public/lfm/files/',
-	'files_url' => '/lfm/files/',
+	// If true, the uploading file's mime type will be valid in valid_image_mimetypes/valid_file_mimetypes.
+	'should_validate_mime' => false,
 
 	// available since v1.3.0
 	'valid_image_mimetypes' => [
@@ -49,35 +102,48 @@ return [
 		'text/plain',
 	],
 
-	// file extensions array, only for showing file information, it won't affect the upload process.
+	/*
+	|--------------------------------------------------------------------------
+	| Image / Folder Setting
+	|--------------------------------------------------------------------------
+	*/
+
+	'thumb_img_width' => 200,
+	'thumb_img_height' => 200,
+
+	/*
+	|--------------------------------------------------------------------------
+	| File Extension Information
+	|--------------------------------------------------------------------------
+	*/
+
 	'file_type_array' => [
-		'pdf' => 'Adobe Acrobat',
-		'doc' => 'Microsoft Word',
+		'pdf'  => 'Adobe Acrobat',
+		'doc'  => 'Microsoft Word',
 		'docx' => 'Microsoft Word',
-		'xls' => 'Microsoft Excel',
+		'xls'  => 'Microsoft Excel',
 		'xlsx' => 'Microsoft Excel',
-		'zip' => 'Archive',
-		'gif' => 'GIF Image',
-		'jpg' => 'JPEG Image',
+		'zip'  => 'Archive',
+		'gif'  => 'GIF Image',
+		'jpg'  => 'JPEG Image',
 		'jpeg' => 'JPEG Image',
-		'png' => 'PNG Image',
-		'ppt' => 'Microsoft PowerPoint',
+		'png'  => 'PNG Image',
+		'ppt'  => 'Microsoft PowerPoint',
 		'pptx' => 'Microsoft PowerPoint',
 	],
 
-	// file extensions array, only for showing icons, it won't affect the upload process.
 	'file_icon_array' => [
-		'pdf' => 'fa-file-pdf-o',
-		'doc' => 'fa-file-word-o',
+		'pdf'  => 'fa-file-pdf-o',
+		'doc'  => 'fa-file-word-o',
 		'docx' => 'fa-file-word-o',
-		'xls' => 'fa-file-excel-o',
+		'xls'  => 'fa-file-excel-o',
 		'xlsx' => 'fa-file-excel-o',
-		'zip' => 'fa-file-archive-o',
-		'gif' => 'fa-file-image-o',
-		'jpg' => 'fa-file-image-o',
+		'zip'  => 'fa-file-archive-o',
+		'gif'  => 'fa-file-image-o',
+		'jpg'  => 'fa-file-image-o',
 		'jpeg' => 'fa-file-image-o',
-		'png' => 'fa-file-image-o',
-		'ppt' => 'fa-file-powerpoint-o',
+		'png'  => 'fa-file-image-o',
+		'ppt'  => 'fa-file-powerpoint-o',
 		'pptx' => 'fa-file-powerpoint-o',
 	],
 ];
