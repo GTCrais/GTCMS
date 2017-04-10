@@ -33,23 +33,23 @@ class BaseModel extends \Eloquent
 	{
 		$m2mData = $modelConfig->getManyToManyRelationData();
 		if (!empty($m2mData['relationData'])) {
-			$groupBy = $m2mData['table'].".".$m2mData['idProperty'];
-			$select = array(
+			$groupBy = $m2mData['table'] . "." . $m2mData['idProperty'];
+			$select = [
 				$m2mData['table'] . ".*",
 				$groupBy
-			);
+			];
 
-			$joins = array();
+			$joins = [];
 
 			foreach ($m2mData['relationData'] as $relationData) {
 				$select[] = $relationData['relationTable']
-					. ".".$relationData['relatedModelId']
-					. " AS ".$relationData['relatedModelId'];
-				$joins[] = array(
+					. "." . $relationData['relatedModelId']
+					. " AS " . $relationData['relatedModelId'];
+				$joins[] = [
 					'table' => $relationData['relationTable'],
 					'key1' => $m2mData['table'] . ".id",
 					'key2' => $relationData['relationTable'] . "." . $relationData['relationId']
-				);
+				];
 			}
 
 			$return = static::select($select);
@@ -59,6 +59,7 @@ class BaseModel extends \Eloquent
 			}
 
 			$return->groupBy($groupBy);
+
 			return $return;
 		}
 
@@ -72,16 +73,16 @@ class BaseModel extends \Eloquent
 
 	public static function searchResultsEntities(ModelConfig $modelConfig)
 	{
-		return static::completeEntities($modelConfig)->where(function($query) use ($modelConfig) {
+		return static::completeEntities($modelConfig)->where(function ($query) use ($modelConfig) {
 			$searchDataArray = AdminHelper::getSearchData($modelConfig);
 			if ($searchDataArray) {
 				foreach ($searchDataArray as $searchData) {
 					if ($searchData['searchConfig']['type'] == 'standard') {
 						if ($searchData['searchConfig']['match'] == 'exact') {
 							if (config('gtcms.premium') && isset($searchData['langDependent']) && $searchData['langDependent']) {
-								$query->where(function($query2) use ($searchData){
+								$query->where(function ($query2) use ($searchData) {
 									foreach (config('gtcmslang.languages') as $lang) {
-										$query2->orWhere($searchData['dbProperty']."_".$lang, $searchData['value']);
+										$query2->orWhere($searchData['dbProperty'] . "_" . $lang, $searchData['value']);
 									}
 								});
 							} else {
@@ -96,7 +97,7 @@ class BaseModel extends \Eloquent
 							}
 						} else if ($searchData['searchConfig']['match'] == 'pattern') {
 							if (config('gtcms.premium') && isset($searchData['langDependent']) && $searchData['langDependent']) {
-								$query->where(function($query2) use ($searchData){
+								$query->where(function ($query2) use ($searchData) {
 									foreach (config('gtcmslang.languages') as $lang) {
 										$query2->orWhere($searchData['dbProperty'] . "_" . $lang, 'LIKE', '%' . $searchData['value'] . '%');
 									}
@@ -203,9 +204,9 @@ class BaseModel extends \Eloquent
 		return number_format(microtime(true), 3, "", "");
 	}
 
-	public static function getPositionPropertyAndValueFromParentData($parentData, $modelConfig)
+	public static function getPositionPropertyDataFromParentData($parentData, $modelConfig)
 	{
-		$positionProperties = array();
+		$positionProperties = [];
 		if ($parentData['allParents']) {
 			foreach ($parentData['allParents'] as $parentIdProperty => $parentId) {
 				$parentModelConfig = AdminHelper::modelExists($parentIdProperty, 'id');
@@ -214,7 +215,10 @@ class BaseModel extends \Eloquent
 						if ($relatedModel->name == $modelConfig->name) {
 							if ($relatedModel->position) {
 								$positionProperty = $relatedModel->positionProperty;
-								$positionProperties[$positionProperty] = static::getNextTablePosition();
+								$positionProperties[$positionProperty] = [
+									'value' => static::getNextTablePosition(),
+									'parentIdProperty' => $parentIdProperty
+								];
 							}
 							break;
 						}
@@ -231,7 +235,7 @@ class BaseModel extends \Eloquent
 		/** @var ModelConfig $modelConfig */
 		$modelConfig = $this->modelConfig();
 
-		\DB::transaction(function() use ($modelConfig) {
+		\DB::transaction(function () use ($modelConfig) {
 			if ($modelConfig->index == 'tree') {
 				$parentIdProperty = $modelConfig->parent->property;
 				\DB::table($this->table)->where($parentIdProperty, $this->$parentIdProperty)->where('position', '>', $this->position)->decrement('position');
@@ -266,12 +270,13 @@ class BaseModel extends \Eloquent
 
 		if ($oldDepth != $newDepth) {
 			Dbar::error("Error: Depth change");
+
 			return false;
 		}
 
 		/** @var BaseModel $object */
 		$object = $this;
-		\DB::transaction(function() use ($parentIdProperty, &$object, $objectClass, $oldParentId, $newParentId, $oldPosition, $newPosition, $modelConfig) {
+		\DB::transaction(function () use ($parentIdProperty, &$object, $objectClass, $oldParentId, $newParentId, $oldPosition, $newPosition, $modelConfig) {
 			$object->position = $newPosition;
 			if ($oldParentId != $newParentId) {
 				// Parent changed
@@ -337,6 +342,7 @@ class BaseModel extends \Eloquent
 
 		if (!$belowItem && !$aboveItem) {
 			Dbar::error("no below or above item");
+
 			return false;
 		}
 
@@ -395,7 +401,7 @@ class BaseModel extends \Eloquent
 		if ($direction == 'move-down') {
 			$this->$positionProperty = $newPosition;
 			$object = &$this;
-			\DB::transaction(function() use ($parentIdProperty, &$object, $positionInParent, $fullObjectClass, $positionProperty, $oldPosition, $newPosition) {
+			\DB::transaction(function () use ($parentIdProperty, &$object, $positionInParent, $fullObjectClass, $positionProperty, $oldPosition, $newPosition) {
 				$object->save();
 				if ($positionInParent) {
 					$fullObjectClass::where($parentIdProperty, $object->$parentIdProperty)
@@ -412,7 +418,7 @@ class BaseModel extends \Eloquent
 			});
 		} else if ($direction == 'move-up') {
 			$object = &$this;
-			\DB::transaction(function() use ($parentIdProperty, &$object, $positionInParent, $fullObjectClass, $positionProperty, $oldPosition, $newPosition)  {
+			\DB::transaction(function () use ($parentIdProperty, &$object, $positionInParent, $fullObjectClass, $positionProperty, $oldPosition, $newPosition) {
 				$object->save();
 				if ($positionInParent) {
 					$fullObjectClass::where($parentIdProperty, $object->$parentIdProperty)
@@ -477,7 +483,7 @@ class BaseModel extends \Eloquent
 		$entity = get_class($this);
 		$reflection = new \ReflectionClass($entity);
 		$shortEntity = $reflection->getShortName();
-		$path = public_path() . "/file/modelFiles/" . $shortEntity . "/" .  $this->$filenameAttribute;
+		$path = public_path() . "/file/modelFiles/" . $shortEntity . "/" . $this->$filenameAttribute;
 
 		if (!file_exists($path)) {
 			return " - ";
@@ -485,8 +491,8 @@ class BaseModel extends \Eloquent
 
 		$size = filesize($path);
 
-		$kb = round($size/1024);
-		$mb = round($size/1024/1024);
+		$kb = round($size / 1024);
+		$mb = round($size / 1024 / 1024);
 
 		if ($mb < 1) {
 			return $kb . " KB";
@@ -515,7 +521,7 @@ class BaseModel extends \Eloquent
 			$parentIdProperties = AdminHelper::objectToArray($modelConfig->getModelParents());
 
 			if (!$parentIdProperties) {
-				$parentIdProperties = array($modelConfig->parent->property);
+				$parentIdProperties = [$modelConfig->parent->property];
 			}
 
 			if (!empty($_GET)) {
@@ -577,13 +583,13 @@ class BaseModel extends \Eloquent
 
 		}
 
-		$data = array(
+		$data = [
 			'parentIdProperty' => $parentIdProperty,
 			'parentId' => $parentId,
 			'parent' => $parent,
 			'parentObject' => $parentObject,
 			'allParents' => $allParents
-		);
+		];
 
 		return $data;
 	}
@@ -597,11 +603,11 @@ class BaseModel extends \Eloquent
 		$parentIdProperty = $parentModelConfig->id;
 		$parentId = request()->segment(4 - $subtract);
 
-		return array(
+		return [
 			'parentIdProperty' => $parentIdProperty,
 			'parentId' => $parentId,
 			'parentModelConfig' => $parentModelConfig
-		);
+		];
 	}
 
 	public function relatedModelConfiguration($relatedModelName, $parentModelConfig = NULL, $returnFalseIfNotFound = false)
@@ -646,13 +652,13 @@ class BaseModel extends \Eloquent
 		$relatedModelConfiguration = (new $parentModel)->relatedModelConfiguration($modelConfig->name, $parentModelConfig);
 
 		return (
-			array(
-				'direction' => $relatedModelConfiguration->direction,
-				'positionProperty' => $relatedModelConfiguration->positionProperty,
-				'position' => $relatedModelConfiguration->position,
-				'hidePositionControls' => $relatedModelConfiguration->hidePositionControls,
-				'parentModelName' => $parentModelConfig->name
-			)
+		[
+			'direction' => $relatedModelConfiguration->direction,
+			'positionProperty' => $relatedModelConfiguration->positionProperty,
+			'position' => $relatedModelConfiguration->position,
+			'hidePositionControls' => $relatedModelConfiguration->hidePositionControls,
+			'parentModelName' => $parentModelConfig->name
+		]
 		);
 	}
 
@@ -661,6 +667,7 @@ class BaseModel extends \Eloquent
 		$reflection = new \ReflectionClass($this);
 		$class = $reflection->getShortName();
 		$modelConfig = AdminHelper::modelExists($class);
+
 		return $modelConfig;
 	}
 

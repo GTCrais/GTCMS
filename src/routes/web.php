@@ -11,15 +11,23 @@
 |
 */
 
-View::share('cPage', false);
+View::share('cPage', new \App\Models\Page());
 
-//Route::post(trans('routes.login'), array('as' => 'login', 'uses' => 'UserController@login'));
-//Route::get(trans('routes.logout'), array('as' => 'logout', 'uses' => 'UserController@logout'));
-//Route::match(array('GET', 'POST'), trans('routes.register'), array('as' => 'register', 'uses' => 'UserController@register'));
+Route::get(trans('routes.login'), ['as' => 'login', 'uses' => 'Auth\LoginController@showLoginForm']);
+Route::post('submit-login', ['as' => 'submitLogin', 'uses' => 'Auth\LoginController@login']);
+Route::get(trans('routes.logout'), ['as' => 'logout', 'uses' => 'Auth\LoginController@logout']);
 
-Route::post('/send-message', array('as' => 'sendQuery', 'uses' => 'ContactController@handler'));
+Route::get(trans('routes.register'), ['as' => 'register', 'uses' => 'Auth\RegisterController@showRegistrationForm']);
+Route::post('submit-registration', ['as' => 'submitRegistration', 'uses' => 'Auth\RegisterController@register']);
 
-Route::get('/', array('as' => 'home', 'uses' => 'PageController@showPage'));
+Route::get(trans('routes.passwordReset'), ['as' => 'passwordReset', 'uses' => 'Auth\ForgotPasswordController@showLinkRequestForm']);
+Route::post('password-reset/email', ['as' => 'sendPasswordResetEmail', 'uses' => 'Auth\ForgotPasswordController@sendResetLinkEmail']);
+Route::get(trans('routes.passwordReset') . '/{token}', ['as' => 'passwordResetToken', 'uses' => 'Auth\ResetPasswordController@showResetForm']);
+Route::post('password-reset/new-password', ['as' => 'submitNewPassword', 'uses' => 'Auth\ResetPasswordController@reset']);
+
+Route::post('/send-message', ['as' => 'sendQuery', 'uses' => 'ContactController@handler']);
+
+Route::get('/', ['as' => 'home', 'uses' => 'PageController@showPage']);
 Route::get('{segments}', 'PageController@showPage')->where('segments', '(.*)');
 
 Route::post('{segments}', 'PageController@show404')->where('segments', '(.*)');

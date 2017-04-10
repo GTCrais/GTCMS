@@ -5,13 +5,13 @@ use Illuminate\Database\Migrations\Migration;
 
 class UpdateUsersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
+	/**
+	 * Run the migrations.
+	 *
+	 * @return void
+	 */
+	public function up()
+	{
 		Schema::table('users', function ($table) {
 			$table->dropColumn(['name']);
 		});
@@ -24,15 +24,15 @@ class UpdateUsersTable extends Migration
 			$table->string('last_name')->nullable()->after('first_name');
 			$table->boolean('is_superadmin')->nullable()->default('0')->after('last_name');
 		});
-    }
+	}
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
+	/**
+	 * Reverse the migrations.
+	 *
+	 * @return void
+	 */
+	public function down()
+	{
 		Schema::table('users', function ($table) {
 			$table->dropColumn(['role', 'first_name', 'last_name', 'is_superadmin']);
 		});
@@ -40,5 +40,5 @@ class UpdateUsersTable extends Migration
 		Schema::table('users', function ($table) {
 			$table->string('name');
 		});
-    }
+	}
 }

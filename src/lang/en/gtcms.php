@@ -2,7 +2,7 @@
 
 // ENG
 
-return array(
+return [
 
 	'minimumDimensions' => 'Minimum dimensions',
 	'save' => 'Save',
@@ -22,6 +22,7 @@ return array(
 	'administration' => 'Administration',
 	'logout' => 'Logout',
 	'optimization' => 'Optimizations',
+	'database' => 'Database',
 	'adminTitle' => 'Administration',
 	'unauthorizedAccess' => 'Unauthorized access',
 	'incorrectUsernameOrPassword' => 'Incorrect username or password',
@@ -38,9 +39,10 @@ return array(
 	'excelExport' => 'Excel Export',
 	'from' => 'from',
 	'to' => 'to',
+	'ofTotal' => 'of total',
 	'newEntry' => 'New entry',
 
 	// Exceptions
 	'createOnTheFlyTooLong' => 'Each item may not be greater than 50 characters.',
 
-);
+];

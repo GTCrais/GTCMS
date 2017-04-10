@@ -7,15 +7,17 @@
 	>
 
 	<div class="fileUploadForm {{($object->$property ? 'hidden' : '')}}">
-				<span class="btn btn-primary fileinput-button">
-					<i class="fa fa-plus-circle"></i>
-					<span>{{trans('gtcms.addFile', array('label' => rtrim($field->label, '*')))}}</span>
-					{{Form::file($field->property, $options)}}
-					{{Form::hidden($property, $object->$property, array("id" => "hidden" . $property))}}
-				</span>
+		<span class="btn btn-primary fileinput-button">
+			<i class="fa fa-plus-circle"></i>
+			<span>{{trans('gtcms.addFile', array('label' => rtrim($field->label, '*')))}}</span>
+			{{Form::file($field->property, $options)}}
+			{{Form::hidden($property, $object->$property, array("id" => "hidden" . $property))}}
+		</span>
+
 		<div class="progress">
 			<div class="progress-bar"></div>
 		</div>
+
 		<div class="uploadError">
 			{{trans('gtcms.errorHasOccurred')}}.
 		</div>
@@ -26,6 +28,7 @@
 			<i class="fa fa-download"></i>
 			<span>{{trans('gtcms.downloadFile', array('label' => rtrim($field->label, '*')))}}</span>
 		</a>
+
 		<div class="controlButtons">
 			<a class="btn btn-default btn-xs deleteButton deleteUploadedFile"
 			   data-objectname=""

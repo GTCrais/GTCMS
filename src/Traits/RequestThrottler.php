@@ -9,6 +9,39 @@ trait RequestThrottler
 {
 	use ThrottlesLogins;
 
+	protected $maxAttempts = 5;
+	protected $lockoutDuration = 1; // In minutes
+
+	protected function processRequest(Request $request)
+	{
+		$request->hasTooManyAttempts = false;
+
+		if ($this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration)) {
+			$errorMessage = trans('auth.throttle', ['seconds' => $this->availableIn($this->throttleKey($request))]);
+			$request->hasTooManyAttempts = true;
+
+			return $errorMessage;
+		}
+
+		$this->incrementAttempts($request, $this->lockoutDuration);
+
+		$retriesLeft = $this->retriesLeft($this->throttleKey($request), $this->maxAttempts);
+		if ($retriesLeft < 0) {
+			$retriesLeft = 0;
+		}
+
+		if (!$retriesLeft) {
+			$errorMessage = trans('auth.throttle', ['seconds' => $this->lockoutDuration * 60]);
+		} else {
+			$errorMessage = trans_choice('auth.attemptsLeft', $retriesLeft, ['attemptsLeft' => $retriesLeft]);
+		}
+
+		// Trigger countdown here
+		$this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration);
+
+		return $errorMessage;
+	}
+
 	protected function hasTooManyAttempts($requestOrKey, $maxAttempts, $lockoutDuration)
 	{
 		if ($requestOrKey instanceof Request) {

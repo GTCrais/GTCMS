@@ -5,7 +5,7 @@ namespace App\Models;
 class Page extends BaseModel
 {
 	protected $table = 'pages';
-	protected $fillable = array('name', 'page_id', 'model_key', 'depth', 'slug', 'position', 'title', 'content', 'meta_description', 'meta_keywords');
+	protected $fillable = ['name', 'page_id', 'model_key', 'depth', 'slug', 'position', 'title', 'content', 'meta_description', 'meta_keywords'];
 
 	public function parentPage()
 	{
@@ -28,8 +28,8 @@ class Page extends BaseModel
 
 	public static function getPageKeyList()
 	{
-		return array(
+		return [
 			'standard' => 'Standard'
-		);
+		];
 	}
 }

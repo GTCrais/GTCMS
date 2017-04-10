@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Classes;
+
 use Barryvdh\Debugbar\Facade as Debugbar;
 
 

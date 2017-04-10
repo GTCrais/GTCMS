@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Classes\Mailer;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -18,8 +19,8 @@ class User extends BaseModel implements
 	use Authenticatable, Authorizable, CanResetPassword, Notifiable;
 
 	protected $table = 'users';
-	protected $hidden = array('password', 'remember_token');
-	protected $fillable = array('email', 'password', 'first_name', 'last_name', 'role', 'is_superadmin');
+	protected $hidden = ['password', 'remember_token'];
+	protected $fillable = ['email', 'password', 'first_name', 'last_name', 'role', 'is_superadmin'];
 
 	public static function userList()
 	{
@@ -38,15 +39,25 @@ class User extends BaseModel implements
 
 	public static function getUserRoles()
 	{
-		return array(
+		return [
 			'user' => 'User',
 			'admin' => 'Administrator'
-		);
+		];
 	}
 
 	public function getFullNameAttribute()
 	{
 		return $this->first_name . " " . $this->last_name;
+	}
+
+	public function sendPasswordResetNotification($token)
+	{
+		try {
+			Mailer::sendPasswordResetLink($this, $token);
+		} catch (\Exception $e) {
+			\Log::error("Error while sending password reset token: " . $e->getMessage());
+			\Log::error($e);
+		}
 	}
 
 	public function isDeletable()
@@ -57,6 +68,7 @@ class User extends BaseModel implements
 		if (!$this->is_superadmin) {
 			return true;
 		}
+
 		return false;
 	}
 
@@ -68,6 +80,7 @@ class User extends BaseModel implements
 		if (!$this->is_superadmin) {
 			return true;
 		}
+
 		return false;
 	}
 

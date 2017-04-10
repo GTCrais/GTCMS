@@ -47,6 +47,7 @@ class AdminController extends Controller
 
 					if ($this->hasTooManyAttempts($request, $maxAttempts, $lockoutDuration)) {
 						$data['message'] = trans('auth.throttle', ['seconds' => $this->availableIn($key)]);
+
 						return response()->json($data);
 					}
 
@@ -62,12 +63,12 @@ class AdminController extends Controller
 					// Trigger countdown here
 					$this->hasTooManyAttempts($request, $maxAttempts, $lockoutDuration);
 
-					if (\Auth::attempt(array('email' => $email, 'password' => $password))) {
+					if (auth()->attempt(['email' => $email, 'password' => $password])) {
 
 						$this->clear($key);
 
 						$allowedUserRoles = config('gtcms.allowedUserRoles');
-						$user = \Auth::user();
+						$user = auth()->user();
 						$userRole = $user->role;
 						if (in_array($userRole, $allowedUserRoles)) {
 							$defaultModel = self::getDefaultModelForUser($user);
@@ -75,14 +76,15 @@ class AdminController extends Controller
 								return redirect()->to(AdminHelper::getCmsPrefix() . $defaultModel . "?getIgnore_loginRedirect=true&getIgnore_isAjax=true");
 							}
 						} else {
-							\Auth::logout();
+							auth()->logout();
 						}
 					}
 
-					$data = array(
+					$data = [
 						'success' => false,
 						'message' => trans('gtcms.incorrectUsernameOrPassword') . ".<br>" . $attemptsLeftMessage
-					);
+					];
+
 					return response()->json($data);
 				} catch (\Exception $e) {
 
@@ -95,7 +97,7 @@ class AdminController extends Controller
 			}
 		}
 
-		return view()->make('gtcms.templates.adminLogin')->with(array('active' => false));
+		return view()->make('gtcms.templates.adminLogin')->with(['active' => false]);
 	}
 
 	public static function getDefaultModelForUser($user = null)
@@ -103,7 +105,7 @@ class AdminController extends Controller
 		$defaultModel = config('gtcms.defaultModel');
 
 		if (!$user) {
-			$user = \Auth::user();
+			$user = auth()->user();
 		}
 
 		if ($user) {
@@ -124,12 +126,14 @@ class AdminController extends Controller
 		}
 
 		Dbar::error("User undefined!");
+
 		return $defaultModel;
 	}
 
 	public function logout(Request $request)
 	{
-		\Auth::logout();
+		auth()->logout();
+
 		return redirect()->to(AdminHelper::getCmsPrefix() . "login");
 	}
 
@@ -148,6 +152,7 @@ class AdminController extends Controller
 
 		if (in_array($request->segment(1), $publicFolders)) {
 			\Log::error("Missing resource: " . $_SERVER["REQUEST_URI"]);
+
 			return "";
 		} else {
 			\Log::notice("AdminController: Redirecting the following request back to admin: " . $_SERVER["REQUEST_URI"]);
@@ -156,10 +161,10 @@ class AdminController extends Controller
 		$ajaxRequest = $request->ajax() && $request->get('getIgnore_isAjax') ? true : false;
 
 		if ($ajaxRequest) {
-			$data = array(
+			$data = [
 				'success' => false,
 				'error' => '404 - Page not found. Please refresh the page and try again.'
-			);
+			];
 
 			return response()->json($data);
 		}
@@ -174,6 +179,7 @@ class AdminController extends Controller
 		}
 
 		session(['accessDenied' => true]);
+
 		return $this->restricted($request);
 	}
 
@@ -193,7 +199,8 @@ class AdminController extends Controller
 				return response()->json($data);
 			} else {
 				$modelConfig = new ModelConfig();
-				return view()->make('gtcms.elements.restricted')->with(array('active' => false, 'modelConfig' => $modelConfig));
+
+				return view()->make('gtcms.elements.restricted')->with(['active' => false, 'modelConfig' => $modelConfig]);
 			}
 		}
 
@@ -202,10 +209,10 @@ class AdminController extends Controller
 
 	public function handleFile(Request $request, $entity, $fileAction, $fileNameField, $id)
 	{
-		$data = array(
+		$data = [
 			'success' => false,
 			'message' => trans('gtcms.errorHasOccurred') . ". " . trans('gtcms.pleaseTryAgain') . "."
-		);
+		];
 
 		try {
 			/** @var \App\Models\BaseModel $entity */
@@ -224,8 +231,8 @@ class AdminController extends Controller
 			$field = AdminHelper::getFieldsByParam($modelConfig, 'property', $fileNameField, true);
 
 			if ($request->ajax() && $modelConfig && $object && $field) {
-				if (in_array($fileAction, array('uploadFile', 'uploadImage'))) {
-					$fieldRules = $field->rules ? array($field->property => ModelConfig::rulesToArray($field->rules)) : array();
+				if (in_array($fileAction, ['uploadFile', 'uploadImage'])) {
+					$fieldRules = $field->rules ? [$field->property => ModelConfig::rulesToArray($field->rules)] : [];
 					$validator = \Validator::make(
 						$request->all(), $fieldRules
 					);
@@ -240,7 +247,7 @@ class AdminController extends Controller
 							$action = 'edit';
 						}
 
-						$input = array();
+						$input = [];
 						$parentProperty = AdminHelper::standaloneCheck($modelConfig, $action, $input, $object);
 
 						if ($fileAction == 'uploadFile' && $fileFields = AdminHelper::modelConfigHasFile($modelConfig)) {
@@ -263,13 +270,13 @@ class AdminController extends Controller
 								$method = $method ? $method : "file";
 								$fileUrl = $fileOriginalUrl = $object->$method('url', $fileNameField);
 							}
-							$data = array(
+							$data = [
 								'success' => true,
 								'message' => false,
 								'fileUrl' => $fileUrl,
 								'fileOriginalUrl' => $fileOriginalUrl,
 								'filename' => $fileData[0]['filename']
-							);
+							];
 						}
 					}
 				} else if ($fileAction == 'deleteFile') {
@@ -293,18 +300,18 @@ class AdminController extends Controller
 							}
 						}
 					} else {
-						$folders = array();
+						$folders = [];
 						$modelImagesPath = public_path("img/modelImages/" . $entity);
 						$scannedFolders = scandir($modelImagesPath);
 						if ($scannedFolders) {
-							foreach($scannedFolders as $scannedFolder) {
-								if (!in_array($scannedFolder, array('.', '..'))) {
+							foreach ($scannedFolders as $scannedFolder) {
+								if (!in_array($scannedFolder, ['.', '..'])) {
 									$folders[] = $scannedFolder;
 								}
 							}
 						}
 
-						foreach($folders as $folder) {
+						foreach ($folders as $folder) {
 							$filePath = $object->$method('path', $folder, $fileNameField, $fileNameValue);
 							if (file_exists($filePath)) {
 								try {
@@ -324,7 +331,7 @@ class AdminController extends Controller
 			}
 		} catch (\Exception $e) {
 			$preventException = false;
-			if (in_array($e->getCode(), array(ImageHandler::DIM_ERROR, FileHandler::INVALID_FILE_ERROR))) {
+			if (in_array($e->getCode(), [ImageHandler::DIM_ERROR, FileHandler::INVALID_FILE_ERROR])) {
 				$preventException = true;
 			}
 			AdminHelper::handleException($e, null, $preventException);
@@ -335,41 +342,15 @@ class AdminController extends Controller
 		return response()->json($data);
 	}
 
-	public function updateLanguages(Request $request)
-	{
-		if (config('gtcms.premium') && \Auth::user()->is_superadmin) {
-			if (!empty($_POST)) {
-				if ($request->get('updateLanguages') == "Proceed") {
-					foreach (AdminHelper::modelConfigs() as $modelConfig) {
-						GtcmsPremium::updateLanguages($modelConfig);
-					}
-					MessageManager::setSuccess("Languages updated");
-				}
-
-				return redirect()->to(AdminHelper::getCmsPrefix());
-			}
-
-			$data = array(
-				'active' => false,
-				'modelConfig' => new ModelConfig()
-			);
-
-			return view()->make("gtcms.elements.updateLanguages")->with($data);
-		}
-
-		session(['accessDenied' => true]);
-		return $this->restricted($request);
-	}
-
 	public function optimize(Request $request)
 	{
-		if (\Auth::user()->is_superadmin) {
+		if (auth()->user()->is_superadmin) {
 
 			$requestData = $request->all();
 
 			if (!empty($_POST)) {
 
-				$redirectUrl = redirect()->to(AdminHelper::getCmsPrefix() . "optimize")->getTargetUrl();
+				$redirectUrl = redirect()->route('gtcmsOptimize')->getTargetUrl();
 
 				if ($requestData['formSubmit'] == "Proceed") {
 
@@ -427,18 +408,90 @@ class AdminController extends Controller
 
 			if (isset($requestData['optimizationMessages'])) {
 				MessageManager::setSuccess($requestData['optimizationMessages']);
-				return redirect()->to(AdminHelper::getCmsPrefix() . 'optimize');
+
+				return redirect()->route('gtcmsOptimize');
 			}
 
-			$data = array(
+			$data = [
 				'active' => false,
 				'modelConfig' => new ModelConfig()
-			);
+			];
 
 			return view()->make("gtcms.elements.optimizationOptions")->with($data);
 		}
 
 		session(['accessDenied' => true]);
+
+		return $this->restricted($request);
+	}
+
+	public function database(Request $request)
+	{
+		if (auth()->user()->is_superadmin) {
+
+			$requestData = $request->all();
+
+			if (!empty($_POST)) {
+
+				$redirectUrl = redirect()->route('gtcmsDatabase')->getTargetUrl();
+
+				if ($requestData['formSubmit'] == "Proceed") {
+
+					$messages = [];
+					$additionalRedirectRequired = false;
+
+					try {
+						if (isset($requestData['migrate'])) {
+							$message = \Artisan::call('migrate', ['--force' => true]);
+							$messages[] = $message;
+						}
+					} catch (\Exception $e) {
+						\Log::error($e);
+						$messages[] = "Error while running migrations: " . $e->getMessage();
+					}
+
+					try {
+						if (isset($requestData['updateLanguages'])) {
+							foreach (AdminHelper::modelConfigs() as $modelConfig) {
+								GtcmsPremium::updateLanguages($modelConfig);
+							}
+							$messages[] = "Languages updated";
+						}
+					} catch (\Exception $e) {
+						\Log::error($e);
+						$messages[] = "Error while updating languages: " . $e->getMessage();
+					}
+
+					if ($messages) {
+						$messages = implode("<br>", $messages);
+
+						if ($additionalRedirectRequired) {
+							$redirectUrl .= "?databaseMessages=" . $messages;
+						}
+
+						MessageManager::setSuccess($messages);
+					}
+				}
+
+				return redirect()->to($redirectUrl);
+			}
+
+			if (isset($requestData['databaseMessages'])) {
+				MessageManager::setSuccess($requestData['databaseMessages']);
+
+				return redirect()->route('gtcmsDatabase');
+			}
+
+			$data = [
+				'active' => false,
+				'modelConfig' => new ModelConfig()
+			];
+
+			return view()->make("gtcms.elements.databaseOptions")->with($data);
+		}
+
+		session(['accessDenied' => true]);
+
 		return $this->restricted($request);
 	}
 
@@ -450,10 +503,10 @@ class AdminController extends Controller
 	public function ajaxUpdate(Request $request)
 	{
 		if ($request->ajax() && $request->get('getIgnore_isAjax')) {
-			$data = array(
+			$data = [
 				'success' => false,
 				'message' => false
-			);
+			];
 
 			try {
 				$class = $request->get('className');

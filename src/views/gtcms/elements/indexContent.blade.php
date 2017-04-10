@@ -18,6 +18,14 @@
 		<div class="indexTableHeader">
 			<a href="{{AdminHelper::getCmsPrefix() . $modelConfig->name}}/add" class="btn btn-primary btn-sm addButton"><i class="fa fa-plus-circle"></i> {{$modelConfig->hrName}}</a>
 
+			<span class="paginationInfo">
+				<span class="paginationFrom">{{$objects->firstItem()}}</span>
+				-
+				<span class="paginationTo">{{$objects->lastItem()}}</span>
+				{{trans('gtcms.ofTotal')}}
+				<span class="paginationTotal">{{$objects->total()}}</span>
+			</span>
+
 			@if ($modelConfig->searchPropertiesExist())
 			<button class="btn btn-default btn-sm openSearch {{$searchIsOpen ? 'searchIsOpen' : ''}}" type="button">
 				<i class="fa fa-search"></i>
@@ -41,7 +49,7 @@
 			@endif
 
 			@if ($objects->count())
-			<div class="table-responsive objectsContainer">
+			<div class="table-responsive">
 				{!! Front::drawObjectTable($objects, $modelConfig, 'table', "", $searchDataWithFieldValues, $ordering) !!}
 			</div>
 			@else

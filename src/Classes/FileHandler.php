@@ -10,10 +10,10 @@ class FileHandler
 
 	public static function process($modelConfig, $fileFields, $parentProperty)
 	{
-		$fileData = array();
+		$fileData = [];
 		$counter = 0;
 		foreach ($fileFields as $fileField) {
-			$inputProperties = array();
+			$inputProperties = [];
 			if (config('gtcms.premium')) {
 				GtcmsPremium::setFileHandlerInputProperties($inputProperties, $fileField);
 			} else {
@@ -38,14 +38,14 @@ class FileHandler
 					$file = request()->file($inputProperty);
 					if ($file->isValid()) {
 						$ext = $file->getClientOriginalExtension();
-						$basePath = public_path()."/file/modelFiles/".$modelConfig->name."/";
+						$basePath = public_path() . "/file/modelFiles/" . $modelConfig->name . "/";
 						$targetName = Str::slug($file->getClientOriginalName());
-						$targetName = preg_replace('/'.$ext.'$/', '', $targetName);
+						$targetName = preg_replace('/' . $ext . '$/', '', $targetName);
 						$originalTargetName = $targetName;
 
 						// Check if file exists
 						$nameCounter = 0;
-						while (file_exists($basePath.$targetName . "." . $ext)) {
+						while (file_exists($basePath . $targetName . "." . $ext)) {
 							$nameCounter++;
 							$targetName = $originalTargetName . "-" . $nameCounter;
 						}

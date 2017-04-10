@@ -6,8 +6,9 @@ class MessageManager
 {
 	public static function getException()
 	{
-		$message = session('exceptionMsg', NULL);
+		$message = session('exceptionMsg', null);
 		self::flush('exceptionMsg');
+
 		return $message;
 	}
 
@@ -18,8 +19,9 @@ class MessageManager
 
 	public static function getSuccess()
 	{
-		$message = session('successMsg', NULL);
+		$message = session('successMsg', null);
 		self::flush('successMsg');
+
 		return $message;
 	}
 
@@ -30,8 +32,9 @@ class MessageManager
 
 	public static function getError()
 	{
-		$message = session('errorMsg', NULL);
+		$message = session('errorMsg', null);
 		self::flush('errorMsg');
+
 		return $message;
 	}
 
@@ -42,8 +45,9 @@ class MessageManager
 
 	public static function getCustom($key)
 	{
-		$message = session($key, NULL);
+		$message = session($key, null);
 		self::flush($key);
+
 		return $message;
 	}
 

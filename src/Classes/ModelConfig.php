@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 class ModelConfig
 {
 	protected $gtcmsModelParents = null;
-	public    $quickEditFields = null;
+	public $quickEditFields = null;
 	protected $langDependentProperties = null;
 	protected $excelExportFields = null;
 	protected $excelExportFieldsCount = null;
@@ -26,6 +26,7 @@ class ModelConfig
 	public function myFullEntityName()
 	{
 		$namespace = $this->namespace ? $this->namespace : config('gtcms.defaultNamespace');
+
 		return $namespace . "\\Models\\" . $this->name;
 	}
 
@@ -41,6 +42,7 @@ class ModelConfig
 		}
 
 		Dbar::error("ModelConfig for " . $entity . "doesn't exist!");
+
 		return "";
 	}
 
@@ -115,8 +117,8 @@ class ModelConfig
 
 	public function getSearchPropertiesData()
 	{
-		$properties = array();
-		$searchConfig = array();
+		$properties = [];
+		$searchConfig = [];
 
 		foreach ($this->getFormFields('all', true) as $field) {
 			if ($field->search) {
@@ -125,10 +127,10 @@ class ModelConfig
 			}
 		}
 
-		$data = array(
+		$data = [
 			'properties' => $properties,
 			'searchConfig' => $searchConfig
-		);
+		];
 
 		return $data;
 	}
@@ -142,16 +144,18 @@ class ModelConfig
 		$searchPropertiesData = $this->getSearchPropertiesData();
 		if ($searchPropertiesData['properties']) {
 			$this->searchPropertiesExist = true;
+
 			return true;
 		}
 
 		$this->searchPropertiesExist = false;
+
 		return false;
 	}
 
 	public function getFieldsWithLabels($search = false)
 	{
-		$fieldsWithLabels = array();
+		$fieldsWithLabels = [];
 		foreach ($this->formFields as $field) {
 			if ($search) {
 				if ($field->search) {
@@ -178,11 +182,11 @@ class ModelConfig
 	public function getPropertyValue($property, $value)
 	{
 		$returnValue = "Undefined";
-		$list = array();
+		$list = [];
 
 		foreach ($this->formFields as $field) {
 			if ($field->property == $property) {
-				if (in_array($field->type, array('select', 'multiSelect'))) {
+				if (in_array($field->type, ['select', 'multiSelect'])) {
 					$listMethod = $field->selectType->listMethod;
 					if ($field->selectType->type == 'model') {
 						/** @var \App\Models\BaseModel $selectModel */
@@ -228,7 +232,7 @@ class ModelConfig
 	{
 		foreach ($this->formFields as $field) {
 			if ($field->property == $property) {
-				if (in_array($field->type, array('date', 'dateTime'))) {
+				if (in_array($field->type, ['date', 'dateTime'])) {
 					if ($field->type == "date") {
 						$value = date("Y-m-d", strtotime($value));
 					} else if ($field->type == "dateTime") {
@@ -245,13 +249,13 @@ class ModelConfig
 
 	public function getPropertiesTables()
 	{
-		$propertiesTables = array();
+		$propertiesTables = [];
 		$model = $this->name;
 
 		foreach ($this->formFields as $field) {
 			if ($field->type == 'multiSelect' && $field->selectType->type == 'model') {
 				$relatedModel = $field->selectType->modelName;
-				$tableNames = array(snake_case($model), snake_case($relatedModel));
+				$tableNames = [snake_case($model), snake_case($relatedModel)];
 				sort($tableNames, SORT_STRING);
 				$tableName = implode('_', $tableNames);
 				$propertiesTables[$field->property] = $tableName;
@@ -266,14 +270,14 @@ class ModelConfig
 
 	public function getManyToManyRelationData()
 	{
-		$data = array();
+		$data = [];
 		$model = $this->name;
 		$fullModel = $this->myFullEntityName();
 		$table = (new $fullModel)->getTable();
 		$data['table'] = $table;
 		$data['modelName'] = strtolower($model);
 		$data['idProperty'] = 'id';
-		$data['relationData'] = array();
+		$data['relationData'] = [];
 
 		foreach ($this->formFields as $field) {
 			if ($field->type == 'multiSelect' &&
@@ -281,14 +285,14 @@ class ModelConfig
 				$field->search
 			) {
 				$relatedModel = $field->selectType->modelName;
-				$tableNames = array(snake_case($model), snake_case($relatedModel));
+				$tableNames = [snake_case($model), snake_case($relatedModel)];
 				sort($tableNames, SORT_STRING);
 				$tableName = implode('_', $tableNames);
-				$relationId = snake_case($model).'_id';
-				$relatedModelId = snake_case($relatedModel)."_id";
-				$data['relationData'][] = array('relationTable' => $tableName,
-												'relationId' => $relationId,
-												'relatedModelId' => $relatedModelId);
+				$relationId = snake_case($model) . '_id';
+				$relatedModelId = snake_case($relatedModel) . "_id";
+				$data['relationData'][] = ['relationTable' => $tableName,
+										   'relationId' => $relationId,
+										   'relatedModelId' => $relatedModelId];
 			}
 		}
 
@@ -301,7 +305,7 @@ class ModelConfig
 			return $this->langDependentProperties;
 		}
 
-		$properties = array();
+		$properties = [];
 		foreach ($this->formFields as $field) {
 			if (config('gtcms.premium') && $field->langDependent) {
 				$properties[] = $field->property;
@@ -309,6 +313,7 @@ class ModelConfig
 		}
 
 		$this->langDependentProperties = $properties;
+
 		return $properties;
 	}
 
@@ -318,11 +323,12 @@ class ModelConfig
 			if ($returnCount) {
 				return $this->excelExportFieldsCount;
 			}
+
 			return $this->excelExportFields;
 		}
 
 		$count = 0;
-		$fields = array();
+		$fields = [];
 		foreach ($this->formFields as $field) {
 			if ($field->excelExport) {
 				$fields[] = $field;
@@ -346,15 +352,15 @@ class ModelConfig
 	public function getFormFields($fieldType, $parseFromTo = false)
 	{
 		if ($parseFromTo && !$this->fromToParsed) {
-			$formFields = array();
+			$formFields = [];
 			foreach ($this->formFields as $field) {
 				if ($field->fromTo && $field->search) {
 					$newField = AdminHelper::objectToArray($field);
-					$newField['hidden'] = array(
+					$newField['hidden'] = [
 						'add' => true, 'edit' => true, 'view' => true
-					);
+					];
 					$fromField = $newField;
-					$fromField['property'] = $field->property."_fieldFrom";
+					$fromField['property'] = $field->property . "_fieldFrom";
 					$fromField['label'] = $newField['label'] . " " . trans('gtcms.from');
 					if (isset($fromField['search']['label'])) {
 						$fromField['search']['label'] = $fromField['search']['label'] . " " . trans('gtcms.from');
@@ -365,7 +371,7 @@ class ModelConfig
 					$fromField = AdminHelper::arrayToObject($fromField);
 
 					$toField = $newField;
-					$toField['property'] = $field->property."_fieldTo";
+					$toField['property'] = $field->property . "_fieldTo";
 					$toField['label'] = $newField['label'] . " " . trans('gtcms.to');
 					if (isset($toField['search']['label'])) {
 						$toField['search']['label'] = $toField['search']['label'] . " " . trans('gtcms.to');
@@ -392,20 +398,22 @@ class ModelConfig
 		if ($fieldType == 'all') {
 			return $this->formFields;
 		} else if ($fieldType == 'regular') {
-			$fields = array();
+			$fields = [];
 			foreach ($this->formFields as $field) {
 				if (!$field->langDependent) {
 					$fields[] = $field;
 				}
 			}
+
 			return $fields;
 		} else if ($fieldType == 'langDependent') {
-			$fields = array();
+			$fields = [];
 			foreach ($this->formFields as $field) {
 				if (config('gtcms.premium') && $field->langDependent) {
 					$fields[] = $field;
 				}
 			}
+
 			return $fields;
 		} else {
 			Dbar::error("ModelConfig - getFormFields: fieldType is incorrect! - " . $fieldType);
@@ -416,7 +424,7 @@ class ModelConfig
 
 	public function getQuickEditFields($fieldType)
 	{
-		$quickEditFields = array();
+		$quickEditFields = [];
 
 		if (config('gtcms.premium')) {
 			return \GtcmsPremium::getQuickEditFields($this, $fieldType);
@@ -431,7 +439,7 @@ class ModelConfig
 			return $this->gtcmsModelParents;
 		}
 
-		$parents = array();
+		$parents = [];
 		foreach (\AdminHelper::modelConfigs() as $modelConfig) {
 			if ($modelConfig->name != $this->name && $modelConfig->relatedModels) {
 				foreach ($modelConfig->relatedModels as $relatedModel) {
@@ -443,6 +451,7 @@ class ModelConfig
 		}
 
 		$this->gtcmsModelParents = $parents;
+
 		return $parents;
 	}
 }

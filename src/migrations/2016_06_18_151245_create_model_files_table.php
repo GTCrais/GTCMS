@@ -5,28 +5,28 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateModelFilesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-        Schema::create('model_files', function (Blueprint $table) {
-            $table->increments('id');
+	/**
+	 * Run the migrations.
+	 *
+	 * @return void
+	 */
+	public function up()
+	{
+		Schema::create('model_files', function (Blueprint $table) {
+			$table->increments('id');
 			$table->string('filename')->nullable();
 			$table->string('title')->nullable();
 			$table->timestamps();
-        });
-    }
+		});
+	}
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::drop('model_files');
-    }
+	/**
+	 * Reverse the migrations.
+	 *
+	 * @return void
+	 */
+	public function down()
+	{
+		Schema::drop('model_files');
+	}
 }
