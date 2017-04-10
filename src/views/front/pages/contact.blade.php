@@ -54,44 +54,63 @@
 			color: #a3a3a3 !important;
 			font-size: 13px;
 		}
+
+		.help-block {
+			margin-top: -7px;
+			margin-bottom: 2px;
+			font-size: 13px;
+			color: red;
+		}
+
+		.form-message {
+			margin-bottom: 12px;
+			font-size: 16px;
+		}
+
+		.form-message.is-error {
+			color: red;
+		}
+
+		.soft-hidden {
+			display: none;
+		}
 	</style>
 
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-12">
 				<div class="auth-form-container">
-					<h2>Password reset</h2>
+					<h2>Example Contact</h2>
 
-					@if ($errors->count() || $errorMessage)
-						<div class="alert alert-warning" role="alert">
-							{!! implode("<br>", $errors->all()) !!}
-							@if ($errorMessage)
-								{!! $errors->count() ? '<br>' : '' !!}
-								{!! $errorMessage !!}
-							@endif
-						</div>
-					@endif
-
-					{{Form::open(['method' => 'post', 'url' => url()->route('submitNewPassword')])}}
-
-					{{Form::hidden('token', $token)}}
+					{{Form::open(['method' => 'post', 'url' => url()->route('sendQuery'), 'id' => 'contact-form'])}}
 
 					<div class="form-group">
-						{{Form::label('email', 'Email')}}
+						{{Form::label('name', trans('front.name'))}}
+						<p class="help-block soft-hidden contact-error name-error" data-emptyfield="{{trans('front.emptyField')}}"></p>
+						{{Form::text('name', null, ['class' => 'form-control', 'id' => 'name'])}}
+					</div>
+
+					<div class="form-group">
+						{{Form::label('email', trans('front.email'))}}
+						<p class="help-block soft-hidden contact-error email-error" data-incorrectemailformat="{{trans('front.incorrectEmailFormat')}}"></p>
 						{{Form::text('email', null, ['class' => 'form-control', 'id' => 'email'])}}
 					</div>
 
 					<div class="form-group">
-						{{Form::label('password', 'Password')}}
-						{{Form::password('password', ['class' => 'form-control', 'id' => 'password'])}}
+						{{Form::label('subject', trans('front.subject'))}}
+						<p class="help-block soft-hidden contact-error subject-error"></p>
+						{{Form::text('subject', null, ['class' => 'form-control', 'id' => 'subject'])}}
 					</div>
 
 					<div class="form-group">
-						{{Form::label('password_confirmation', 'Confirm password')}}
-						{{Form::password('password_confirmation', ['class' => 'form-control', 'id' => 'password_confirmation'])}}
+						{{Form::label('contact-message', trans('front.message'))}}
+						<p class="help-block soft-hidden contact-error message-error"></p>
+						{{Form::textarea('message', null, ['class' => 'form-control', 'id' => 'contact-message'])}}
 					</div>
 
-					{{Form::submit('SUBMIT', ['class' => 'btn btn-default'])}}
+					<div class="form-message soft-hidden"></div>
+
+					{{Form::submit('SUBMIT', ['class' => 'btn btn-default', 'id' => 'submit'])}}
 
 					{{Form::close()}}
 

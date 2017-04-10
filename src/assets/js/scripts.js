@@ -14,7 +14,8 @@ function handleContactForm() {
 			}
 			form.addClass("disabled");
 
-			var button = $("button#submit");
+			var button = $("input#submit");
+			button.addClass('disabled');
 
 			var name = $.trim($("input#name").val());
 			var email = $.trim($("input#email").val());
@@ -22,68 +23,69 @@ function handleContactForm() {
 			var message = $.trim($("textarea#contact-message").val());
 			var token = $('input[name="_token"]').val();
 
-			var errors = $("span.contact-error");
-			var nameErr = $("span.name-error");
-			var emailErr = $("span.email-error");
-			var subjectErr = $("span.subject-error");
-			var messageErr = $("span.message-error");
+			var errors = $("p.contact-error");
+			var nameErr = $("p.name-error");
+			var emailErr = $("p.email-error");
+			var subjectErr = $("p.subject-error");
+			var messageErr = $("p.message-error");
 			var formMessage = $("div.form-message");
 
 			var emptyField = nameErr.attr('data-emptyfield');
 			var incorrectEmailFormat = emailErr.attr('data-incorrectemailformat');
 
 			var valid = true;
-			errors.each(function(){
-				$(this).html("");
-			});
-			formMessage.html("");
+			errors.html("").hide();
+			formMessage.html("").removeClass('is-error').hide();
 
 			if (name == "") {
-				nameErr.html(emptyField);
+				nameErr.html(emptyField).show();
 				valid = false;
 			}
 
 			if (email == "") {
-				emailErr.html(emptyField);
+				emailErr.html(emptyField).show();
 				valid = false;
 			} else if (!validateEmail(email)) {
-				emailErr.html(incorrectEmailFormat);
+				emailErr.html(incorrectEmailFormat).show();
 				valid = false;
 			}
 
 			if (subject == "") {
-				subjectErr.html(emptyField);
+				subjectErr.html(emptyField).show();
 				valid = false;
 			}
 
 			if (message == "") {
-				messageErr.html(emptyField);
+				messageErr.html(emptyField).show();
 				valid = false;
 			}
 
 			if (valid) {
 				$.ajax({
 					type: 'POST',
-					url: '/send-message',
+					url: form.attr('action'),
 					data: {
 						name: name,
 						email: email,
 						subject: subject,
 						message: message,
-						_token: token
+						_token: token,
+						getIgnore_isAjax: true
 					},
 					success: function(data) {
 						if (data) {
-							formMessage.html(data.message);
 							if (data.success) {
 								button.remove();
+							} else {
+								formMessage.addClass('is-error');
 							}
+							formMessage.html(data.message).show();
 						} else {
-							formMessage.html("An error has occurred.<br>Please refresh the page and try again.")
+							formMessage.addClass('is-error').html("An error has occurred.<br>Please refresh the page and try again.").show();
 						}
 					},
 					error: function() {
-						formMessage.html("An error has occurred.<br>Please refresh the page and try again.")
+						formMessage.addClass('is-error').html("An error has occurred.<br>Please refresh the page and try again.").show();
 					},
 					complete: function() {
 						$("input#name").val("");
@@ -91,10 +93,12 @@ function handleContactForm() {
 						$("input#subject").val("");
 						$("textarea#contact-message").val("");
 						form.removeClass("disabled");
+						button.removeClass('disabled');
 					}
 				});
 			} else {
 				form.removeClass("disabled");
+				button.removeClass('disabled');
 			}
 
 		});

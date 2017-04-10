@@ -15,6 +15,7 @@
 			left: 0;
 			right: 0;
 			top: calc(50% - 80px);
+			padding: 0 15px;
 		}
 
 		@media screen and (max-width: 480px) {
@@ -31,9 +32,11 @@
 			color: gray;
 		}
 
-		a {
+		.gtcms a {
 			text-decoration: none;
 			color: #424242;
+			display: inline-block;
+			margin-bottom: 5px;
 		}
 	</style>
 
@@ -52,7 +55,10 @@
 				@if (auth()->guest() || auth()->user()->role != 'admin')
 					login
 				@endif
+				&nbsp;|&nbsp;
 			</a>
+
+				<a href="/contact">Contact</a>
 		</div>
 	</div>
 

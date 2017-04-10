@@ -47,6 +47,7 @@ class ContactController extends Controller
 			} else {
 				try {
 					Mailer::sendMessage($request->all());
+
 					$data['success'] = true;
 					$data['title'] = trans('front.contactSuccessTitle');
 					$data['message'] = trans('front.contactSuccessMessage');
@@ -66,7 +67,7 @@ class ContactController extends Controller
 		if (self::$requestType == 'ajax') {
 			return response()->json($data);
 		} else {
-			// Custom code
+			return back()->with($data);
 		}
 	}
 }

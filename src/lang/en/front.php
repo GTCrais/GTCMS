@@ -25,6 +25,7 @@ return [
 	'email' => 'Email',
 	'password' => 'Password',
 	'passwordConfirmation' => 'Confirm password',
+	'name' => 'Name',
 	'firstName' => 'First name',
 	'lastName' => 'Last name',
 	'city' => 'City',
@@ -32,6 +33,11 @@ return [
 	'address' => 'Address',
 
 	// Contact
+	'emptyField' => 'Field is required',
+	'incorrectEmailFormat' => 'Incorrect email format',
+
+	'subject' => 'Subject',
+	'message' => 'Message',
 	'contactSuccessTitle' => 'Message sent',
 	'contactSuccessMessage' => 'Your message has been sent successfully. We will contact you shortly.',
 	'contactErrorTitle' => 'Error',

@@ -2,6 +2,6 @@
 
 @section('content')
 	<p>
-		{{$body}}
+		{!! $body !!}
 	</p>
 @endsection

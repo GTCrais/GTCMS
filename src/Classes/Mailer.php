@@ -13,12 +13,10 @@ class Mailer
 	public static function sendMessage($inputData)
 	{
 		$body = "
-			<br>
 			<strong>Name:</strong> " . \Html::entities($inputData['name']) . "<br>
 			<strong>Email:</strong> " . \Html::entities($inputData['email']) . "<br>
 			<strong>Subject:</strong> " . \Html::entities($inputData['subject']) . "<br>
-			<strong>Message:</strong><br>" . \Html::entities($inputData['message']) . "<br>
-		";
+			<strong>Message:</strong><br>" . \Html::entities($inputData['message']);
 
 		\Mail::send('front.emails.simple', ['body' => $body], function ($message) {
 			$message->to(config('gtcms.adminEmail'))->subject(config('gtcms.siteName') . " - New message");

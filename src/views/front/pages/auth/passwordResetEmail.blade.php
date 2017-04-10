@@ -37,7 +37,7 @@
 			font-weight: 300;
 		}
 
-		a {
+		.auth-form-container a {
 			text-decoration: none !important;
 			position: relative;
 			top: 8px;

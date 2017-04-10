@@ -30,6 +30,12 @@ class PageController extends Controller
 				$slugString = "slug";
 			}
 
+			// Example Contact Page
+			if ($slug == 'contact') {
+				return view()->make('front.pages.contact');
+			}
+			// End example
+
 			$cPage = Page::where($slugString, $slug)->first();
 			if ($cPage) {
 				PageMetaManager::setPage($cPage);

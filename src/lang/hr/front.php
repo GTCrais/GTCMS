@@ -25,6 +25,7 @@ return [
 	'email' => 'Email',
 	'password' => 'Lozinka',
 	'passwordConfirmation' => 'Potvrdi lozinku',
+	'name' => 'Ime i prezime',
 	'firstName' => 'Ime',
 	'lastName' => 'Prezime',
 	'city' => 'Grad',
@@ -32,6 +33,11 @@ return [
 	'address' => 'Adresa',
 
 	// Contact
+	'emptyField' => 'Polje je obvezno',
+	'incorrectEmailFormat' => 'Netočan email format',
+
+	'subject' => 'Naslov',
+	'message' => 'Poruka',
 	'contactSuccessTitle' => 'Upit poslan',
 	'contactSuccessMessage' => 'Vaš upit je uspješno poslan. Javit ćemo vam se u najkraćem mogućem roku.',
 	'contactErrorTitle' => 'Greška',

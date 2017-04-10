@@ -29,7 +29,7 @@
 			margin-bottom: 30px;
 		}
 
-		a {
+		.auth-form-container a {
 			text-decoration: none !important;
 			color: #424242 !important;
 			font-size: 14px;
