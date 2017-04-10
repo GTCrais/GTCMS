@@ -4,23 +4,25 @@
 
 return [
 
-	'login' => 'Login',
-	'logout' => 'Logout',
-	'registration' => 'Registration',
+	// General
 	'search' => 'Search',
 	'searchPlaceholder' => 'Search...',
 	'hi' => 'Hi',
 	'next' => 'Next',
 	'back' => 'Back',
 	'close' => 'Close',
-	'passwordReset' => 'Password reset',
-	'reset' => 'Reset',
 	'errorHasOccurred' => 'An error has occurred. Please refresh the page try again.',
 
 	// Login / Register
 	'incorrectLoginField' => 'Incorrect email or password.',
+
+	'login' => 'Login',
+	'logout' => 'Logout',
+	'registration' => 'Registration',
 	'rememberMe' => 'Remember me',
 	'forgotPassword' => 'Forgot your password?',
+	'passwordReset' => 'Password reset',
+	'reset' => 'Reset',
 
 	'email' => 'Email',
 	'password' => 'Password',

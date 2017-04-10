@@ -4,23 +4,25 @@
 
 return [
 
-	'login' => 'Prijava',
-	'logout' => 'Odjava',
-	'registration' => 'Registracija',
+	// General
 	'search' => 'Pretraga',
 	'searchPlaceholder' => 'Traži...',
 	'hi' => 'Bok',
 	'next' => 'Dalje',
 	'back' => 'Nazad',
 	'close' => 'Zatvori',
-	'passwordReset' => 'Reset lozinke',
-	'reset' => 'Resetiraj',
 	'errorHasOccurred' => 'Došlo je do greške. Osvježite stranicu i pokušajte ponovo.',
 
 	// Login / Register
 	'incorrectLoginField' => 'Netočan email ili lozinka.',
+
+	'login' => 'Prijava',
+	'logout' => 'Odjava',
+	'registration' => 'Registracija',
 	'rememberMe' => 'Zapamti me',
 	'forgotPassword' => 'Zaboravljena lozinka?',
+	'passwordReset' => 'Reset lozinke',
+	'reset' => 'Resetiraj',
 
 	'email' => 'Email',
 	'password' => 'Lozinka',
