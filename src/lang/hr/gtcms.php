@@ -39,6 +39,7 @@ return [
 	'excelExport' => 'Excel',
 	'from' => 'od',
 	'to' => 'do',
+	'ofTotal' => 'od ukupno',
 	'newEntry' => 'Novi zapis',
 
 	// Exceptions

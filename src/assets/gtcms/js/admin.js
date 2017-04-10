@@ -835,11 +835,28 @@ function reloadSearchResults(objectsContainer, data) {
 				$("a.excelExport").attr("href", excelExport);
 			}
 
+			updatePaginationInfo(data);
 			setupRepositioning();
 			resetLinksAfterSearch();
 
 		});
 	});
+}
+
+function updatePaginationInfo(data) {
+	var paginationFrom = $("span.paginationFrom");
+	var paginationTo = $("span.paginationTo");
+	var paginationTotal = $("span.paginationTotal");
+
+	if (data.paginationFrom && paginationFrom.length) {
+		paginationFrom.html(data.paginationFrom);
+	}
+	if (data.paginationTo && paginationTo.length) {
+		paginationTo.html(data.paginationTo);
+	}
+	if (data.paginationTotal && paginationTotal.length) {
+		paginationTotal.html(data.paginationTotal);
+	}
 }
 
 function setupEditFormInputs() {
@@ -1550,6 +1567,7 @@ function setFormHandling() {
 											$(this).attr("href", addRelatedHref.replace("new_gtcms_entry", data.objectId));
 										});
 									}
+
 									if (data.replaceCurrentHistory) {
 										var historyContainer = $("h3.page-header");
 										var newHistory = data.replaceCurrentHistory.modelName;
@@ -1561,8 +1579,10 @@ function setFormHandling() {
 											$(this).fadeIn(250);
 										});
 									}
+
 									successCheckmark.delay(500).fadeOut(100);
 									$("html, body").delay(500).animate({ scrollTop: "0" }, 250);
+
 									if (form.hasClass('addForm')) {
 										var disabledInputs = form.find("div.form-group.disabledInput");
 										if (disabledInputs.length) {
@@ -1580,6 +1600,7 @@ function setFormHandling() {
 										closeQuickEdit(false, data);
 										setSelectize();
 									} else {
+										updatePaginationInfo(data);
 										setupEditFormInputs();
 										setFormHandling();
 									}

@@ -39,6 +39,7 @@ return [
 	'excelExport' => 'Excel Export',
 	'from' => 'from',
 	'to' => 'to',
+	'ofTotal' => 'of total',
 	'newEntry' => 'New entry',
 
 	// Exceptions

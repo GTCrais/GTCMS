@@ -160,6 +160,12 @@ class AdminEntityController extends Controller
 				'searchDataWithFieldValues' => $searchDataWithFieldValues || $ordering ? true : false
 			];
 
+			if ($indexType != 'Tree') {
+				$data['paginationFrom'] = $objects->firstItem();
+				$data['paginationTo'] = $objects->lastItem();
+				$data['paginationTotal'] = $objects->total();
+			}
+
 			return response()->json($data);
 		}
 
