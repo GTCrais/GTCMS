@@ -54,22 +54,26 @@ class LoginController extends Controller
 		$password = $request->get('password');
 		$remember = $request->get('remember_me') ? true : false;
 
-		$errorMessage = false;
+		$attemptsMessage = false;
 
 		if ($this->throttleRequests) {
-			$errorMessage = $this->processRequest($request);
+			$attemptsMessage = $this->processRequest($request);
 
 			if ($request->hasTooManyAttempts) {
 				return back()->with(compact('errorMessage'));
 			}
-
-			$errorMessage = trans('front.incorrectLoginField') . "<br>" . $errorMessage;
 		}
 
 		if (auth()->attempt(['email' => $email, 'password' => $password], $remember)) {
 			$this->clear($this->throttleKey($request));
 
 			return redirect()->route('home');
+		}
+
+		$errorMessage = trans('front.incorrectLoginField');
+
+		if ($attemptsMessage) {
+			$errorMessage .= "<br>" . $attemptsMessage;
 		}
 
 		return back()->withInput()->with(compact('errorMessage'));

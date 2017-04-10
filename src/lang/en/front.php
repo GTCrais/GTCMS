@@ -5,13 +5,14 @@
 return [
 
 	// General
+	'errorHasOccurred' => 'An error has occurred. Please refresh the page try again.',
+
 	'search' => 'Search',
 	'searchPlaceholder' => 'Search...',
 	'hi' => 'Hi',
 	'next' => 'Next',
 	'back' => 'Back',
 	'close' => 'Close',
-	'errorHasOccurred' => 'An error has occurred. Please refresh the page try again.',
 
 	// Login / Register
 	'incorrectLoginField' => 'Incorrect email or password.',

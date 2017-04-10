@@ -5,13 +5,14 @@
 return [
 
 	// General
+	'errorHasOccurred' => 'Došlo je do greške. Osvježite stranicu i pokušajte ponovo.',
+
 	'search' => 'Pretraga',
 	'searchPlaceholder' => 'Traži...',
 	'hi' => 'Bok',
 	'next' => 'Dalje',
 	'back' => 'Nazad',
 	'close' => 'Zatvori',
-	'errorHasOccurred' => 'Došlo je do greške. Osvježite stranicu i pokušajte ponovo.',
 
 	// Login / Register
 	'incorrectLoginField' => 'Netočan email ili lozinka.',
