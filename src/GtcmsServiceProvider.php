@@ -6,6 +6,10 @@ use Illuminate\Support\ServiceProvider;
 
 class GtcmsServiceProvider extends ServiceProvider
 {
+	protected $commands = [
+		'GTCrais\GTCMS\Console\Commands\GtcmsPublish'
+	];
+
 	/**
 	 * Bootstrap the application services.
 	 *
@@ -47,5 +51,7 @@ class GtcmsServiceProvider extends ServiceProvider
 		$this->app->register('Collective\Html\HtmlServiceProvider');
 		$this->app->register('Intervention\Image\ImageServiceProvider');
 		$this->app->register('Unisharp\Laravelfilemanager\LaravelFilemanagerServiceProvider');
+
+		$this->commands($this->commands);
 	}
 }
