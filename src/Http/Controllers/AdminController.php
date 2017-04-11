@@ -417,7 +417,7 @@ class AdminController extends Controller
 				'modelConfig' => new ModelConfig()
 			];
 
-			return view()->make("gtcms.elements.optimizationOptions")->with($data);
+			return view()->make('gtcms.elements.optimizationOptions')->with($data);
 		}
 
 		session(['accessDenied' => true]);
@@ -487,7 +487,7 @@ class AdminController extends Controller
 				'modelConfig' => new ModelConfig()
 			];
 
-			return view()->make("gtcms.elements.databaseOptions")->with($data);
+			return view()->make('gtcms.elements.databaseOptions')->with($data);
 		}
 
 		session(['accessDenied' => true]);
