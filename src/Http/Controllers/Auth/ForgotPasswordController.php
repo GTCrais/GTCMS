@@ -44,7 +44,7 @@ class ForgotPasswordController extends Controller
 
 	public function showLinkRequestForm()
 	{
-		return view('front.pages.auth.passwordResetEmail')->with([
+		return view()->make('front.pages.auth.passwordResetEmail')->with([
 			'success' => session('success', false),
 			'message' => session('message', false)
 		]);

@@ -76,6 +76,10 @@ function handleContactForm() {
 						if (data) {
 							if (data.success) {
 								button.remove();
+								$("input#name").val("");
+								$("input#email").val("");
+								$("input#subject").val("");
+								$("textarea#contact-message").val("");
 							} else {
 								formMessage.addClass('is-error');
 							}
@@ -88,10 +92,6 @@ function handleContactForm() {
 						formMessage.addClass('is-error').html("An error has occurred.<br>Please refresh the page and try again.").show();
 					},
 					complete: function() {
-						$("input#name").val("");
-						$("input#email").val("");
-						$("input#subject").val("");
-						$("textarea#contact-message").val("");
 						form.removeClass("disabled");
 						button.removeClass('disabled');
 					}

@@ -50,7 +50,7 @@ class ResetPasswordController extends Controller
 
 	public function showResetForm(Request $request, $token = null)
 	{
-		return view('front.pages.auth.resetPassword')->with([
+		return view()->make('front.pages.auth.resetPassword')->with([
 			'errorMessage' => session('errorMessage', false),
 			'token' => $token,
 			'email' => $request->get('email')
