@@ -17,7 +17,7 @@
 
 	<p>
 		Can't click the button? Here's the link:<br>
-		<a class="activation-link" href="{{url()->route('passwordResetToken', ['token' => $token])}}">
+		<a href="{{url()->route('passwordResetToken', ['token' => $token])}}">
 			{{url()->route('passwordResetToken', ['token' => $token])}}
 		</a>
 	</p>

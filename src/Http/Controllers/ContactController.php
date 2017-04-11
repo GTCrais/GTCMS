@@ -53,6 +53,10 @@ class ContactController extends Controller
 					$data['message'] = trans('front.contactSuccessMessage');
 				} catch (\Exception $e) {
 					Dbar::error("Error while sending message: " . $e->getMessage());
+
+					if (app()->environment() != 'production') {
+						$data['message'] .= "<br>Non-production environment detected. Try changing your email driver to 'log'.";
+					}
 				}
 			}
 
@@ -60,6 +64,25 @@ class ContactController extends Controller
 		}
 
 		abort(404);
+	}
+
+	public function testEmail(Request $request)
+	{
+		if (auth()->guest() || !auth()->user()->is_superadmin) {
+			abort(404);
+		}
+
+		$body = view()->make('front.emails.test.testContent')->render();
+
+		try {
+		    Mailer::sendEmail($body);
+
+			return "Test email sent successfully.";
+		} catch (\Exception $e) {
+			\Log::error($e);
+
+			return "Error while sending test email: " . $e->getMessage();
+		}
 	}
 
 	protected function returnData($data)

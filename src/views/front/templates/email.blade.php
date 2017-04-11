@@ -36,12 +36,11 @@
 			}
 
 			.logo-link img {
-				width: 100%;
-				max-width: 351px;
+				max-width: 100%
 			}
 
 			.content-container {
-				padding: 0 15px 0 15px;
+				padding: 0;
 			}
 
 			h2 {
@@ -50,7 +49,7 @@
 			}
 
 			a {
-				color: #db4343;
+				color: #0088cc;
 				text-decoration: none;
 			}
 
@@ -60,7 +59,7 @@
 
 			a.button {
 				color: #fff;
-				background: #db4343;
+				background: #0088cc;
 				border-radius: 4px;
 				padding: 12px 22px 12px 22px;
 				font-size: 14px;
@@ -70,7 +69,7 @@
 			a.button:hover {
 				color: #fff;
 				text-decoration: none;
-				background: #c34444;
+				background: #005580;
 			}
 
 			.with-bm {
@@ -87,7 +86,7 @@
 						<td>
 							<div class="logo-container">
 								<a class="logo-link" href="/">
-									<img src="{{asset("img/" . config('gtcms.emailLogo'))}}" alt="{{config('gtcms.siteName')}}" />
+									<img src="{{$message->embed(asset("img/" . config('gtcms.emailLogo')))}}" alt="{{config('gtcms.siteName')}}" />
 								</a>
 							</div>
 

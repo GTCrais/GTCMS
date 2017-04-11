@@ -17,7 +17,7 @@
 			margin: 0 auto;
 		}
 
-		.auth-form-container {
+		.content-container {
 			font-family: 'Roboto', sans-serif;
 			font-size: 18px;
 			font-weight: 300;
@@ -29,7 +29,7 @@
 			margin-bottom: 30px;
 		}
 
-		.auth-form-container a {
+		.content-container a {
 			text-decoration: none !important;
 			color: #424242 !important;
 			font-size: 14px;
@@ -61,7 +61,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-12">
-				<div class="auth-form-container">
+				<div class="content-container">
 					<h2>Login</h2>
 
 					@if ($passwordResetSuccess)
