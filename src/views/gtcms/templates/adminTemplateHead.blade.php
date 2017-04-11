@@ -44,7 +44,7 @@
 	<script src={{asset("/gtcms/js/jquery.ui.touch-punch.min.js")}}></script>
 	<script src={{asset("/gtcms/js/jquery.numeric.min.js")}}></script>
 	@if (config('gtcms.premium'))
-	<script src={{asset("/gtcms/js/gtcmspremium.js")}}></script>
+		<script src={{asset("/gtcms/js/gtcmspremium.js")}}></script>
 	@endif
 	<script src={{asset("/gtcms/js/admin.js")}}></script>
 

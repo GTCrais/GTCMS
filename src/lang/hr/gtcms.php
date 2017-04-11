@@ -2,7 +2,7 @@
 
 // HRV
 
-return array(
+return [
 
 	'minimumDimensions' => 'Minimalne dimenzije',
 	'save' => 'Spremi',
@@ -22,6 +22,7 @@ return array(
 	'administration' => 'Administracija',
 	'logout' => 'Odjava',
 	'optimization' => 'Optimizacija',
+	'database' => 'Baza podataka',
 	'adminTitle' => 'Administracija',
 	'unauthorizedAccess' => 'Neovlašten pristup',
 	'incorrectUsernameOrPassword' => 'Netočno korisničko ime ili lozinka',
@@ -38,9 +39,10 @@ return array(
 	'excelExport' => 'Excel',
 	'from' => 'od',
 	'to' => 'do',
+	'ofTotal' => 'od ukupno',
 	'newEntry' => 'Novi zapis',
 
 	// Exceptions
 	'createOnTheFlyTooLong' => 'Svaki zapis može imati najviše 50 znakova.',
 
-);
+];

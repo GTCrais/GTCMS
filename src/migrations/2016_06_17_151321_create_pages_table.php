@@ -5,15 +5,15 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreatePagesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-        Schema::create('pages', function (Blueprint $table) {
-            $table->increments('id');
+	/**
+	 * Run the migrations.
+	 *
+	 * @return void
+	 */
+	public function up()
+	{
+		Schema::create('pages', function (Blueprint $table) {
+			$table->increments('id');
 			$table->integer('page_id')->unsigned()->nullable();
 			$table->foreign('page_id')->references('id')->on('pages')->onUpdate('cascade')->onDelete('cascade');
 			$table->integer('depth')->nullable();
@@ -23,21 +23,20 @@ class CreatePagesTable extends Migration
 			$table->string('title')->nullable();
 			$table->text('lead')->nullable();
 			$table->text('content')->nullable();
-			$table->string('meta_keywords')->nullable();
-			$table->string('meta_description')->nullable();
+			$table->text('meta_keywords')->nullable();
+			$table->text('meta_description')->nullable();
 			$table->string('model_key')->index()->nullable();
-			$table->dateTime('created_at')->nullable();
-			$table->dateTime('updated_at')->nullable();
-        });
-    }
+			$table->timestamps();
+		});
+	}
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::drop('pages');
-    }
+	/**
+	 * Reverse the migrations.
+	 *
+	 * @return void
+	 */
+	public function down()
+	{
+		Schema::drop('pages');
+	}
 }

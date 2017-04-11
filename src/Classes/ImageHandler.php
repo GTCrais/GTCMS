@@ -2,23 +2,23 @@
 
 namespace App\Classes;
 
-class ImageHandler {
-
+class ImageHandler
+{
 	const DIM_ERROR = 99;
 
-	public static function process($modelConfig, $imageFields, $parentProperty) {
-
-		$imageData = array();
+	public static function process($modelConfig, $imageFields, $parentProperty)
+	{
+		$imageData = [];
 		$counter = 0;
 
 		foreach ($imageFields as $imageField) {
 			$imageData[$counter]['property'] = $imageField->property;
-			if (\Request::hasFile($imageField->property)) {
-				$ext = \Request::file($imageField->property)->getClientOriginalExtension();
-				if (!in_array(strtolower($ext), array('jpg', 'jpeg', 'gif', 'png'))) {
+			if (request()->hasFile($imageField->property)) {
+				$ext = request()->file($imageField->property)->getClientOriginalExtension();
+				if (!in_array(strtolower($ext), ['jpg', 'jpeg', 'gif', 'png'])) {
 					throw new \Exception ("File is not an image");
 				} else {
-					$basePath = public_path()."/img/modelImages/".$modelConfig->name."/";
+					$basePath = public_path() . "/img/modelImages/" . $modelConfig->name . "/";
 
 					$dirs = [
 						public_path("img"),
@@ -36,12 +36,12 @@ class ImageHandler {
 
 					//here check if file exists
 					do {
-						$name = str_random(32).".".$ext;
-					} while (file_exists($basePath."original/".$name));
+						$name = str_random(32) . "." . $ext;
+					} while (file_exists($basePath . "original/" . $name));
 					//end check
 
 					//copy the image to the original folder
-					\Image::make(\Request::file($imageField->property)->getRealPath())->save($basePath . "original/" . $name);
+					\Image::make(request()->file($imageField->property)->getRealPath())->save($basePath . "original/" . $name);
 					$img = \Image::make($basePath . "original/" . $name);
 
 					if ($parentProperty && $modelConfig->name == 'ModelImage') {
@@ -67,15 +67,17 @@ class ImageHandler {
 					$minHeight = $size[1];
 					$transformMethod = $size[2];
 
-					if (in_array($transformMethod, array('resizeCanvas', 'resize'))) {
+					if (in_array($transformMethod, ['resizeCanvas', 'resize'])) {
 						if ($img->width() < $minWidth && $img->height() < $minHeight) {
 							throw new \Exception (trans('gtcms.imageTooSmall'), self::DIM_ERROR);
 						}
-					} if (in_array($transformMethod, array('minWidth'))) {
+					}
+					if (in_array($transformMethod, ['minWidth'])) {
 						if ($img->width() < $minWidth) {
 							throw new \Exception (trans('gtcms.imageTooSmall'), self::DIM_ERROR);
 						}
-					} if (in_array($transformMethod, array('minHeight'))) {
+					}
+					if (in_array($transformMethod, ['minHeight'])) {
 						if ($img->height() < $minHeight) {
 							throw new \Exception (trans('gtcms.imageTooSmall'), self::DIM_ERROR);
 						}
@@ -87,15 +89,15 @@ class ImageHandler {
 
 					$returnFolder = 'gtcmsThumb';
 
-					$gtcmsSize = array(
+					$gtcmsSize = [
 						80, 50, 'resizeCanvas', 'gtcmsThumb', 100
-					);
+					];
 
 					$sizes = AdminHelper::objectToArray($sizes);
 					array_unshift($sizes, $gtcmsSize);
 
 					foreach ($sizes as $size) {
-						$newImg = clone($img);
+						$newImg = \Image::make($basePath . "original/" . $name);
 						$size = AdminHelper::objectToArray($size);
 
 						if (!is_dir($basePath . $size[3])) {
@@ -104,12 +106,12 @@ class ImageHandler {
 
 						if ($size[2] == 'crop') {
 							$newImg->fit($size[0], $size[1])->save($basePath . $size[3] . "/" . $name, $size[4]);
-						} else if (in_array($size[2], array('resize', 'minWidth', 'minHeight'))){
-							$newImg->resize($size[0], $size[1], function($constraint){
+						} else if (in_array($size[2], ['resize', 'minWidth', 'minHeight'])) {
+							$newImg->resize($size[0], $size[1], function ($constraint) {
 								$constraint->aspectRatio();
 								$constraint->upsize();
 							})->save($basePath . $size[3] . "/" . $name, $size[4]);
-						} else if ($size[2] == 'resizeCanvas'){
+						} else if ($size[2] == 'resizeCanvas') {
 							$newImg->resize($size[0], null, function ($constraint) {
 								$constraint->aspectRatio();
 								$constraint->upsize();
@@ -136,7 +138,7 @@ class ImageHandler {
 				}
 			}
 		}
+
 		return $imageData;
 	}
-
 }

@@ -2,8 +2,9 @@
 
 // HRV
 
-return array(
+return [
 	'login' => 'prijava',
 	'logout' => 'odjava',
-	'register' => 'registracija'
-);
+	'register' => 'registracija',
+	'passwordReset' => 'reset-lozinke'
+];

@@ -26,11 +26,11 @@
 			@endif
 			</span>
 
-		@if ($quickEdit)
-			<a href="javascript:;" class="quickEditButton close">
-				<i class="fa fa-times"></i>
-			</a>
-		@endif
+			@if ($quickEdit)
+				<a href="javascript:;" class="quickEditButton close">
+					<i class="fa fa-times"></i>
+				</a>
+			@endif
 
 		</h3>
 	</div>

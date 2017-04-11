@@ -4,15 +4,15 @@ namespace App\Classes;
 
 use App\Models\Page;
 
-class PageMetaManager {
-
+class PageMetaManager
+{
 	public static $page = null;
 	public static $category = null;
 	public static $product = null;
 	public static $post = null;
 
-	public static function getMetaDescription() {
-
+	public static function getMetaDescription()
+	{
 		if (self::$post) {
 			return strip_tags(self::$post->excerpt);
 		}
@@ -30,11 +30,10 @@ class PageMetaManager {
 		}
 
 		return self::getDefaultMeta('description');
-
 	}
 
-	public static function getMetaKeywords() {
-
+	public static function getMetaKeywords()
+	{
 		if (self::$category) {
 			return self::$category->meta_keywords ? self::$category->meta_keywords : self::getDefaultMeta('keywords');
 		}
@@ -48,24 +47,26 @@ class PageMetaManager {
 		}
 
 		return self::getDefaultMeta('keywords');
-
 	}
 
-	public static function getMetaTitle() {
-
+	public static function getMetaTitle()
+	{
 		$title = config('gtcms.siteName');
+
 		if (self::$page) {
 			//$title = self::$page->name . " :: " . $title;
 			$title = $title . " :: " . self::$page->name;
 		}
+
 		if (self::$post) {
 			$title = self::$post->title . " :: " . $title;
 		}
-		return $title;
 
+		return $title;
 	}
 
-	public static function getAdminTitle() {
+	public static function getAdminTitle()
+	{
 		$title = trans('gtcms.adminTitle');
 		$siteName = config('gtcms.siteName');
 
@@ -73,7 +74,8 @@ class PageMetaManager {
 		return $siteName . " :: " . $title;
 	}
 
-	private static function getDefaultMeta($attr = 'description') {
+	private static function getDefaultMeta($attr = 'description')
+	{
 		$homepage = Page::whereNull('page_id')->first();
 		if ($attr == 'description') {
 			return $homepage->meta_description;
@@ -82,20 +84,23 @@ class PageMetaManager {
 		}
 	}
 
-	public static function setPage($page) {
+	public static function setPage($page)
+	{
 		self::$page = $page;
 	}
 
-	public static function setCategory($category) {
+	public static function setCategory($category)
+	{
 		self::$category = $category;
 	}
 
-	public static function setProduct($product) {
+	public static function setProduct($product)
+	{
 		self::$product = $product;
 	}
 
-	public static function setPost($post) {
+	public static function setPost($post)
+	{
 		self::$post = $post;
 	}
-
 }

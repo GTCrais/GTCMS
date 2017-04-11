@@ -1,13 +1,13 @@
 <?php
 
-return array(
+return [
 
-	'languages' => array(
+	'languages' => [
 		'en'
-	),
+	],
 
 	'defaultLocale' => 'en',
 	'defaultAdminLocale' => 'en',
 	'siteIsMultilingual' => false
 
-);
+];

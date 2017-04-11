@@ -10,9 +10,9 @@
 
 		<meta property="og:title" content="{{PageMetaManager::getMetaTitle()}}" />
 		<meta property="og:type" content="website" />
-		<meta property="og:url" content="{{\Request::url()}}" />
+		<meta property="og:url" content="{{request()->url()}}" />
 		@if (config('gtcms.ogImage', false))
-		<meta property="og:image" content="http://{{\Request::server ("HTTP_HOST")}}/img/{{config('gtcms.ogImage')}}" />
+		<meta property="og:image" content="http://{{request()->server ("HTTP_HOST")}}/img/{{config('gtcms.ogImage')}}" />
 		@endif
 		<meta property="og:description" content="{{PageMetaManager::getMetaDescription()}}">
 

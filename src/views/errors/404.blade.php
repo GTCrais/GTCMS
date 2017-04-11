@@ -16,6 +16,6 @@
 		}
 	</style>
 
-	<div class="gtcms">GTCMS</div>
+	<div class="gtcms">404 :(</div>
 
 @stop

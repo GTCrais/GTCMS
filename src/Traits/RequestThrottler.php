@@ -5,9 +5,42 @@ namespace App\Traits;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
 
-trait RequestThrottler {
-
+trait RequestThrottler
+{
 	use ThrottlesLogins;
+
+	protected $maxAttempts = 5;
+	protected $lockoutDuration = 1; // In minutes
+
+	protected function processRequest(Request $request)
+	{
+		$request->hasTooManyAttempts = false;
+
+		if ($this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration)) {
+			$errorMessage = trans('auth.throttle', ['seconds' => $this->availableIn($this->throttleKey($request))]);
+			$request->hasTooManyAttempts = true;
+
+			return $errorMessage;
+		}
+
+		$this->incrementAttempts($request, $this->lockoutDuration);
+
+		$retriesLeft = $this->retriesLeft($this->throttleKey($request), $this->maxAttempts);
+		if ($retriesLeft < 0) {
+			$retriesLeft = 0;
+		}
+
+		if (!$retriesLeft) {
+			$errorMessage = trans('auth.throttle', ['seconds' => $this->lockoutDuration * 60]);
+		} else {
+			$errorMessage = trans_choice('auth.attemptsLeft', $retriesLeft, ['attemptsLeft' => $retriesLeft]);
+		}
+
+		// Trigger countdown here
+		$this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration);
+
+		return $errorMessage;
+	}
 
 	protected function hasTooManyAttempts($requestOrKey, $maxAttempts, $lockoutDuration)
 	{
@@ -49,7 +82,8 @@ trait RequestThrottler {
 		$this->limiter()->resetAttempts($key);
 	}
 
-	protected function clear($key) {
+	protected function clear($key)
+	{
 		$this->limiter()->clear($key);
 	}
 
@@ -63,11 +97,13 @@ trait RequestThrottler {
 		return $retriesLeft;
 	}
 
-	protected function availableIn($key) {
+	protected function availableIn($key)
+	{
 		return $this->limiter()->availableIn($key);
 	}
 
-	protected function lock($key, $maxAttempts, $lockoutDuration) {
+	protected function lock($key, $maxAttempts, $lockoutDuration)
+	{
 		$retriesLeft = $this->retriesLeft($key, $maxAttempts);
 
 		if ($retriesLeft) {
@@ -77,8 +113,8 @@ trait RequestThrottler {
 		}
 	}
 
-	protected function attemptsWord($attemptsLeft) {
+	protected function attemptsWord($attemptsLeft)
+	{
 		return $attemptsLeft == 1 ? "attempt" : "attempts";
 	}
-
 }
