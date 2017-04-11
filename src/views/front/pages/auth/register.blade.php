@@ -17,7 +17,7 @@
 			margin: 0 auto;
 		}
 
-		.auth-form-container {
+		.content-container {
 			font-family: 'Roboto', sans-serif;
 			font-size: 18px;
 			font-weight: 300;
@@ -37,7 +37,7 @@
 			font-weight: 300;
 		}
 
-		.auth-form-container a {
+		.content-container a {
 			text-decoration: none !important;
 			position: relative;
 			top: 8px;
@@ -59,7 +59,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-12">
-				<div class="auth-form-container">
+				<div class="content-container">
 					<h2>Registration</h2>
 
 					@if ($errors->count() || $errorMessage)

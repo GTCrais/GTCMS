@@ -21,10 +21,10 @@ return [
 	'showTestAdminLoginInfo' => true,
 	'adminEmail' => 'info@site.name',
 	'ogImage' => false,
-	'skin' => 'dark',
 	'loginLogo' => 'gtcms-login-logo.png',
 	'navigationLogo' => 'gtcms-nav-logo.png',
-	'emailLogo' => 'gtcms-login-logo.png',
+	'emailLogo' => 'gtcms-email-logo.png',
+	'skin' => 'dark',
 	'faIconColors' => [
 		'#0088cc', // blue
 		'#989898', // grey

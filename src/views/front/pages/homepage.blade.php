@@ -38,6 +38,10 @@
 			display: inline-block;
 			margin-bottom: 5px;
 		}
+
+		.gtcms a.cms {
+			color: #0088cc;
+		}
 	</style>
 
 	<div class="gtcms">
@@ -50,15 +54,14 @@
 				<a href="{{url()->route('register')}}">Register</a> &nbsp;|&nbsp;
 			@endif
 
-			<a href="{{url()->to(AdminHelper::getCmsPrefix())}}">
+			<a href="/contact">Contact</a> &nbsp;|&nbsp;
+
+			<a class="cms" href="{{url()->to(AdminHelper::getCmsPrefix())}}">
 				CMS
 				@if (auth()->guest() || auth()->user()->role != 'admin')
 					login
 				@endif
-				&nbsp;|&nbsp;
 			</a>
-
-				<a href="/contact">Contact</a>
 		</div>
 	</div>
 

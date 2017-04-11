@@ -68,6 +68,7 @@ class RegisterController extends Controller
 		try {
 			event(new Registered($user = $this->create($request)));
 			auth()->login($user);
+
 			$this->clear($this->throttleKey($request));
 
 			return redirect()->route('home');
@@ -108,6 +109,7 @@ class RegisterController extends Controller
 			'first_name' => $request->get('first_name'),
 			'email' => $request->get('email'),
 			'password' => bcrypt($request->get('password')),
+			'role' => 'user'
 		]);
 	}
 }
