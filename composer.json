@@ -10,7 +10,7 @@
         }
     ],
     "license": "GTCMS Basic license",
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "GTCrais\\GTCMS\\": "src"

@@ -2,12 +2,37 @@
 
 namespace GTCrais\GTCMS;
 
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
 
 class GtcmsServiceProvider extends ServiceProvider
 {
+	protected $serviceProviders = [
+		'Barryvdh\Debugbar\ServiceProvider',
+		'Collective\Html\HtmlServiceProvider',
+		'Intervention\Image\ImageServiceProvider',
+		'Unisharp\Laravelfilemanager\LaravelFilemanagerServiceProvider'
+	];
+
+	protected $vendorAliases = [
+		'Form' => 'Collective\Html\FormFacade',
+		'Html' => 'Collective\Html\HtmlFacade',
+		'Image' => 'Intervention\Image\Facades\Image'
+	];
+
+	protected $gtcmsAliases = [
+		'Front' => 'Classes\Front',
+		'AdminHelper' => 'Classes\AdminHelper',
+		'Tools' => 'Classes\Tools',
+		'ModelConfig' => 'Classes\ModelConfig',
+		'Dbar' => 'Classes\Dbar',
+		'PageMetaManager' => 'Classes\PageMetaManager',
+		'GtcmsPremium' => 'Classes\GtcmsPremium'
+	];
+
 	protected $commands = [
-		'GTCrais\GTCMS\Console\Commands\GtcmsPublish'
+		'GTCrais\GTCMS\Console\Commands\GtcmsPublish',
+		'GTCrais\GTCMS\Console\Commands\GtcmsInstall'
 	];
 
 	/**
@@ -47,11 +72,24 @@ class GtcmsServiceProvider extends ServiceProvider
 	 */
 	public function register()
 	{
-		$this->app->register('Barryvdh\Debugbar\ServiceProvider');
-		$this->app->register('Collective\Html\HtmlServiceProvider');
-		$this->app->register('Intervention\Image\ImageServiceProvider');
-		$this->app->register('Unisharp\Laravelfilemanager\LaravelFilemanagerServiceProvider');
+		// Register Service Providers
+		foreach ($this->serviceProviders as $serviceProvider) {
+			$this->app->register($serviceProvider);
+		}
 
+		// Register Aliases
+		$aliasLoader = AliasLoader::getInstance();
+		$namespace = config('gtcms.defaultNamespace', 'App');
+
+		foreach ($this->vendorAliases as $alias => $class) {
+			$aliasLoader->alias($alias, $class);
+		}
+
+		foreach ($this->gtcmsAliases as $alias => $class) {
+			$aliasLoader->alias($alias, $namespace . "\\" . $class);
+		}
+
+		// Register commands
 		$this->commands($this->commands);
 	}
 }
