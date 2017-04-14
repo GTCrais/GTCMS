@@ -5,7 +5,7 @@ return [
 	"models" => [
 
 		//Model Image
-		"ModelImage" => array(
+		"ModelImage" => [
 			'id' => 'model_image_id',
 			'name' => 'ModelImage',
 			'hrNamePlural' => 'Images',
@@ -14,36 +14,36 @@ return [
 			'faIcon' => 'fa-photo',
 
 			'standalone' => false,
-			'requiredParents' => array(
+			'requiredParents' => [
 
 				// THIS FIELD IS REQUIRED
 
-			),
+			],
 
-			'formFields' => array(
-				array(
+			'formFields' => [
+				[
 					'property' => 'imagename',
-					'displayProperty' => array(
+					'displayProperty' => [
 						'type' => 'image',
 						'display' => 'image',
 						'method' => 'image'
-					),
+					],
 					'label' => 'Image',
 					'type' => 'image',
 					'rules' => 'image',
 					'showDimensions' => true,
 					'sideTable' => true,
-				),
-				array(
+				],
+				[
 					'property' => 'caption',
 					'label' => 'Caption',
 					'type' => 'text'
-				),
-			),
-		),
+				],
+			],
+		],
 
 		//Model File
-		"ModelFile" => array(
+		"ModelFile" => [
 			'id' => 'model_file_id',
 			'name' => 'ModelFile',
 			'hrNamePlural' => 'Files',
@@ -52,42 +52,33 @@ return [
 			'faIcon' => 'fa-file',
 
 			'standalone' => false,
-			'requiredParents' => array(
+			'requiredParents' => [
 
 				// THIS FIELD IS REQUIRED
 
-			),
+			],
 
-			'formFields' => array(
-				array(
+			'formFields' => [
+				[
 					'property' => 'title',
 					'label' => 'Title',
 					'type' => 'text',
 					'sideTable' => true,
 					'sideTableLink' => true,
 					'rules' => 'required'
-				),
-				array(
+				],
+				[
 					'property' => 'filename',
-					'displayProperty' => array(
-						'type' => 'file',
-						'display' => 'url',
-						'method' => 'file'
-					),
 					'label' => 'File',
-					'info' => 'Leave empty to keep current file.',
 					'type' => 'file',
 					'rules' => 'mimes:pdf',
-					'sideTable' => true,
-					'hiddenInfo' => array(
-						'add' => true
-					)
-				),
-			),
-		),
+					'sideTable' => true
+				],
+			],
+		],
 
 		//Page
-		"Page" => array(
+		"Page" => [
 			'id' => 'page_id',
 			'name' => 'Page',
 			'hrNamePlural' => 'Pages',
@@ -99,83 +90,87 @@ return [
 			'index' => 'tree',
 			'linkProperty' => 'name',
 			'maxDepth' => 2, // 0, 1, 2
-			'parent' =>  array(
+			'parent' => [
 				'name' => 'Page',
 				'method' => 'parentPage',
 				'property' => 'page_id',
-			),
-			'children' => array(
+			],
+			'children' => [
 				'name' => 'Page',
 				'method' => 'pages'
-			),
+			],
 			'generateSlug' => true,
 			'slugProperty' => 'name',
 			'skipFirstLevelSlug' => true,
 			'maxFirstLevelItems' => 1,
 			// end tree-structure config
 
-			'tabs' => array(
+			'tabs' => [
 				'Common', 'Meta'
-			),
+			],
 
-			'formFields' => array(
-				array(
+			'formFields' => [
+				[
 					'property' => 'model_key',
 					'label' => 'Page Key',
 					'type' => 'select',
 					'rules' => 'required',
-					'selectType' => array(
+					'selectType' => [
 						'type' => 'list',
 						'listMethod' => 'getPageKeyList'
-					),
+					],
 					'tab' => 'Common'
-				),
-				array(
+				],
+				[
 					'property' => 'name',
 					'label' => 'Name',
 					'type' => 'text',
 					'rules' => 'required',
 					'tab' => 'Common'
-				),
-				array(
+				],
+				[
 					'property' => 'title',
 					'label' => 'Title',
 					'type' => 'text',
 					'rules' => 'required',
 					'tab' => 'Common'
-				),
-				array(
+				],
+				[
 					'property' => 'content',
 					'label' => 'Content',
 					'type' => 'textarea',
-					'options' => array(
-						'class' => 'simpleEditor'
-					),
+					'options' => [
+						'class' => 'editor',
+						'data-editortoolbar' => 'bold-italic|bullet-list|justify|link'
+					],
 					'tab' => 'Common',
-					'modelKey' => array(
-						'home'
-					)
-				),
-				array(
+					'modelKey' => [
+						'standard'
+					]
+				],
+				[
 					'property' => 'meta_keywords',
 					'label' => 'Meta Keywords',
-					'type' => 'text',
+					'type' => 'textarea',
+					'options' => [
+						'class' => 'autosize'
+					],
 					'tab' => 'Meta'
-				),
-				array(
+				],
+				[
 					'property' => 'meta_description',
 					'label' => 'Meta Description',
 					'type' => 'textarea',
-					'options' => array(
-						'class' => 'shortTextarea'
-					),
+					'options' => [
+						'class' => 'autosize'
+					],
 					'tab' => 'Meta'
-				)
-			)
-		),
+				]
+			]
+		],
 
 		//User
-		"User" => array(
+		"User" => [
 			'id' => 'user_id',
 			'name' => 'User',
 			'hrNamePlural' => 'Users',
@@ -187,28 +182,28 @@ return [
 			'direction' => 'desc',
 			'perPage' => 5,
 
-			'formFields' => array(
-				array(
+			'formFields' => [
+				[
 					'property' => 'role',
 					'label' => 'User Role',
 					'type' => 'select',
-					'displayProperty' => array(
+					'displayProperty' => [
 						'type' => 'accessor',
 						'method' => 'roleName'
-					),
-					'selectType' => array(
+					],
+					'selectType' => [
 						'type' => 'list',
 						'listMethod' => 'getUserRoles'
-					),
+					],
 					'rules' => 'required',
 					'default' => 'user',
-					'search' => array(
+					'search' => [
 						'type' => 'standard',
 						'match' => 'exact'
-					),
+					],
 					'excelExport' => true
-				),
-				array(
+				],
+				[
 					'property' => 'email',
 					'label' => 'Email',
 					'type' => 'text',
@@ -216,80 +211,80 @@ return [
 					'table' => true,
 					'order' => true,
 					'tableLink' => true,
-					'search' => array(
+					'search' => [
 						'type' => 'standard',
 						'match' => 'pattern'
-					),
+					],
 					'excelExport' => true
-				),
-				array(
+				],
+				[
 					'property' => 'password',
 					'label' => 'Password',
 					'type' => 'text',
 					'rules' => '{addRequired}',
 					'info' => 'Leave empty to keep current password',
-					'hiddenInfo' => array(
+					'hiddenInfo' => [
 						'add' => true
-					),
-					'options' => array(
+					],
+					'options' => [
 						'autocomplete' => 'off'
-					),
+					],
 					'autofill' => false
-				),
-				array(
+				],
+				[
 					'property' => 'is_superadmin',
 					'label' => 'Is SuperAdmin',
 					'type' => 'checkbox',
 					'restrictedToSuperadmin' => true,
-					'search' => array(
+					'search' => [
 						'type' => 'standard',
 						'match' => 'exact'
-					),
+					],
 					'table' => true,
-				),
-				array(
+				],
+				[
 					'property' => 'first_name',
 					'label' => 'First Name',
 					'type' => 'text',
 					'rules' => 'required',
 					'table' => true,
 					'order' => true,
-					'search' => array(
+					'search' => [
 						'type' => 'standard',
 						'match' => 'pattern'
-					),
+					],
 					'excelExport' => true
-				),
-				array(
+				],
+				[
 					'property' => 'last_name',
 					'label' => 'Last Name',
 					'type' => 'text',
 					'rules' => 'required',
 					'table' => true,
 					'order' => true,
-					'search' => array(
+					'search' => [
 						'type' => 'standard',
 						'match' => 'pattern'
-					),
+					],
 					'excelExport' => true
-				),
-				array(
+				],
+				[
 					'property' => 'created_at',
-					'displayProperty' => array(
+					'displayProperty' => [
 						'type' => 'accessor',
 						'method' => 'indexDate'
-					),
+					],
 					'label' => 'Created',
 					'type' => 'text',
 					'table' => true,
 					'order' => true,
-					'hidden' => array(
+					'hidden' => [
 						'add' => true, 'edit' => true
-					),
+					],
 					'excelExport' => true
-				)
-			)
-		),
+				]
+			]
+		],
 
 		//Gtcms Setting
 		/*"GtcmsSetting" => array(

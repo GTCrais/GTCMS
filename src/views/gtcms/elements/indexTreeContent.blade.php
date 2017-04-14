@@ -13,15 +13,15 @@
 			{!! Front::showMessages() !!}
 		</div>
 
+		@if($addEntity)
+			<div class="indexTableHeader">
+				<a href="{{AdminHelper::getCmsPrefix() . $modelConfig->name}}/add" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> {{$modelConfig->hrName}}</a>
+			</div>
+		@endif
+
 		@if (!$objects->count())
 			<p>{{trans('gtcms.currentlyNoObjects', array('objects' => $modelConfig->hrNamePlural))}}</p>
 		@else
-			@if($addEntity)
-				<div class="indexTableHeader">
-					<a href="{{AdminHelper::getCmsPrefix() . $modelConfig->name}}/add" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i> {{$modelConfig->hrName}}</a>
-				</div>
-			@endif
-
 			<div class="table-responsive">
 				{!! Front::drawObjectTree($objects, $modelConfig, $modelConfig) !!}
 			</div>

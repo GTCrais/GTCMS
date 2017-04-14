@@ -47,8 +47,6 @@ a:active
       padding 0 !important
       border none !important
 
-
-
 .paginationContainer {
   text-align: center
 }
@@ -97,6 +95,16 @@ div.globalMessages
 
 .indexTableHeader
   margin-bottom: 10px
+
+  .addButton
+    margin-right 10px
+
+  span.paginationInfo
+    position relative
+    top 3px
+
+    > span
+      font-weight bold
 
   .openSearch
     float right
@@ -277,7 +285,8 @@ textarea {
 }
 
 .navbar-brand
-  padding 11px 15px
+  padding 14px 15px
+  height 44px
 
 .sidebar
   .nav
@@ -497,9 +506,16 @@ body.loginBody
   background-color white
 
 .login-panel.panel
-  margin-top 200px
+  margin-top 0
+  padding-top calc(50vh - 330px)
   box-shadow none
   border none
+
+  .login-logo
+    opacity 0
+    max-width 100%
+    margin 0 auto 40px
+    display block
 
 form.loginForm
   opacity 0
@@ -547,6 +563,14 @@ body.loginRedirect
 
 input.disabledInput
   cursor default !important
+
+form.entityForm
+  ul.nav.nav-tabs
+    > li.has-warning
+      > a
+        border-color adminOrange
+        border-bottom-color transparent
+        color adminOrange
 
 form.entityForm.editForm .form-group:not(.has-warning)
 form.entityForm.addForm .form-group.disabledInput
@@ -871,7 +895,7 @@ body.nav-narrow
   right -100%
   width 600px
   height 100%
-  border-left 3px solid #eee
+  border-left 1px solid #eee
   box-shadow: -2px 0 10px 1px #eee;
   z-index 5000
   background-color white

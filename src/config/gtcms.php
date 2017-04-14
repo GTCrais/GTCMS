@@ -20,10 +20,10 @@ return [
 	'siteName' => 'Site Name',
 	'showTestAdminLoginInfo' => true,
 	'adminEmail' => 'info@site.name',
-	'fromEmail' => 'no-reply@site.name',
-	'fromPerson' => 'Site Name',
-	'contactMessageSubject' => '[Site Name] - New message',
 	'ogImage' => false,
+	'loginLogo' => 'gtcms-login-logo.png',
+	'navigationLogo' => 'gtcms-nav-logo.png',
+	'emailLogo' => 'gtcms-email-logo.png',
 	'skin' => 'dark',
 	'faIconColors' => [
 		'#0088cc', // blue

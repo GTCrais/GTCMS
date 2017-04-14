@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Classes\Mailer;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -15,18 +16,19 @@ class User extends BaseModel implements
 	AuthorizableContract,
 	CanResetPasswordContract
 {
-
 	use Authenticatable, Authorizable, CanResetPassword, Notifiable;
 
 	protected $table = 'users';
-	protected $hidden = array('password', 'remember_token');
-	protected $fillable = array('email', 'password', 'first_name', 'last_name', 'role', 'is_superadmin');
+	protected $hidden = ['password', 'remember_token'];
+	protected $fillable = ['email', 'password', 'first_name', 'last_name', 'role', 'is_superadmin'];
 
-	public static function userList() {
+	public static function userList()
+	{
 		return User::pluck('email', 'id');
 	}
 
-	public function getRoleNameAttribute() {
+	public function getRoleNameAttribute()
+	{
 		$userRoles = self::getUserRoles();
 		if (isset($userRoles[$this->role])) {
 			return $userRoles[$this->role];
@@ -35,47 +37,63 @@ class User extends BaseModel implements
 		return null;
 	}
 
-	public static function getUserRoles() {
-		return array(
+	public static function getUserRoles()
+	{
+		return [
 			'user' => 'User',
 			'admin' => 'Administrator'
-		);
+		];
 	}
 
-	public function getFullNameAttribute() {
+	public function getFullNameAttribute()
+	{
 		return $this->first_name . " " . $this->last_name;
 	}
 
-	public function isDeletable() {
-		if (\Auth::user() && \Auth::user()->is_superadmin) {
+	public function sendPasswordResetNotification($token)
+	{
+		try {
+			Mailer::sendPasswordResetLink($this, $token);
+		} catch (\Exception $e) {
+			\Log::error("Error while sending password reset token: " . $e->getMessage());
+			\Log::error($e);
+		}
+	}
+
+	public function isDeletable()
+	{
+		if (auth()->user() && auth()->user()->is_superadmin) {
 			return true;
 		}
 		if (!$this->is_superadmin) {
 			return true;
 		}
+
 		return false;
 	}
 
-	public function isEditable() {
-		if (\Auth::user() && \Auth::user()->is_superadmin) {
+	public function isEditable()
+	{
+		if (auth()->user() && auth()->user()->is_superadmin) {
 			return true;
 		}
 		if (!$this->is_superadmin) {
 			return true;
 		}
+
 		return false;
 	}
 
-	public function setPasswordAttribute($value) {
-		if (!\Request::has('password')) {
+	public function setPasswordAttribute($value)
+	{
+		if (!request()->has('password')) {
 			if ($value) {
 				$this->attributes['password'] = $value;
 			} else {
 				$this->attributes['password'] = $this->password;
 			}
 		} else {
-			$this->attributes['password'] = \Hash::make(\Request::get('password'));
+			$this->attributes['password'] = \Hash::make(request()->get('password'));
 		}
 	}
-
 }

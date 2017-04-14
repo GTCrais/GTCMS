@@ -4,36 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Classes\Dbar;
 use App\Classes\Mailer;
+use Illuminate\Http\Request;
 
-class ContactController extends Controller {
-
+class ContactController extends Controller
+{
 	protected static $requestType = 'ajax';
-	protected static $rules = array(
+	protected static $rules = [
 		'name' => 'required',
 		'email' => 'required|email',
 		'subject' => 'required',
 		'message' => 'required'
-	);
+	];
 
-	public static function handler() {
-
-		$data = array(
+	public function handler(Request $request)
+	{
+		$data = [
 			'success' => false,
-			'title' => trans('t.contactErrorTitle'),
-			'message' => trans('t.contactErrorMessage')
-		);
+			'title' => trans('front.contactErrorTitle'),
+			'message' => trans('front.errorHasOccurred')
+		];
 
 		$requestAllowed = true;
 		if (self::$requestType == 'ajax') {
-			$requestAllowed = \Request::ajax() && \Request::get('getIgnore_isAjax');
+			$requestAllowed = $request->ajax() && $request->get('getIgnore_isAjax');
 		}
 
 		if ($requestAllowed) {
 
-			$validator = \Validator::make(\Request::all(), self::$rules);
+			$validator = \Validator::make($request->all(), self::$rules);
 			if ($validator->fails()) {
 				$messages = $validator->getMessageBag()->toArray();
-				$finalMessages = array();
+				$finalMessages = [];
 				foreach ($messages as $field => $fieldMessages) {
 					foreach ($fieldMessages as $fieldMessage) {
 						$finalMessages[] = $fieldMessage;
@@ -41,32 +42,55 @@ class ContactController extends Controller {
 				}
 				$message = implode("\n", $finalMessages);
 				$data['message'] = $message;
-				return self::returnData($data);
+
+				return $this->returnData($data);
 			} else {
 				try {
-					Mailer::sendMessage(\Request::all());
+					Mailer::sendMessage($request->all());
+
 					$data['success'] = true;
-					$data['title'] = trans('t.contactSuccessTitle');
-					$data['message'] = trans('t.contactSuccessMessage');
+					$data['title'] = trans('front.contactSuccessTitle');
+					$data['message'] = trans('front.contactSuccessMessage');
 				} catch (\Exception $e) {
-					Dbar::error("Error while sending message: ".$e->getMessage());
+					Dbar::error("Error while sending message: " . $e->getMessage());
+
+					if (app()->environment() != 'production') {
+						$data['message'] .= "<br>Non-production environment detected. Try changing your email driver to 'log'.";
+					}
 				}
 			}
 
-			return self::returnData($data);
+			return $this->returnData($data);
 		}
 
-		\App::abort(404);
-
+		abort(404);
 	}
 
-	protected static function returnData($data) {
+	public function testEmail(Request $request)
+	{
+		if (auth()->guest() || !auth()->user()->is_superadmin) {
+			abort(404);
+		}
+
+		$body = view()->make('front.emails.test.testContent')->render();
+
+		try {
+		    Mailer::sendEmail($body);
+
+			return "Test email sent successfully.";
+		} catch (\Exception $e) {
+			\Log::error($e);
+
+			return "Error while sending test email: " . $e->getMessage();
+		}
+	}
+
+	protected function returnData($data)
+	{
 		if (self::$requestType == 'ajax') {
-			return \Response::json($data);
+			return response()->json($data);
 		} else {
-			// Custom code
-
+			return back()->with($data);
 		}
 	}
-
 }

@@ -19,11 +19,11 @@ foreach ($formFields as $field) {
 		$continue = true;
 	}
 
-	if ($field->restrictedToSuperadmin && !Auth::user()->is_superadmin) {
+	if ($field->restrictedToSuperadmin && auth()->user()->is_superadmin) {
 		$continue = true;
 	}
 
-	$userRole = Auth::user()->role;
+	$userRole = auth()->user()->role;
 	if ($field->restrictedAccess && !$field->restrictedAccess->$userRole) {
 		$continue = true;
 	}
@@ -107,7 +107,7 @@ foreach ($formFields as $field) {
 			$infoWidthClass = " col-sm-offset-" . $modelConfig->form->labelWidth . " col-sm-" . $modelConfig->form->inputWidth;
 		}
 
-		$role = \Auth::user()->role;
+		$role = auth()->user()->role;
 
 		if ($field->viewField || ($field->viewFieldForRoles && $field->viewFieldForRoles->$role)) {
 
@@ -328,13 +328,13 @@ foreach ($formFields as $field) {
 					echo Form::hidden($field->property, $_GET[$field->property]);
 					echo Form::text('dummy', $list[$_GET[$field->property]], $options);
 				} else {
-					Throw new Exception("You are not allowed to add ".$modelConfig->hrNamePlural." for this model, or non-existing parent model.");
+					throw new \Exception("You are not allowed to add " . $modelConfig->hrNamePlural . " for this model, or non-existing parent model.");
 				}
 			} else {
 				$options['placeholder'] = is_string($field->selectablePlaceholder) ? $field->selectablePlaceholder : " - ";
 				$options['class'] .= $field->create ? ' doSelectize selectizeCreate ' : ' doSelectize selectizeNoCreate ';
 				$options['class'] .= $field->selectablePlaceholder ? " selectablePlaceholder " : '';
-				echo Form::select($field->property, $list, \Request::old($field->property) ? \Request::old($field->property) : $originalValue, $options);
+				echo Form::select($field->property, $list, $originalValue, $options);
 			}
 
 			// ----------- MULTISELECT ------------
@@ -441,7 +441,7 @@ foreach ($formFields as $field) {
 			} else if ($type == 'dateTime') {
 				$options['class'] .= ' dateTimePicker ';
 			}
-			echo Form::text($field->property, \Request::old($field->property) ? \Request::old($field->property) : $originalValue, $options);
+			echo Form::text($field->property, $originalValue, $options);
 
 			// ----------- OTHER FIELDS ------------
 
@@ -454,7 +454,7 @@ foreach ($formFields as $field) {
 			{
 				$options['rows'] = 2;
 			}
-			echo Form::$type($field->property, \Request::old($field->property) ? \Request::old($field->property) : $originalValue, $options);
+			echo Form::$type($field->property, $originalValue, $options);
 		}
 
 		if ($showEditIcon) {

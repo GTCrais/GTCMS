@@ -4,16 +4,16 @@ namespace App\Classes;
 
 use Illuminate\Support\Str;
 
-class FileHandler {
-
+class FileHandler
+{
 	const INVALID_FILE_ERROR = 99;
 
-	public static function process($modelConfig, $fileFields, $parentProperty) {
-
-		$fileData = array();
+	public static function process($modelConfig, $fileFields, $parentProperty)
+	{
+		$fileData = [];
 		$counter = 0;
 		foreach ($fileFields as $fileField) {
-			$inputProperties = array();
+			$inputProperties = [];
 			if (config('gtcms.premium')) {
 				GtcmsPremium::setFileHandlerInputProperties($inputProperties, $fileField);
 			} else {
@@ -34,18 +34,18 @@ class FileHandler {
 
 			foreach ($inputProperties as $inputProperty) {
 				$fileData[$counter]['property'] = $inputProperty;
-				if (\Request::hasFile($inputProperty)) {
-					$file = \Request::file($inputProperty);
+				if (request()->hasFile($inputProperty)) {
+					$file = request()->file($inputProperty);
 					if ($file->isValid()) {
 						$ext = $file->getClientOriginalExtension();
-						$basePath = public_path()."/file/modelFiles/".$modelConfig->name."/";
+						$basePath = public_path() . "/file/modelFiles/" . $modelConfig->name . "/";
 						$targetName = Str::slug($file->getClientOriginalName());
-						$targetName = preg_replace('/'.$ext.'$/', '', $targetName);
+						$targetName = preg_replace('/' . $ext . '$/', '', $targetName);
 						$originalTargetName = $targetName;
 
 						// Check if file exists
 						$nameCounter = 0;
-						while (file_exists($basePath.$targetName . "." . $ext)) {
+						while (file_exists($basePath . $targetName . "." . $ext)) {
 							$nameCounter++;
 							$targetName = $originalTargetName . "-" . $nameCounter;
 						}
@@ -63,7 +63,7 @@ class FileHandler {
 				}
 			}
 		}
+
 		return $fileData;
 	}
-
 }

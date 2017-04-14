@@ -256,8 +256,8 @@ function setFileUpload() {
 				sequentialUploads: true,
 				dataType: 'json',
 				disableImageResize: true,
-				previewMaxWidth: 200,
-				previewMaxHeight: 150,
+				previewMaxWidth: 80,
+				previewMaxHeight: 50,
 				previewCrop: false,
 				previewContainer: field.imagePreviewContainer,
 				imageUpload: imageUpload,
@@ -523,14 +523,14 @@ function setupRepositioning() {
 					disableRepositioning();
 
 					$.ajax({
-						url: getCmsPrefix(true, true) +  + modelName + "/ajaxMove",
+						url: getCmsPrefix(true, true) + modelName + "/ajaxMove",
 						type: "GET",
 						data: {
 							objectId: objectId,
 							parentId: parentId,
 							position: position,
 							treeStructure: true,
-							getIgnore_isAjax: true,
+							getIgnore_isAjax: true
 						},
 						beforeSend: function(xhr){
 							xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
@@ -835,11 +835,28 @@ function reloadSearchResults(objectsContainer, data) {
 				$("a.excelExport").attr("href", excelExport);
 			}
 
+			updatePaginationInfo(data);
 			setupRepositioning();
 			resetLinksAfterSearch();
 
 		});
 	});
+}
+
+function updatePaginationInfo(data) {
+	var paginationFrom = $("span.paginationFrom");
+	var paginationTo = $("span.paginationTo");
+	var paginationTotal = $("span.paginationTotal");
+
+	if (data.paginationFrom && paginationFrom.length) {
+		paginationFrom.html(data.paginationFrom);
+	}
+	if (data.paginationTo && paginationTo.length) {
+		paginationTo.html(data.paginationTo);
+	}
+	if (data.paginationTotal && paginationTotal.length) {
+		paginationTotal.html(data.paginationTotal);
+	}
 }
 
 function setupEditFormInputs() {
@@ -1347,10 +1364,18 @@ function loadLoginForm() {
 		}
 
 		var form = $("form.entityForm.loginForm");
+		var loginLogo = $("img.login-logo");
+
 		setTimeout(function () {
 			form.animate({
 				opacity: 1
 			}, 500);
+
+			if (loginLogo.length) {
+				loginLogo.animate({
+					opacity: 1
+				}, 500);
+			}
 		}, 500);
 	}
 }
@@ -1472,6 +1497,7 @@ function setFormHandling() {
 		var errorMsg = form.find('div.formSubmitMessage span.errorMessage');
 		var successCheckmark = form.find('div.formSubmitMessage i.fa');
 		var spinnerTarget = form.find('.formSpinner');
+		var tabs = form.find("ul.nav.nav-tabs > li");
 
 		if(!spinnerTarget.find("div.spinner").length) {
 			$formSpinner = spin(spinnerTarget);
@@ -1512,6 +1538,8 @@ function setFormHandling() {
 						//console.error("success");
 						$("span.errorMsg").slideUp(100).remove();
 						$("div.form-group").removeClass('has-warning');
+						tabs.removeClass('has-warning');
+
 						spinnerTarget.fadeOut(100).promise().done(function(){
 							$formSpinner.stop();
 							successCheckmark.fadeIn(250).promise().done(function(){
@@ -1539,6 +1567,7 @@ function setFormHandling() {
 											$(this).attr("href", addRelatedHref.replace("new_gtcms_entry", data.objectId));
 										});
 									}
+
 									if (data.replaceCurrentHistory) {
 										var historyContainer = $("h3.page-header");
 										var newHistory = data.replaceCurrentHistory.modelName;
@@ -1550,8 +1579,10 @@ function setFormHandling() {
 											$(this).fadeIn(250);
 										});
 									}
+
 									successCheckmark.delay(500).fadeOut(100);
 									$("html, body").delay(500).animate({ scrollTop: "0" }, 250);
+
 									if (form.hasClass('addForm')) {
 										var disabledInputs = form.find("div.form-group.disabledInput");
 										if (disabledInputs.length) {
@@ -1569,6 +1600,7 @@ function setFormHandling() {
 										closeQuickEdit(false, data);
 										setSelectize();
 									} else {
+										updatePaginationInfo(data);
 										setupEditFormInputs();
 										setFormHandling();
 									}
@@ -1584,8 +1616,10 @@ function setFormHandling() {
 							displayMessage(data.exception);
 						}
 
+						tabs.removeClass('has-warning');
+
 						if (data.errors) {
-							for (fieldId in data.errors) {
+							for (var fieldId in data.errors) {
 								var formGroup = $("input#"+fieldId).closest("div.form-group");
 								if (!formGroup.length) {
 									formGroup = $("select#"+fieldId).closest("div.form-group");
@@ -1594,6 +1628,12 @@ function setFormHandling() {
 									formGroup = $("textarea#"+fieldId).closest("div.form-group");
 								}
 								if (formGroup.length) {
+									var tabPane = formGroup.closest("div.tab-pane");
+									if (tabPane.length) {
+										var tab = $('a[href="#' + (tabPane.attr('id')) + '"]').parents('li');
+										tab.addClass('has-warning');
+									}
+
 									var infoClass = "";
 									var horizontalForm = form.hasClass('form-horizontal');
 									if (horizontalForm) {
@@ -1754,7 +1794,7 @@ function setDatePicker() {
 }
 
 function setEditors() {
-	var editors = $("textarea.simpleEditor");
+	var editors = $("textarea.editor");
 	var editorObjects = [];
 
 	if (editors.length) {
@@ -1771,24 +1811,62 @@ function setEditors() {
 			CKEDITOR.plugins.addExternal('webkit-span-fix', '/gtcms/ckeditor/webkit-span-fix/', 'plugin.js');
 		}
 
+		editors.each(function(i) {
+			var toolbarOptions = $(this).attr('data-editortoolbar') ? $(this).attr('data-editortoolbar').split("|") : [];
 
-
-		editors.each(function(i){
 			var toolbar = [
-				[ 'Undo' ],
-				[ 'Bold', 'Italic' ],
-				[ 'BulletedList'],
-				//[ 'JustifyLeft', 'JustifyBlock' ],
-				[ 'Link', 'Unlink' ],
-				[ 'Image' ]
+				[ 'Undo' ]
 			];
 
 			var styleSet = [];
 			var hasStyles = false;
 
-			if ($(this).hasClass('arbitrary-class-here')) {
+			// Toolbar Options
+
+			if ($.inArray('bold-italic', toolbarOptions) != -1) {
+				toolbar.push(['Bold', 'Italic']);
+			}
+
+			if ($.inArray('bullet-list', toolbarOptions) != -1) {
+				toolbar.push(['BulletedList']);
+			}
+
+			if ($.inArray('justify', toolbarOptions) != -1) {
+				toolbar.push(['JustifyLeft', 'JustifyBlock']);
+			}
+
+			if (($.inArray('link', toolbarOptions) != -1) || ($.inArray('file-upload', toolbarOptions) != -1)) {
+				toolbar.push(['Link', 'Unlink']);
+			}
+
+			if ($.inArray('image', toolbarOptions) != -1) {
+				toolbar.push(['Image']);
+			}
+
+			// Options in Styles dropdown
+
+			if ($.inArray('h1', toolbarOptions) != -1) {
+				styleSet.push({ name: 'H1', element: 'h1', attributes: {}, styles: {} });
+				hasStyles = true;
+			}
+
+			if ($.inArray('h2', toolbarOptions) != -1) {
 				styleSet.push({ name: 'H2', element: 'h2', attributes: {}, styles: {} });
+				hasStyles = true;
+			}
+
+			if ($.inArray('h3', toolbarOptions) != -1) {
 				styleSet.push({ name: 'H3', element: 'h3', attributes: {}, styles: {} });
+				hasStyles = true;
+			}
+
+			if ($.inArray('h4', toolbarOptions) != -1) {
+				styleSet.push({ name: 'H4', element: 'h4', attributes: {}, styles: {} });
+				hasStyles = true;
+			}
+
+			if ($.inArray('h5', toolbarOptions) != -1) {
+				styleSet.push({ name: 'H5', element: 'h5', attributes: {}, styles: {} });
 				hasStyles = true;
 			}
 
@@ -1796,7 +1874,9 @@ function setEditors() {
 				toolbar.push(['Styles']);
 			}
 
-			editorObjects[i] = $(this).ckeditor({
+			// CKE Config
+
+			var ckeConfig = {
 				toolbar: toolbar,
 				stylesSet: styleSet,
 				width: "100%",
@@ -1811,11 +1891,6 @@ function setEditors() {
 				contentsCss: '/gtcms/css/gtcms-ckeditor.css?v=1.1',
 				entities_latin: false,
 				forcePasteAsPlainText: true,
-
-				filebrowserImageBrowseUrl: '/laravel-filemanager?type=Images',
-				filebrowserImageUploadUrl: '/laravel-filemanager/upload?type=Images&_token=' + $csrf,
-				filebrowserBrowseUrl: '/laravel-filemanager?type=Files',
-				filebrowserUploadUrl: '/laravel-filemanager/upload?type=Files&_token=' + $csrf,
 
 				on: {
 					focus: function() {
@@ -1835,7 +1910,16 @@ function setEditors() {
 						contentHtml.removeClass('editMode');
 					}
 				}
-			});
+			};
+
+			if ($.inArray('file-upload', toolbarOptions) != -1) {
+				ckeConfig.filebrowserImageBrowseUrl = '/laravel-filemanager?type=Images';
+				ckeConfig.filebrowserImageUploadUrl = '/laravel-filemanager/upload?type=Images&_token=' + $csrf;
+				ckeConfig.filebrowserBrowseUrl = '/laravel-filemanager?type=Files';
+				ckeConfig.filebrowserUploadUrl = '/laravel-filemanager/upload?type=Files&_token=' + $csrf;
+			}
+
+			editorObjects[i] = $(this).ckeditor(ckeConfig);
 		});
 	}
 }

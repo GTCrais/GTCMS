@@ -15,9 +15,11 @@
 				{{Form::file($field->property, $options)}}
 				{{Form::hidden($property, $object->$property, array("id" => "hidden" . $property))}}
 			</span>
+
 		<div class="progress">
 			<div class="progress-bar"></div>
 		</div>
+
 		<div class="uploadError">
 			{{trans('gtcms.errorHasOccurred')}}.
 		</div>
@@ -25,10 +27,12 @@
 
 	<div class="fileDownloadContainer imageDownloadContainer {{($object->$property ? '' : 'hidden')}}">
 		<div class="uploadedImagePreview">
-			<a target="_blank" class="btn btn-primary standardLink fileDownloadLink imageDownloadLink" href="{{$object->$method('url', 'original', $field->property)}}">
-				<img class="theImage" src="{{$object->$method('url', 'gtcmsThumb', $field->property)}}" />
+			<a target="_blank" class="btn btn-primary standardLink fileDownloadLink imageDownloadLink"
+			   href="{{$object->$method('url', 'original', $field->property)}}">
+				<img class="theImage" src="{{$object->$method('url', 'gtcmsThumb', $field->property)}}"/>
 			</a>
 		</div>
+
 		<div class="controlButtons">
 			<a class="btn btn-default btn-xs deleteButton deleteUploadedFile deleteImageFile"
 			   data-objectname=""

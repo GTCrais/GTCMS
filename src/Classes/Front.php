@@ -5,10 +5,10 @@ namespace App\Classes;
 use Collective\Html\FormFacade as Form;
 use Illuminate\Database\Eloquent\Collection;
 
-class Front {
-
-	public static function drawObjectTree($objects, ModelConfig $modelConfig, $parentModelConfig, $depth = 0) {
-
+class Front
+{
+	public static function drawObjectTree($objects, ModelConfig $modelConfig, $parentModelConfig, $depth = 0)
+	{
 		$tree = "";
 		if ($depth == 0) {
 			$tree = "
@@ -25,7 +25,7 @@ class Front {
 		$parentProperty = $objectChildren = false;
 		$printProperty = $modelConfig->printProperty;
 		if ($modelConfig->parent) {
-			$addParentNameOriginal = "?".$modelConfig->parent->property;
+			$addParentNameOriginal = "?" . $modelConfig->parent->property;
 			$parentProperty = $modelConfig->parent->property;
 		}
 
@@ -97,7 +97,7 @@ class Front {
 			if ($modelConfig->getQuickEditFields('all')) {
 				$tree .=
 					'<a
-						href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id  . '"
+						href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id . '"
 						class="btn btn-default btn-xs quickEditButton treeQuickEdit"
 						>
 							<i class="fa fa-pencil-square-o"></i>
@@ -133,7 +133,7 @@ class Front {
 				$tree .= "
 					<tr class='childTableContainer'>
 						<td colspan='3'>
-							<table class='table table-hover hasTreeStructure sortContainer" . ($depth+1) . "' data-depth='" . ($depth + 1) . "'>
+							<table class='table table-hover hasTreeStructure sortContainer" . ($depth + 1) . "' data-depth='" . ($depth + 1) . "'>
 								<tbody class='transitionHeight depth" . ($depth + 1) . "'>";
 
 				$method = $objectChildren->method;
@@ -171,8 +171,8 @@ class Front {
 
 	}
 
-	public static function drawObjectTable($objects, ModelConfig $modelConfig, $tableType = 'table', $parent = "", $searchDataWithFieldValues = false, $ordering = false, $quickEdit = false, $loadSideTablePaginationResults = false) {
-
+	public static function drawObjectTable($objects, ModelConfig $modelConfig, $tableType = 'table', $parent = "", $searchDataWithFieldValues = false, $ordering = false, $quickEdit = false, $loadSideTablePaginationResults = false)
+	{
 		$hasPositionInParent = false;
 		$parentModelName = false;
 		$hidePositionControls = $modelConfig->hidePositionControls;
@@ -206,11 +206,11 @@ class Front {
 				<tr>';
 			$counter = 0;
 			foreach ($modelConfig->formFields as $field) {
-				if ($field->restrictedToSuperadmin && !\Auth::user()->is_superadmin) {
+				if ($field->restrictedToSuperadmin && !auth()->user()->is_superadmin) {
 					continue;
 				}
 
-				$userRole = \Auth::user()->role;
+				$userRole = auth()->user()->role;
 				if ($field->restrictedAccess && !$field->restrictedAccess->$userRole) {
 					continue;
 				}
@@ -252,7 +252,7 @@ class Front {
 		foreach ($objects as $object) {
 
 			$objectName = "";
-			$gets = $parent ? $parent . (Tools::getGets() ? "&" . Tools::getGets(array(), false, false) : '') : Tools::getGets();
+			$gets = $parent ? $parent . (Tools::getGets() ? "&" . Tools::getGets([], false, false) : '') : Tools::getGets();
 
 			$tree .= '
 			<tr
@@ -264,11 +264,11 @@ class Front {
 			//regular fields
 			$counter = 0;
 			foreach ($modelConfig->formFields as $index => $field) {
-				if ($field->restrictedToSuperadmin && !\Auth::user()->is_superadmin) {
+				if ($field->restrictedToSuperadmin && !auth()->user()->is_superadmin) {
 					continue;
 				}
 
-				$userRole = \Auth::user()->role;
+				$userRole = auth()->user()->role;
 				if ($field->restrictedAccess && !$field->restrictedAccess->$userRole) {
 					continue;
 				}
@@ -297,7 +297,7 @@ class Front {
 
 								$value = "";
 								foreach ($relatedModels as $relModel) {
-									$value .= ($relModel->$relatedProperty).", ";
+									$value .= ($relModel->$relatedProperty) . ", ";
 								}
 								$value = rtrim($value, ", ");
 							} else if (!$field->displayProperty->multiple && $object->$method) {
@@ -323,14 +323,19 @@ class Front {
 
 					$tree .= "<td class='" . ($field->responsiveClasses) . "'>";
 
-					if (property_exists($field, $tableType.'Link') && !$image) {
+					if (property_exists($field, $tableType . 'Link') && !$image) {
 						if ($field->displayProperty && $field->displayProperty->type == 'model') {
 							$tree .= '<a href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id . $gets . '">' . ($object->$method ? \Html::entities($object->$method->$property) : '- deleted -') . '</a>';
 							if (!$objectName) {
 								$objectName = $object->$method ? \Html::entities($object->$method->$property) : '';
 							}
 						} else {
-							$tree .= '<a href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id . $gets . '">' . \Html::entities($object->$property) . '</a>';
+							if (in_array($field->type, ['date', 'dateTime'])) {
+								$value = $object->formatDate($object->$property, $field->displayProperty->dateFormat ? $field->displayProperty->dateFormat : $field->dateFormat);
+							} else {
+								$value = $object->$property;
+							}
+							$tree .= '<a href="' . AdminHelper::getCmsPrefix() . $modelConfig->name . '/edit/' . $object->id . $gets . '">' . \Html::entities($value) . '</a>';
 							if (!$objectName) {
 								$objectName = \Html::entities($object->$property);
 							}
@@ -352,7 +357,7 @@ class Front {
 						} else {
 							$tree .= ($object->$method ? \Html::entities($object->$method->$property) : ' - ');
 						}
-					} else if (in_array($field->type, array('date', 'dateTime'))) {
+					} else if (in_array($field->type, ['date', 'dateTime'])) {
 						$tree .= $object->formatDate($object->$property, $field->displayProperty->dateFormat ? $field->displayProperty->dateFormat : $field->dateFormat);
 					} else if ($field->type == 'checkbox') {
 						$tree .= ($object->$property ? self::drawCheckboxIcon(true) : self::drawCheckboxIcon(false));
@@ -360,7 +365,7 @@ class Front {
 						$originalValue = $object->$property;
 						$listMethod = $field->selectType->listMethod;
 						$options['class'] = "";
-						$list = array();
+						$list = [];
 						if ($field->selectType->type == 'model') {
 							$selectModel = $field->selectType->modelName;
 							$fullModel = ModelConfig::fullEntityName($selectModel);
@@ -379,8 +384,8 @@ class Front {
 						}
 
 						if ($field->selectablePlaceholder) {
-							$null = array('' => '-');
-							$list = $null+$list;
+							$null = ['' => '-'];
+							$list = $null + $list;
 						}
 
 						$options['class'] .= ' ajaxSelectUpdate ';
@@ -447,12 +452,12 @@ class Front {
 
 			if (is_a($objects, "Illuminate\\Pagination\\LengthAwarePaginator") && $objects->hasPages()) {
 				$tree .= '<div class="paginationContainer" data-tabletype="' . $tableType . '">' .
-					$objects->appends(Tools::getGets(array(
+					$objects->appends(Tools::getGets([
 						$objects->getPageName() => NULL,
 						'getIgnore_getSearchResults' => 'true',
 						'getIgnore_tableType' => $tableType,
 						'getIgnore_modelName' => $modelConfig->name
-					), TRUE))->links() .
+					], TRUE))->links() .
 					'</div>';
 			}
 
@@ -460,10 +465,10 @@ class Front {
 		}
 
 		return $tree;
-
 	}
 
-	public static function getHistoryLinks() {
+	public static function getHistoryLinks()
+	{
 		$links = AdminHistoryManager::getHistory();
 		$returnLinks = "";
 		if ($links) {
@@ -471,42 +476,43 @@ class Front {
 				$returnLinks .=
 					'<a data-loadtype="moveRight" href="' . $link['link'] . '"><i class="fa ' . $link['modelIcon'] . '"></i> ' . $link['modelName'] . '</a> <i class="fa fa-caret-right"></i>';
 			}
+
 			return $returnLinks;
-		} else {
-			return "";
 		}
+
+		return "";
 	}
 
-	public static function drawSearch(ModelConfig $modelConfig, $searchParams = false) {
-
+	public static function drawSearch(ModelConfig $modelConfig, $searchParams = false)
+	{
 		$html = \Form::open(
-			array(
+			[
 				'method' => 'get',
 				'url' => AdminHelper::getCmsPrefix() . ($modelConfig->name),
 				'class' => 'searchForm model' . $modelConfig->name . " " . (($modelConfig->form && $modelConfig->form->horizontal) ? ' form-horizontal' : '')
-			)
+			]
 		);
 
 		$labelClass = "";
 		if ($modelConfig->searchForm && $modelConfig->searchForm->horizontal) {
-			$labelClass = " control-label col-sm-".$modelConfig->searchForm->labelWidth;
+			$labelClass = " control-label col-sm-" . $modelConfig->searchForm->labelWidth;
 		}
 
 		foreach ($modelConfig->getFormFields('all', true) as $field) {
-			if ($field->restrictedToSuperadmin && !\Auth::user()->is_superadmin) {
+			if ($field->restrictedToSuperadmin && !auth()->user()->is_superadmin) {
 				continue;
 			}
 
-			$userRole = \Auth::user()->role;
+			$userRole = auth()->user()->role;
 			if ($field->restrictedAccess && !$field->restrictedAccess->$userRole) {
 				continue;
 			}
 
 			if ($field->search) {
 				$html .= "<div class='form-group'>";
-				$options = array(
+				$options = [
 					'class' => ' form-control '
-				);
+				];
 
 				if ($field->options) {
 					foreach ($field->options as $key => $value) {
@@ -523,34 +529,34 @@ class Front {
 				if ($field->search->type == 'standard') {
 					$label = $field->search->label ? $field->search->label : $field->label;
 
-					if (!in_array($field->type, array('checkbox', 'radio', 'hidden'))) {
-						$html .= \Form::label("search_" . $field->property, $label, array('class' => $labelClass));
+					if (!in_array($field->type, ['checkbox', 'radio', 'hidden'])) {
+						$html .= \Form::label("search_" . $field->property, $label, ['class' => $labelClass]);
 					}
 
 					if ($modelConfig->searchForm && $modelConfig->searchForm->horizontal) {
-						$class = "col-sm-".$modelConfig->searchForm->inputWidth;
-						if (in_array($field->type, array('checkbox', 'radio'))) {
+						$class = "col-sm-" . $modelConfig->searchForm->inputWidth;
+						if (in_array($field->type, ['checkbox', 'radio'])) {
 							$class .= " col-sm-offset-" . $modelConfig->searchForm->labelWidth;
 						}
 						$html .= "<div class='" . $class . "'>";
 					}
 
 					if ($field->type == 'text' || $field->type == 'textarea') {
-						$html .= \Form::text("search_" . $field->property, \Request::get("search_" . $field->property), $options);
+						$html .= \Form::text("search_" . $field->property, request()->get("search_" . $field->property), $options);
 					} else if ($field->type == 'checkbox') {
 						$html .= "<div class='checkbox'><label>";
-						$html .= \Form::checkbox("search_" . $field->property, 1, \Request::get("search_" . $field->property));
+						$html .= \Form::checkbox("search_" . $field->property, 1, request()->get("search_" . $field->property));
 						$html .= " " . $label . "</label></div>";
-					} else if (in_array($field->type, array('select', 'multiSelect'))) {
+					} else if (in_array($field->type, ['select', 'multiSelect'])) {
 						$listMethod = $field->selectType->listMethod;
 						$options['class'] = '';
-						$list = array();
+						$list = [];
 						if ($field->selectType->type == 'model') {
 							/** @var \App\Models\BaseModel $selectModel */
 							$selectModel = ModelConfig::fullEntityName($field->selectType->modelName);
 							if ($field->selectType->ajax) {
-								$list = array();
-								if ($value = \Request::get('search_' . $field->property)) {
+								$list = [];
+								if ($value = request()->get('search_' . $field->property)) {
 									$valueProperty = $field->selectType->ajax->valueProperty;
 									$list = $selectModel::where('id', $value)->get()->pluck($valueProperty, 'id');
 								}
@@ -584,14 +590,14 @@ class Front {
 
 						$options['placeholder'] = " - ";
 						$options['class'] .= ' selectizeNoCreate doSelectize';
-						$html .= \Form::select("search_".$field->property, $list, \Request::get("search_".$field->property), $options);
-					} else if (in_array($field->type, array('date', 'dateTime'))) {
+						$html .= \Form::select("search_" . $field->property, $list, request()->get("search_" . $field->property), $options);
+					} else if (in_array($field->type, ['date', 'dateTime'])) {
 						if ($field->type == 'date') {
 							$options['class'] .= ' datePicker ';
 						} else if ($field->type == 'dateTime') {
 							$options['class'] .= ' dateTimePicker ';
 						}
-						$html .= \Form::text("search_" . $field->property, \Request::get("search_".$field->property), $options);
+						$html .= \Form::text("search_" . $field->property, request()->get("search_" . $field->property), $options);
 					}
 				} else if ($field->search->type == 'exception') {
 					//custom code here
@@ -606,7 +612,7 @@ class Front {
 			}
 		}
 
-		$html .= \Form::submit(trans('gtcms.search'), array('class' => 'btn btn-default cBoth floatNone'));
+		$html .= \Form::submit(trans('gtcms.search'), ['class' => 'btn btn-default cBoth floatNone']);
 		$html .= "
 			<div class='formSubmitMessage'>
 				<div class='formSpinner'></div>
@@ -618,7 +624,8 @@ class Front {
 		return $html;
 	}
 
-	public static function drawSearchCriteria($searchData) {
+	public static function drawSearchCriteria($searchData)
+	{
 		$html = "";
 		if ($searchData) {
 			$html .= "
@@ -637,10 +644,12 @@ class Front {
 				</ul>
 			";
 		}
+
 		return $html;
 	}
 
-	public static function showMessages() {
+	public static function showMessages()
+	{
 		$messages = "";
 		if ($msg = MessageManager::getException()) {
 			$messages .=
@@ -667,7 +676,8 @@ class Front {
 		return $messages;
 	}
 
-	public static function embedVideo($url, $params = array()) {
+	public static function embedVideo($url, $params = [])
+	{
 		$data = Tools::parseMediaUrl($url);
 
 		$class = isset($params['class']) ? $params['class'] : "";
@@ -701,7 +711,8 @@ class Front {
 		return $embedCode;
 	}
 
-	public static function drawCheckboxIcon($success = true, $return = true) {
+	public static function drawCheckboxIcon($success = true, $return = true)
+	{
 		if ($success) {
 			$icon = '<i class="fa fa-check adminBlue"></i>';
 		} else {
@@ -710,9 +721,8 @@ class Front {
 
 		if ($return) {
 			return $icon;
-		} else {
-			echo $icon;
 		}
-	}
 
+		echo $icon;
+	}
 }

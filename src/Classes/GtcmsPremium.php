@@ -2,6 +2,7 @@
 
 namespace App\Classes;
 
-class GtcmsPremium {
+class GtcmsPremium
+{
 
 }

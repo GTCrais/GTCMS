@@ -10,18 +10,18 @@
         }
     ],
     "license": "GTCMS Basic license",
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "GTCrais\\GTCMS\\": "src"
         }
     },
     "require": {
-        "laravelcollective/html": "5.3.*",
+        "laravelcollective/html": "5.4.*",
         "barryvdh/laravel-debugbar": "^2.3",
-        "intervention/image": "2.3.7",
-        "doctrine/dbal": "2.5.4",
-        "mk-j/php_xlsxwriter": "0.22",
-        "unisharp/laravel-filemanager": "1.5.2"
+        "intervention/image": "2.3.11",
+        "doctrine/dbal": "2.5.12",
+        "mk-j/php_xlsxwriter": "0.32",
+        "unisharp/laravel-filemanager": "1.7.1"
     }
 }
