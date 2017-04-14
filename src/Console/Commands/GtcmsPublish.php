@@ -18,7 +18,7 @@ class GtcmsPublish extends Command
      *
      * @var string
      */
-    protected $description = 'Publishes GTCMS package files';
+    protected $description = 'Publishes all required vendor package files';
 
     /**
      * Create a new command instance.
@@ -37,16 +37,16 @@ class GtcmsPublish extends Command
      */
     public function handle()
     {
-        \Artisan::call('vendor:publish', [
+		$this->call('vendor:publish', [
 			'--provider' => 'GTCrais\GTCMS\GtcmsServiceProvider',
 			'--force' => true
 		]);
 
-		\Artisan::call('vendor:publish', [
+		$this->callSilent('vendor:publish', [
 			'--provider' => 'Unisharp\Laravelfilemanager\LaravelFilemanagerServiceProvider',
 			'--tag' => 'lfm_public'
 		]);
 
-		$this->info("GTCMS Package files published!");
+		$this->info("All required vendor files published.");
     }
 }
