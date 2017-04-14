@@ -50,6 +50,7 @@ class GtcmsInstall extends Command
 		$this->updatePackageJson();
 		$this->installFrontendPackages();
 		$this->deleteUserClassFile();
+		$this->runMigrations();
 
 		$this->dumpAutoload();
 
