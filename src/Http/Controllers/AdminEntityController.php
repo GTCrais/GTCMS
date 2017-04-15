@@ -195,7 +195,7 @@ class AdminEntityController extends Controller
 		/** @var \App\Models\BaseModel $fullEntity */
 		$fullEntity = self::$modelConfig->myFullEntityName();
 
-		if (config('gtcms.premium') && $entity == "GtcmsSetting") {
+		if ($entity == "GtcmsSetting") {
 			$object = GtcmsSetting::createSettingsObject();
 		} else {
 			/** @var \App\Models\BaseModel $object */
