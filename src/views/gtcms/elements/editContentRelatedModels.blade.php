@@ -52,7 +52,7 @@
 					?>
 
 					@if ($relatedObjects->count())
-						{!! Front::drawObjectTable($relatedObjects, $relatedModelConfig, 'sideTable', '?' . $modelConfig->id . '=' . $object->id) !!}
+						{!! Front::drawObjectTable($relatedObjects, $relatedModelConfig, 'sideTable', ['parentIdProperty' => $modelConfig->id, 'parentIdValue' => $object->id]) !!}
 					@else
 						{!! trans('gtcms.noRelatedModels', array('modelName1' => $modelConfig->hrName, 'modelName2' => $relatedModelConfig->hrNamePlural)) !!}
 					@endif

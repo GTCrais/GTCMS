@@ -9,20 +9,35 @@ class AdminHelper
 	public static function modelConfigs()
 	{
 		$modelsArray = config('gtcmsmodels.models');
-		$models = [];
-		foreach ($modelsArray as $modelName => $model) {
-			$models[$modelName] = self::arrayToObject($model);
+		$modelConfigs = [];
+
+		foreach ($modelsArray as $modelName => $modelData) {
+			if (!isset(BaseModel::$modelConfigs[$modelName])) {
+				$modelConfig =  self::arrayToObject($modelData);
+				BaseModel::$modelConfigs[$modelName] = $modelConfig;
+			} else {
+				$modelConfig = BaseModel::$modelConfigs[$modelName];
+			}
+
+			$modelConfigs[] = $modelConfig;
 		}
 
-		return $models;
+		return $modelConfigs;
 	}
 
 	public static function modelExists($modelProperty, $property = 'name')
 	{
 		if ($property == 'name') {
+			if (isset(BaseModel::$modelConfigs[$modelProperty])) {
+				return BaseModel::$modelConfigs[$modelProperty];
+			}
+
 			$modelConfigs = config('gtcmsmodels.models');
 			if (array_key_exists($modelProperty, $modelConfigs)) {
-				return self::arrayToObject($modelConfigs[$modelProperty]);
+				$modelConfig = self::arrayToObject($modelConfigs[$modelProperty]);
+				BaseModel::$modelConfigs[$modelProperty] = $modelConfig;
+
+				return $modelConfig;
 			}
 		} else {
 			foreach (self::modelConfigs() as $modelConfig) {
@@ -70,7 +85,7 @@ class AdminHelper
 	{
 		$rules = [];
 		/** @var ModelConfig $modelConfig */
-		$formFields = $quickEdit ? $modelConfig->getQuickEditFields('all') : $modelConfig->formFields;
+		$formFields = $quickEdit ? $modelConfig->getFormFields('quickEdit', ['quickEditType' => 'all']) : $modelConfig->formFields;
 		if ($formFields) {
 
 			$user = auth()->user();
@@ -140,37 +155,6 @@ class AdminHelper
 		return $validatorAttributes;
 	}
 
-	public static function modelConfigHasImage($modelConfig)
-	{
-		$imageFields = [];
-		foreach ($modelConfig->formFields as $field) {
-			if ($field->type == 'image') {
-				$imageFields[] = $field;
-			}
-		}
-
-		if (empty($imageFields)) {
-			return false;
-		}
-
-		return $imageFields;
-	}
-
-	public static function modelConfigHasFile($modelConfig)
-	{
-		$fileFields = [];
-		foreach ($modelConfig->formFields as $field) {
-			if ($field->type == 'file') {
-				$fileFields[] = $field;
-			}
-		}
-		if (empty($fileFields)) {
-			return false;
-		}
-
-		return $fileFields;
-	}
-
 	public static function getImageFieldRequirements($modelConfig, $fieldProperty)
 	{
 		$size = false;
@@ -224,40 +208,6 @@ class AdminHelper
 		return false;
 	}
 
-	public static function getOrderParams($modelConfig)
-	{
-		if (request()->has('orderBy')) {
-			$orderBy = request()->get('orderBy');
-			$acceptable = false;
-			foreach ($modelConfig->formFields as $field) {
-				if ($field->property == $orderBy && $field->order) {
-					$acceptable = true;
-					if (config('gtcms.premium') && $field->langDependent) {
-						$orderBy = $orderBy . "_" . (app()->getLocale());
-					}
-					break;
-				}
-			}
-
-			if (!$acceptable) {
-				$orderBy = $modelConfig->orderBy;
-			}
-		} else {
-			$orderBy = $modelConfig->orderBy;
-		}
-
-		if (request()->has('direction')) {
-			$direction = request()->get('direction');
-			if (!in_array($direction, ['asc', 'desc'])) {
-				$direction = $modelConfig->direction;
-			}
-		} else {
-			$direction = $modelConfig->direction;
-		}
-
-		return ['orderBy' => $orderBy, 'direction' => $direction];
-	}
-
 	public static function getSearchData(ModelConfig $modelConfig, $searchFieldValue = false)
 	{
 		if (request()->isMethod('get')) {
@@ -265,9 +215,9 @@ class AdminHelper
 			$searchPropertiesData = $modelConfig->getSearchPropertiesData();
 			$searchProperties = $searchPropertiesData['properties'];
 			$searchConfig = $searchPropertiesData['searchConfig'];
-			$fieldsWithLabels = $modelConfig->getFieldsWithLabels(true);
+			$fieldsWithLabels = $modelConfig->getSearchFieldsWithLabels();
 			$propertiesTables = $modelConfig->getPropertiesTables();
-			$langDependentProperties = $modelConfig->getLangDependentProperties();
+			$langDependentProperties = $modelConfig->getFormFields('langDependent');
 			$propertyFieldArray = $modelConfig->getPropertyFieldArray();
 
 			foreach (request()->all() as $property => $value) {
@@ -414,24 +364,14 @@ class AdminHelper
 		return false;
 	}
 
-	public static function input($modelConfig, $action)
+	public static function input(ModelConfig $modelConfig, $action)
 	{
 		$input = request()->all();
 		$user = auth()->user();
 
 		if (is_array($input) && !empty($input)) {
-			$formFields = [];
-			$languages = config('gtcmslang.languages');
-
-			foreach ($modelConfig->formFields as $field) {
-				if (config('gtcms.premium') && config('gtcmslang.siteIsMultilingual') && $field->langDependent) {
-					foreach ($languages as $language) {
-						$formFields[$field->property . "_" . $language] = $field;
-					}
-				} else {
-					$formFields[$field->property] = $field;
-				}
-			}
+			$modelConfig->parseFormFields();
+			$formFields = array_merge($modelConfig->modifiedLangDependentPropertyFieldArray, $modelConfig->regularPropertyFieldArray);
 
 			foreach ($input as $property => &$value) {
 
@@ -697,33 +637,6 @@ class AdminHelper
 		return false;
 	}
 
-	public static function getFieldsByParam($modelConfig, $paramName, $paramValue, $returnFirst = false)
-	{
-		$fields = [];
-		foreach ($modelConfig->formFields as $field) {
-			if (config('gtcms.premium') && $field->langDependent) {
-				foreach (config('gtcmslang.languages') as $lang) {
-					if (($field->$paramName . "_" . $lang) === $paramValue) {
-						if ($returnFirst) {
-							return $field;
-						}
-						$fields[] = $field;
-					}
-				}
-
-			} else {
-				if ($field->$paramName === $paramValue) {
-					if ($returnFirst) {
-						return $field;
-					}
-					$fields[] = $field;
-				}
-			}
-		}
-
-		return $fields;
-	}
-
 	public static function getValidatorErrors($validator)
 	{
 		$messages = $validator->getMessageBag()->toArray();
@@ -735,22 +648,6 @@ class AdminHelper
 		}
 
 		return implode(", ", $finalMessages);
-	}
-
-	public static function getLangDependentFields($modelConfig)
-	{
-		$fields = [];
-		foreach ($modelConfig->formFields as $field) {
-			if (config('gtcms.premium') && $field->langDependent) {
-				$fields[] = $field->property;
-			}
-		}
-
-		if (config('gtcms.premium') && $modelConfig->generateSlug && $modelConfig->langDependentSlug) {
-			$fields[] = "slug";
-		}
-
-		return $fields;
 	}
 
 	public static function setNavigationSize($size = false)

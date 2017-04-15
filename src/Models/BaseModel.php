@@ -12,7 +12,7 @@ use App\Classes\ModelConfig;
 
 class BaseModel extends \Eloquent
 {
-	public static $modelConfig = false;
+	public static $modelConfigs = [];
 
 	public function __get($key)
 	{
@@ -86,7 +86,7 @@ class BaseModel extends \Eloquent
 									}
 								});
 							} else {
-								$value = $modelConfig->getDatabasePropertyValue($searchData['property'], $searchData['value']);
+								$value = $modelConfig->getDatabasePropertyValue($searchData['trueProperty'], $searchData['value']);
 								$eqSign = "=";
 								if ($searchData['fieldFrom']) {
 									$eqSign = ">=";
@@ -651,15 +651,13 @@ class BaseModel extends \Eloquent
 		$parentModel = ModelConfig::fullEntityName($parentModel);
 		$relatedModelConfiguration = (new $parentModel)->relatedModelConfiguration($modelConfig->name, $parentModelConfig);
 
-		return (
-		[
+		return [
 			'direction' => $relatedModelConfiguration->direction,
 			'positionProperty' => $relatedModelConfiguration->positionProperty,
 			'position' => $relatedModelConfiguration->position,
 			'hidePositionControls' => $relatedModelConfiguration->hidePositionControls,
 			'parentModelName' => $parentModelConfig->name
-		]
-		);
+		];
 	}
 
 	public function modelConfig()

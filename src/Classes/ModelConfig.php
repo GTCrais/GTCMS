@@ -6,12 +6,38 @@ use Illuminate\Support\Str;
 
 class ModelConfig
 {
-	protected $gtcmsModelParents = null;
-	public $quickEditFields = null;
-	protected $langDependentProperties = null;
-	protected $excelExportFields = null;
-	protected $excelExportFieldsCount = null;
-	protected $searchPropertiesExist = null;
+	// All properties are public because if for any reason
+	// a ModelConfig is turned into array and then back to object
+	// the properties will remain
+
+	public $formFieldsParsed = false;
+	public $gtcmsModelParents = null;
+	public $langDependentProperties = null;
+	public $searchPropertiesExist = false;
+	public $searchPropertiesData = [
+		'properties' => [],
+		'searchConfig' => []
+	];
+	public $regularFormFields = [];
+	public $langDependentFormFields = [];
+	public $searchFieldsWithLabels = [];
+	public $propertyFieldArray = [];
+	public $regularPropertyFieldArray = [];
+	public $langDependentPropertyFieldArray = [];
+	public $modifiedLangDependentPropertyFieldArray = [];
+	public $propertiesTables = [];
+	public $manyToManyRelationData = [];
+	public $excelExportFields = [];
+	public $excelExportFieldsCount = 0;
+	public $quickEditFields = [
+		'all' => [],
+		'regular' => [],
+		'langDependent' => []
+	];
+	public $imageFields = [];
+	public $fileFields = [];
+	public $orderAndDirection = [];
+
 	protected static $faIconColors = null;
 
 	public function __get($property)
@@ -115,171 +141,111 @@ class ModelConfig
 		return $iconColor;
 	}
 
-	public function getSearchPropertiesData()
+	public function parseFormFields()
 	{
-		$properties = [];
-		$searchConfig = [];
-
-		foreach ($this->getFormFields('all', true) as $field) {
-			if ($field->search) {
-				$properties[] = $field->property;
-				$searchConfig[$field->property] = AdminHelper::objectToArray($field->search);
-			}
+		if ($this->formFieldsParsed) {
+			return;
 		}
 
-		$data = [
-			'properties' => $properties,
-			'searchConfig' => $searchConfig
-		];
-
-		return $data;
-	}
-
-	public function searchPropertiesExist()
-	{
-		if (!is_null($this->searchPropertiesExist)) {
-			return $this->searchPropertiesExist;
-		}
-
-		$searchPropertiesData = $this->getSearchPropertiesData();
-		if ($searchPropertiesData['properties']) {
-			$this->searchPropertiesExist = true;
-
-			return true;
-		}
-
-		$this->searchPropertiesExist = false;
-
-		return false;
-	}
-
-	public function getFieldsWithLabels($search = false)
-	{
-		$fieldsWithLabels = [];
-		foreach ($this->formFields as $field) {
-			if ($search) {
-				if ($field->search) {
-					$fieldsWithLabels[$field->property] = $field->label;
-				}
-			} else {
-				$fieldsWithLabels[$field->property] = $field->label;
-			}
-		}
-
-		return $fieldsWithLabels;
-	}
-
-	public function getPropertyFieldArray()
-	{
-		$fields = [];
-		foreach ($this->formFields as $field) {
-			$fields[$field->property] = $field;
-		}
-
-		return $fields;
-	}
-
-	public function getPropertyValue($property, $value)
-	{
-		$returnValue = "Undefined";
-		$list = [];
-
-		foreach ($this->formFields as $field) {
-			if ($field->property == $property) {
-				if (in_array($field->type, ['select', 'multiSelect'])) {
-					$listMethod = $field->selectType->listMethod;
-					if ($field->selectType->type == 'model') {
-						/** @var \App\Models\BaseModel $selectModel */
-						$selectModel = ModelConfig::fullEntityName($field->selectType->modelName);
-						if ($field->selectType->ajax && config('gtcms.premium')) {
-							$valueProperty = $field->selectType->ajax->valueProperty;
-							$list = $selectModel::where('id', $value)->get()->pluck($valueProperty, 'id');
-						} else {
-
-							// Even if 'callMethodOnInstance' is declared we need a static method
-							// of the same name which will return the list of ALL selectable items
-							// instead of just the ones a particular object would return
-							// This method must be declared in Related Model Class
-
-							$list = $selectModel::$listMethod();
-						}
-					} else if ($field->selectType->type == 'list') {
-						$entity = $this->myFullEntityName();
-						$list = $entity::$listMethod();
-					}
-
-					foreach ($list as $actualValue => $frontValue) {
-						if ($actualValue == $value) {
-							$returnValue = $frontValue;
-							break;
-						}
-					}
-				} else if ($field->type == 'checkbox') {
-					$returnValue = $value ? Front::drawCheckboxIcon(true) : Front::drawCheckboxIcon(false);
-				} else {
-					$returnValue = $value;
-				}
-
-				return $returnValue;
-				break;
-			}
-		}
-
-		return $returnValue;
-	}
-
-	public function getDatabasePropertyValue($property, $value)
-	{
-		foreach ($this->formFields as $field) {
-			if ($field->property == $property) {
-				if (in_array($field->type, ['date', 'dateTime'])) {
-					if ($field->type == "date") {
-						$value = date("Y-m-d", strtotime($value));
-					} else if ($field->type == "dateTime") {
-						$value = date("Y-m-d H:i:s", strtotime($value));
-					} else {
-						$value = "";
-					}
-				}
-			}
-		}
-
-		return $value;
-	}
-
-	public function getPropertiesTables()
-	{
-		$propertiesTables = [];
+		$premium = config('gtcms.premium');
 		$model = $this->name;
+		$fullModel = $this->myFullEntityName();
+		$table = (new $fullModel)->getTable();
+		$this->manyToManyRelationData = [
+			'table' => $table,
+			'modelName' => strtolower($model),
+			'idProperty' => 'id',
+			'relationData' => []
+		];
+		$requestOrderBy = request()->get('orderBy');
+		$requestOrderByAcceptable = false;
 
 		foreach ($this->formFields as $field) {
+
+			// Parse FromTo Option
+
+			if ($field->fromTo && $field->search) {
+				$newField = AdminHelper::objectToArray($field);
+
+				$fromField = $newField;
+				$fromField['property'] = $field->property . "_fieldFrom";
+				$fromField['label'] = $newField['label'] . " " . trans('gtcms.from');
+				if (isset($fromField['search']['label'])) {
+					$fromField['search']['label'] = $fromField['search']['label'] . " " . trans('gtcms.from');
+				}
+				$fromField['search']['fieldFrom'] = true;
+				$fromField = AdminHelper::arrayToObject($fromField);
+
+				$toField = $newField;
+				$toField['property'] = $field->property . "_fieldTo";
+				$toField['label'] = $newField['label'] . " " . trans('gtcms.to');
+				if (isset($toField['search']['label'])) {
+					$toField['search']['label'] = $toField['search']['label'] . " " . trans('gtcms.to');
+				}
+				$toField['search']['fieldTo'] = true;
+				$toField = AdminHelper::arrayToObject($toField);
+
+				$field->fromToFields = new BaseClass();
+				$field->fromToFields->fromField = $fromField;
+				$field->fromToFields->toField = $toField;
+			}
+
+			// Search Properties Data
+
+			if ($field->search) {
+				if ($field->fromTo) {
+					$this->searchPropertiesData['properties'][] = $field->fromToFields->fromField->property;
+					$this->searchPropertiesData['searchConfig'][$field->fromToFields->fromField->property] = AdminHelper::objectToArray($field->fromToFields->fromField->search);
+					$this->searchFieldsWithLabels[$field->fromToFields->fromField->property] = $field->fromToFields->fromField->label;
+
+					$this->searchPropertiesData['properties'][] = $field->fromToFields->toField->property;
+					$this->searchPropertiesData['searchConfig'][$field->fromToFields->toField->property] = AdminHelper::objectToArray($field->fromToFields->toField->search);
+					$this->searchFieldsWithLabels[$field->fromToFields->toField->property] = $field->fromToFields->toField->label;
+				} else {
+					$this->searchPropertiesData['properties'][] = $field->property;
+					$this->searchPropertiesData['searchConfig'][$field->property] = AdminHelper::objectToArray($field->search);
+					$this->searchFieldsWithLabels[$field->property] = $field->label;
+				}
+
+				$this->searchPropertiesExist = true;
+			}
+
+			// Regular and Lang Dependent Fields
+
+			if (!$field->langDependent) {
+				$this->regularFormFields[] = $field;
+			} else if ($premium && $field->langDependent) {
+				$this->langDependentFormFields[] = $field;
+			}
+
+			// (Lang Dependent) Property Field Array
+
+			$this->propertyFieldArray[$field->property] = $field;
+
+			if ($premium && $field->langDependent) {
+				foreach (config('gtcmslang.languages') as $language) {
+					$this->modifiedLangDependentPropertyFieldArray[$field->property . "_" . $language] = $field;
+				}
+				$this->langDependentPropertyFieldArray[$field->property] = $field;
+			} else if (!$field->langDependent) {
+				$this->regularPropertyFieldArray[$field->property] = $field;
+			}
+
+			// Properties Tables
+
 			if ($field->type == 'multiSelect' && $field->selectType->type == 'model') {
 				$relatedModel = $field->selectType->modelName;
 				$tableNames = [snake_case($model), snake_case($relatedModel)];
 				sort($tableNames, SORT_STRING);
 				$tableName = implode('_', $tableNames);
-				$propertiesTables[$field->property] = $tableName;
+				$this->propertiesTables[$field->property] = $tableName;
 			} else {
 				$fullModel = $this->myFullEntityName();
-				$propertiesTables[$field->property] = (new $fullModel)->getTable();
+				$this->propertiesTables[$field->property] = (new $fullModel)->getTable();
 			}
-		}
 
-		return $propertiesTables;
-	}
+			// Many-To-Many Relation Data
 
-	public function getManyToManyRelationData()
-	{
-		$data = [];
-		$model = $this->name;
-		$fullModel = $this->myFullEntityName();
-		$table = (new $fullModel)->getTable();
-		$data['table'] = $table;
-		$data['modelName'] = strtolower($model);
-		$data['idProperty'] = 'id';
-		$data['relationData'] = [];
-
-		foreach ($this->formFields as $field) {
 			if ($field->type == 'multiSelect' &&
 				$field->selectType->type == 'model' &&
 				$field->search
@@ -290,147 +256,267 @@ class ModelConfig
 				$tableName = implode('_', $tableNames);
 				$relationId = snake_case($model) . '_id';
 				$relatedModelId = snake_case($relatedModel) . "_id";
-				$data['relationData'][] = ['relationTable' => $tableName,
-										   'relationId' => $relationId,
-										   'relatedModelId' => $relatedModelId];
-			}
-		}
 
-		return $data;
-	}
-
-	public function getLangDependentProperties()
-	{
-		if (!is_null($this->langDependentProperties)) {
-			return $this->langDependentProperties;
-		}
-
-		$properties = [];
-		foreach ($this->formFields as $field) {
-			if (config('gtcms.premium') && $field->langDependent) {
-				$properties[] = $field->property;
-			}
-		}
-
-		$this->langDependentProperties = $properties;
-
-		return $properties;
-	}
-
-	public function getExcelExportFields($returnCount = false)
-	{
-		if (!is_null($this->excelExportFields)) {
-			if ($returnCount) {
-				return $this->excelExportFieldsCount;
+				$this->manyToManyRelationData['relationData'][] = [
+					'relationTable' => $tableName,
+					'relationId' => $relationId,
+					'relatedModelId' => $relatedModelId
+				];
 			}
 
-			return $this->excelExportFields;
-		}
+			// Excel Export Fields
 
-		$count = 0;
-		$fields = [];
-		foreach ($this->formFields as $field) {
 			if ($field->excelExport) {
-				$fields[] = $field;
-				$count++;
-				if (config('gtcms.premium') && $field->langDependent) {
-					$count += count(config('gtcmslang.languages')) - 1;
+				$this->excelExportFields[] = $field;
+				$this->excelExportFieldsCount++;
+				if ($premium && $field->langDependent) {
+					$this->excelExportFieldsCount += count(config('gtcmslang.languages')) - 1;
+				}
+			}
+
+			// Quick Edit Fields
+
+			if ($premium && $field->quickEdit) {
+				$this->quickEditFields['all'][] = $field;
+				if ($field->langDependent) {
+					$this->quickEditFields['langDependent'][] = $field;
+				} else {
+					$this->quickEditFields['regular'][] = $field;
+				}
+			}
+
+			// Image and File Fields
+
+			if ($field->type == 'image') {
+				$this->imageFields[] = $field;
+			}
+
+			if ($field->type == 'file') {
+				$this->fileFields[] = $field;
+			}
+
+			// Order By
+
+			if (!isset($this->orderAndDirection['orderBy']) && $requestOrderBy) {
+				if ($field->property == $requestOrderBy && $field->order) {
+					$requestOrderByAcceptable = true;
+					if ($premium && $field->langDependent) {
+						$requestOrderBy = $requestOrderBy . "_" . (app()->getLocale());
+					}
+				}
+
+				if ($requestOrderByAcceptable) {
+					$this->orderAndDirection['orderBy'] = $requestOrderBy;
 				}
 			}
 		}
 
-		$this->excelExportFields = $fields;
-		$this->excelExportFieldsCount = $count;
-
-		if ($returnCount) {
-			return $count;
+		if (!isset($this->orderAndDirection['orderBy'])) {
+			$this->orderAndDirection['orderBy'] = $this->orderBy;
 		}
 
-		return $fields;
+		if (request()->has('direction')) {
+			$direction = request()->get('direction');
+			if (!in_array($direction, ['asc', 'desc'])) {
+				$direction = $this->direction;
+			}
+		} else {
+			$direction = $this->direction;
+		}
+
+		$this->orderAndDirection['direction'] = $direction;
+
+		$this->formFieldsParsed = true;
 	}
 
-	public function getFormFields($fieldType, $parseFromTo = false)
+	public function getSearchPropertiesData()
 	{
-		if ($parseFromTo && !$this->fromToParsed) {
-			$formFields = [];
-			foreach ($this->formFields as $field) {
-				if ($field->fromTo && $field->search) {
-					$newField = AdminHelper::objectToArray($field);
-					$newField['hidden'] = [
-						'add' => true, 'edit' => true, 'view' => true
-					];
-					$fromField = $newField;
-					$fromField['property'] = $field->property . "_fieldFrom";
-					$fromField['label'] = $newField['label'] . " " . trans('gtcms.from');
-					if (isset($fromField['search']['label'])) {
-						$fromField['search']['label'] = $fromField['search']['label'] . " " . trans('gtcms.from');
+		$this->parseFormFields();
+
+		return $this->searchPropertiesData;
+	}
+
+	public function searchPropertiesExist()
+	{
+		$this->parseFormFields();
+
+		return $this->searchPropertiesExist;
+	}
+
+	public function getSearchFieldsWithLabels()
+	{
+		$this->parseFormFields();
+
+		return $this->searchFieldsWithLabels;
+	}
+
+	public function getPropertyFieldArray()
+	{
+		$this->parseFormFields();
+
+		return $this->propertyFieldArray;
+	}
+
+	public function getPropertyValue($property, $value)
+	{
+		$this->parseFormFields();
+
+		$returnValue = "Undefined";
+		$list = [];
+
+		if (isset($this->propertyFieldArray[$property])) {
+			$field = $this->propertyFieldArray[$property];
+
+			if (in_array($field->type, ['select', 'multiSelect'])) {
+				$listMethod = $field->selectType->listMethod;
+				if ($field->selectType->type == 'model') {
+					/** @var \App\Models\BaseModel $selectModel */
+					$selectModel = ModelConfig::fullEntityName($field->selectType->modelName);
+					if ($field->selectType->ajax && config('gtcms.premium')) {
+						$valueProperty = $field->selectType->ajax->valueProperty;
+						$list = $selectModel::where('id', $value)->get()->pluck($valueProperty, 'id');
+					} else {
+
+						// Even if 'callMethodOnInstance' is declared we need a static method
+						// of the same name which will return the list of ALL selectable items
+						// instead of just the ones a particular object would return
+						// This method must be declared in Related Model Class
+
+						$list = $selectModel::$listMethod();
 					}
-					$fromField['search']['fieldFrom'] = true;
-					$fromField['table'] = false;
-					$fromField['sideTable'] = false;
-					$fromField = AdminHelper::arrayToObject($fromField);
-
-					$toField = $newField;
-					$toField['property'] = $field->property . "_fieldTo";
-					$toField['label'] = $newField['label'] . " " . trans('gtcms.to');
-					if (isset($toField['search']['label'])) {
-						$toField['search']['label'] = $toField['search']['label'] . " " . trans('gtcms.to');
-					}
-					$toField['search']['fieldTo'] = true;
-					$toField['table'] = false;
-					$toField['sideTable'] = false;
-					$toField = AdminHelper::arrayToObject($toField);
-
-					$formFields[] = $fromField;
-					$formFields[] = $toField;
-
-					$field->search = false;
-					$formFields[] = $field;
-				} else {
-					$formFields[] = $field;
+				} else if ($field->selectType->type == 'list') {
+					$entity = $this->myFullEntityName();
+					$list = $entity::$listMethod();
 				}
+
+				foreach ($list as $actualValue => $frontValue) {
+					if ($actualValue == $value) {
+						$returnValue = $frontValue;
+						break;
+					}
+				}
+			} else if ($field->type == 'checkbox') {
+				$returnValue = $value ? Front::drawCheckboxIcon(true) : Front::drawCheckboxIcon(false);
+			} else {
+				$returnValue = $value;
 			}
 
-			$this->fromToParsed = true;
-			$this->formFields = $formFields;
+			return $returnValue;
 		}
 
-		if ($fieldType == 'all') {
-			return $this->formFields;
-		} else if ($fieldType == 'regular') {
-			$fields = [];
-			foreach ($this->formFields as $field) {
-				if (!$field->langDependent) {
-					$fields[] = $field;
+		return $returnValue;
+	}
+
+	public function getDatabasePropertyValue($property, $value)
+	{
+		$this->parseFormFields();
+
+		if (isset($this->propertyFieldArray[$property])) {
+			$field = $this->propertyFieldArray[$property];
+
+			if (in_array($field->type, ['date', 'dateTime'])) {
+				if ($field->type == "date") {
+					$value = date("Y-m-d", strtotime($value));
+				} else if ($field->type == "dateTime") {
+					$value = date("Y-m-d H:i:s", strtotime($value));
+				} else {
+					$value = "";
 				}
 			}
+		}
 
-			return $fields;
-		} else if ($fieldType == 'langDependent') {
-			$fields = [];
-			foreach ($this->formFields as $field) {
-				if (config('gtcms.premium') && $field->langDependent) {
-					$fields[] = $field;
-				}
+		return $value;
+	}
+
+	public function getPropertiesTables()
+	{
+		$this->parseFormFields();
+
+		return $this->propertiesTables;
+	}
+
+	public function getManyToManyRelationData()
+	{
+		$this->parseFormFields();
+
+		return $this->manyToManyRelationData;
+	}
+
+	public function hasImage()
+	{
+		$this->parseFormFields();
+
+		return $this->imageFields;
+	}
+
+	public function hasFile()
+	{
+		if (!$this->formFieldsParsed) {
+			$this->parseFormFields();
+		}
+
+		return $this->fileFields;
+	}
+
+	public function getOrderParams()
+	{
+		$this->parseFormFields();
+
+		return $this->orderAndDirection;
+	}
+
+	public function getFieldByPropertyParam($paramValue)
+	{
+		$this->parseFormFields();
+
+		if (config('gtcms.premium')) {
+			if (isset($this->modifiedLangDependentPropertyFieldArray[$paramValue])) {
+				return $this->modifiedLangDependentPropertyFieldArray[$paramValue];
 			}
+		}
 
-			return $fields;
-		} else {
-			Dbar::error("ModelConfig - getFormFields: fieldType is incorrect! - " . $fieldType);
+		if (isset($this->propertyFieldArray[$paramValue])) {
+			return $this->propertyFieldArray[$paramValue];
 		}
 
 		return false;
 	}
 
-	public function getQuickEditFields($fieldType)
+	public function getFormFields($fieldType = 'all', $options = [])
 	{
-		$quickEditFields = [];
+		$this->parseFormFields();
 
-		if (config('gtcms.premium')) {
-			return \GtcmsPremium::getQuickEditFields($this, $fieldType);
+		if ($fieldType == 'all') {
+			return $this->formFields;
+		} else if ($fieldType == 'regular') {
+			return $this->regularFormFields;
+		} else if ($fieldType == 'langDependent') {
+			return $this->langDependentFormFields;
+		} else if ($fieldType == 'quickEdit') {
+			$quickEditType = 'all';
+
+			if (isset($options['quickEditType'])) {
+				if (in_array($options['quickEditType'], ['all', 'regular', 'langDependent'])) {
+					$quickEditType = $options['quickEditType'];
+				} else {
+					Dbar::error("ModelConfig - getFormFields: fieldType is incorrect! - " . $fieldType);
+
+					return [];
+				}
+			}
+
+			return $this->quickEditFields[$quickEditType];
+		} else if ($fieldType == 'excelExport') {
+			if (isset($options['count']) && $options['count']) {
+				return $this->excelExportFieldsCount;
+			}
+
+			return $this->excelExportFields;
+		} else {
+			Dbar::error("ModelConfig - getFormFields: fieldType is incorrect! - " . $fieldType);
 		}
 
-		return $quickEditFields;
+		return false;
 	}
 
 	public function getModelParents()

@@ -32,7 +32,7 @@
 			</button>
 			@endif
 
-			@if (config('gtcms.premium') && $modelConfig->getExcelExportFields(true) && $objects->count())
+			@if (config('gtcms.premium') && $modelConfig->getFormFields('excelExport', ['count' => true]) && $objects->count())
 			<a href="{{AdminHelper::getCmsPrefix()}}excelExport/{{$modelConfig->name . Tools::getGets()}}" class="btn btn-primary btn-sm excelExport standardLink"><i class="fa fa-download"></i> {{trans('gtcms.excelExport')}}</a>
 			@endif
 		</div>
@@ -50,7 +50,7 @@
 
 			@if ($objects->count())
 			<div class="table-responsive">
-				{!! Front::drawObjectTable($objects, $modelConfig, 'table', "", $searchDataWithFieldValues, $ordering) !!}
+				{!! Front::drawObjectTable($objects, $modelConfig, 'table', ['searchDataWithFieldValues' => $searchDataWithFieldValues, 'ordering' => $ordering]) !!}
 			</div>
 			@else
 				<p>{{trans('gtcms.currentlyNoObjects', array('objects' => $modelConfig->hrNamePlural))}}</p>
@@ -67,7 +67,7 @@
 			<div class="panel-body">
 				<div class="row">
 					<div class="col-lg-12">
-					{!! Front::drawSearch($modelConfig, $searchParams) !!}
+						{!! Front::drawSearch($modelConfig, $searchParams) !!}
 					</div>
 				</div>
 			</div>

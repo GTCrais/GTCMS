@@ -5,15 +5,16 @@ if ($modelConfig->index == 'tree' && $object->id) {
 }
 
 if ($quickEdit) {
-	$formFields = $modelConfig->getQuickEditFields($fieldType);
+	$formFields = $modelConfig->getFormFields('quickEdit', ['quickEditType' => $fieldType]);
 	$modelConfig->form = false;
 } else {
 	$formFields = $modelConfig->getFormFields($fieldType);
 }
 
-foreach ($formFields as $field) {
+foreach ($formFields as $originalField) {
 
 	$continue = false;
+	$field = clone $originalField;
 
 	if (!$quickEdit && $modelConfig->tabs && $field->tab != $tab) {
 		$continue = true;
