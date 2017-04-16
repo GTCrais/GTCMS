@@ -39,6 +39,7 @@
 			</url>
 
 		@endif
+
 	@endforeach
 
 </urlset>
