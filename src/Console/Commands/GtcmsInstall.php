@@ -43,6 +43,13 @@ class GtcmsInstall extends Command
 
 		if (!$this->verifyNodeJsInstallation()) {
 			$this->info("Node.js not found. Aborting installation.");
+
+			return;
+		}
+
+		if (!$this->verifyDatabaseConnection()) {
+			$this->info('Could not establish database connection. Aborting installation.');
+
 			return;
 		}
 
@@ -66,6 +73,17 @@ class GtcmsInstall extends Command
 			if (empty($output)) {
 				return false;
 			}
+
+			return true;
+		} catch (\Exception $e) {
+			return false;
+		}
+	}
+
+	protected function verifyDatabaseConnection()
+	{
+		try {
+			\DB::connection()->getPdo();
 
 			return true;
 		} catch (\Exception $e) {
@@ -129,7 +147,7 @@ class GtcmsInstall extends Command
 		$this->info("Installing Node packages. This might take a minute...");
 
 		$output = [];
-		exec('npm install', $output);
+		exec('npm --loglevel=error install', $output);
 
 		foreach ($output as $line) {
 			$this->info($line);
