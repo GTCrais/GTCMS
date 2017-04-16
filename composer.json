@@ -6,11 +6,11 @@
     "authors": [
         {
             "name": "Tomislav Modrić",
-            "email": "tomislav@gtcrais.net"
+            "email": "modric.tomislav@gmail.com"
         }
     ],
     "license": "GTCMS Basic license",
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "GTCrais\\GTCMS\\": "src"
