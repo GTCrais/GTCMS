@@ -23,7 +23,7 @@ class Page extends BaseModel
 		$propertyName = config('gtcms.premium') && config('gtcmslang.siteIsMultilingual') ? "slug_" . app()->getLocale() : "slug";
 		$langPrefix = app()->getLocale() == $defaultLocale ? '' : "/" . app()->getLocale();
 
-		return request()->root() . $langPrefix . "/" . $this->$propertyName;
+		return rtrim(request()->root() . $langPrefix . "/" . $this->$propertyName, "/");
 	}
 
 	public static function getPageKeyList()

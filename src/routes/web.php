@@ -14,6 +14,7 @@
 View::share('cPage', new \App\Models\Page());
 
 Route::get('gtcms-test-email', ['as' => 'testEmail', 'uses' => 'ContactController@testEmail']);
+Route::get('fetch-sitemap', ['as' => 'fetchSitemap', 'uses' => 'PageController@sitemap']);
 
 Route::get(trans('routes.login'), ['as' => 'login', 'uses' => 'Auth\LoginController@showLoginForm']);
 Route::post('submit-login', ['as' => 'submitLogin', 'uses' => 'Auth\LoginController@login']);

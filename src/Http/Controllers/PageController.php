@@ -50,6 +50,14 @@ class PageController extends Controller
 		}
 	}
 
+	public function sitemap(Request $request)
+	{
+		$pages = Page::orderBy('depth')->orderBy('position')->get();
+		$content = view()->make('front.pages.sitemap')->with(compact('pages'));
+
+		return response()->make($content)->header('Content-Type', 'text/xml');
+	}
+
 	public function compose(View $view)
 	{
 		$navPages = Page::where('depth', 1)->orderBy('position')->with(['pages'])->get();
