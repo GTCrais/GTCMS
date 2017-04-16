@@ -105,7 +105,7 @@ class AdminEntityController extends Controller
 			$searchDataWithFieldValues = AdminHelper::getSearchData(self::$modelConfig, true);
 			$input = [];
 			AdminHelper::standaloneCheck(self::$modelConfig, 'index', $input);
-			$orderAndDirection = AdminHelper::getOrderParams(self::$modelConfig);
+			$orderAndDirection = self::$modelConfig->getOrderParams();
 			$objects = $fullEntity::searchResultsEntities(self::$modelConfig)
 				->where(function ($query) {
 					if (self::$modelConfig->name == 'User' && !auth()->user()->is_superadmin) {
@@ -195,7 +195,7 @@ class AdminEntityController extends Controller
 		/** @var \App\Models\BaseModel $fullEntity */
 		$fullEntity = self::$modelConfig->myFullEntityName();
 
-		if (config('gtcms.premium') && $entity == "GtcmsSetting") {
+		if ($entity == "GtcmsSetting") {
 			$object = GtcmsSetting::createSettingsObject();
 		} else {
 			/** @var \App\Models\BaseModel $object */
@@ -227,6 +227,7 @@ class AdminEntityController extends Controller
 
 		$sideTablePaginationResults =
 			$request->get('getIgnore_tableType') == 'sideTable' &&
+			$request->get('getIgnore_modelName') &&
 			$ajaxRequest &&
 			$action == "edit"
 				? true : false;
@@ -307,7 +308,11 @@ class AdminEntityController extends Controller
 		$method = $configInParent->method;
 
 		$relatedObjects = $object->$method()->orderBy($configInParent->orderBy, $configInParent->direction)->paginate($configInParent->perPage, ['*'], $configInParent->name . "Page");;
-		$objectsView = Front::drawObjectTable($relatedObjects, $relatedModelConfig, 'sideTable', '?' . self::$modelConfig->id . '=' . $object->id, false, false, false, true);
+		$objectsView = Front::drawObjectTable($relatedObjects, $relatedModelConfig, 'sideTable', [
+			'parentIdProperty' => self::$modelConfig->id,
+			'parentIdValue' => $object->id,
+			'loadSideTablePaginationResults' => true
+		]);
 		$setUrl = AdminHelper::getCmsPrefix() . self::$modelConfig->name . '/edit/' . ($object->id ? $object->id : 'new') . Tools::getGets();
 
 		$returnData = [

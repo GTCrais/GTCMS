@@ -228,7 +228,7 @@ class AdminController extends Controller
 				$object = $fullEntity::find($id);
 			}
 
-			$field = AdminHelper::getFieldsByParam($modelConfig, 'property', $fileNameField, true);
+			$field = $modelConfig->getFieldByPropertyParam($fileNameField);
 
 			if ($request->ajax() && $modelConfig && $object && $field) {
 				if (in_array($fileAction, ['uploadFile', 'uploadImage'])) {
@@ -250,9 +250,9 @@ class AdminController extends Controller
 						$input = [];
 						$parentProperty = AdminHelper::standaloneCheck($modelConfig, $action, $input, $object);
 
-						if ($fileAction == 'uploadFile' && $fileFields = AdminHelper::modelConfigHasFile($modelConfig)) {
+						if ($fileAction == 'uploadFile' && $fileFields = $modelConfig->hasFile()) {
 							$fileData = FileHandler::process($modelConfig, $fileFields, $parentProperty);
-						} else if ($fileAction == 'uploadImage' && $imageFields = AdminHelper::modelConfigHasImage($modelConfig)) {
+						} else if ($fileAction == 'uploadImage' && $imageFields = $modelConfig->hasImage()) {
 							$fileData = ImageHandler::process($modelConfig, $imageFields, $parentProperty);
 						}
 

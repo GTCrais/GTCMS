@@ -1599,6 +1599,7 @@ function setFormHandling() {
 									if (getGtcmsPremium() && data.quickEdit) {
 										closeQuickEdit(false, data);
 										setSelectize();
+										enableRepositioning();
 									} else {
 										updatePaginationInfo(data);
 										setupEditFormInputs();

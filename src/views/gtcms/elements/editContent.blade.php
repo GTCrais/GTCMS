@@ -60,9 +60,6 @@
 		<div class="panel panel-default">
 			<div class="panel-body">
 
-
-				<?php $originalModelConfig = AdminHelper::modelExists($modelConfig->name); ?>
-
 				@if ($modelConfig->tabs && !$quickEdit)
 					<ul class="nav nav-tabs">
 						@foreach ($modelConfig->tabs as $index => $tab)
@@ -78,13 +75,11 @@
 								@if (config('gtcms.premium') && $modelConfig->tabbedLanguageFields)
 									@include('gtcms.elements.tabbedLanguageFields')
 								@else
-									<?php
-									$fieldType = 'all';
-									$ignoreLanguageIterations = false;
-									$hideSave = false;
-									$modelConfig = AdminHelper::modelExists($modelConfig->name);
-									?>
-									@include("gtcms.elements.editContentFormFields")
+									@include("gtcms.elements.editContentFormFields", [
+										'fieldType' => 'all',
+										'ignoreLanguageIterations' => false,
+										'hideSave' => false
+									])
 								@endif
 							</div>
 						@endforeach
@@ -94,13 +89,11 @@
 					@if (config('gtcms.premium') && $modelConfig->tabbedLanguageFields)
 						@include('gtcms.elements.tabbedLanguageFields')
 					@else
-						<?php
-						$fieldType = 'all';
-						$ignoreLanguageIterations = false;
-						$hideSave = false;
-						$modelConfig = AdminHelper::modelExists($modelConfig->name);
-						?>
-						@include("gtcms.elements.editContentFormFields")
+						@include("gtcms.elements.editContentFormFields", [
+							'fieldType' => 'all',
+							'ignoreLanguageIterations' => false,
+							'hideSave' => false
+						])
 					@endif
 				@endif
 
