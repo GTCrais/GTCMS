@@ -188,11 +188,7 @@ class GtcmsInstall extends Command
 			Log::error($e);
 
 			$this->info('Could not run migrations: ' . $e->getMessage());
-			$this->info(
-				'You either haven\'t configured your database credentials,
-				or your database doesn\'t fully support utf8mb4 encoding.
-				Check Laravel\'s error log to see detailed error information.'
-			);
+			$this->info('It\'s possible your database doesn\'t fully support utf8mb4 encoding. Check Laravel\'s error log to see detailed error information.');
 		}
 	}
 
