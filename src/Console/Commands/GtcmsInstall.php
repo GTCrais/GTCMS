@@ -144,7 +144,7 @@ class GtcmsInstall extends Command
 
 	protected function installFrontendPackages()
 	{
-		$this->info("Installing Node packages. This might take a minute...");
+		$this->info("Installing Node packages. This might take a minute or two...");
 
 		$output = [];
 		exec('npm --loglevel=error install', $output);
