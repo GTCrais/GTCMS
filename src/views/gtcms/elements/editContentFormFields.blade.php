@@ -20,7 +20,7 @@ foreach ($formFields as $originalField) {
 		$continue = true;
 	}
 
-	if ($field->restrictedToSuperadmin && auth()->user()->is_superadmin) {
+	if ($field->restrictedToSuperadmin && !auth()->user()->is_superadmin) {
 		$continue = true;
 	}
 
