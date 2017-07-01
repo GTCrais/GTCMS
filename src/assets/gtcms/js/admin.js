@@ -829,7 +829,7 @@ function reloadSearchResults(objectsContainer, data) {
 			$(this).removeClass('hidden');
 
 			if (!data.sideTablePagination) {
-				var addUrl = getCmsPrefix(true, true) +  + data.entity + "/add" + data.getParams
+				var addUrl = getCmsPrefix(true, true) + data.entity + "/add" + data.getParams
 				var excelExport = getCmsPrefix(true, true) + "excelExport/" + data.entity + data.getParams
 				$("a.addButton").attr("href", addUrl);
 				$("a.excelExport").attr("href", excelExport);
