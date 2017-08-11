@@ -4,7 +4,10 @@
 	@include("gtcms.templates.adminTemplateHead")
 
 	<body class="nav-{{AdminHelper::getNavigationSize()}} skin-{{config('gtcms.skin', 'dark')}}">
-		<div class="quickEditContainer"></div>
+
+		@if (config('gtcms.premium'))
+			<div class="quickEditContainer"></div>
+		@endif
 
 		@include("gtcms.elements.navigation")
 
