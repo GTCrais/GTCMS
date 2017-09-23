@@ -256,11 +256,19 @@ class Front
 		}
 
 		$getGetsOptions = ['quickEditTableType' => null];
+		$gets = Tools::getGets($getGetsOptions, false, "");
+
 		if ($parentIdProperty) {
-			$getGetsOptions[$parentIdProperty] = $parentIdValue ?: null;
+			$prepend = $parentIdProperty . "=" . $parentIdValue;
+
+			if ($gets) {
+				$prepend .= "&";
+			}
+
+			$gets = $prepend . $gets;
 		}
 
-		$gets = Tools::getGets($getGetsOptions);
+		$gets = $gets ? "?" . $gets : "";
 
 		/** @var \App\Models\BaseModel $object */
 		foreach ($objects as $object) {
