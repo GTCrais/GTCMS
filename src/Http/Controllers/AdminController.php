@@ -357,11 +357,6 @@ class AdminController extends Controller
 					$messages = [];
 					$additionalRedirectRequired = false;
 
-					if (isset($requestData['clearCompiled'])) {
-						\Artisan::call('clear-compiled');
-						$messages[] = "Compiled classes cleared";
-					}
-
 					if (isset($requestData['clearCache'])) {
 						\Artisan::call('config:clear');
 						$messages[] = "Cached configuration options cleared";
@@ -370,11 +365,6 @@ class AdminController extends Controller
 					if (isset($requestData['clearRoutes'])) {
 						\Artisan::call('route:clear');
 						$messages[] = "Cached routes cleared";
-					}
-
-					if (isset($requestData['optimize'])) {
-						\Artisan::call('optimize', ['--force' => true]);
-						$messages[] = "Optimized class loader generated";
 					}
 
 					// This one is special because it messes up the Session of the current request

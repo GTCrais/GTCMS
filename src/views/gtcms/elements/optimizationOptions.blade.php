@@ -17,15 +17,6 @@
 					{{Form::open()}}
 
 					<div class="form-group">
-						<span class="info checkInfo clearTopMargin">Deletes optimized class loader</span>
-						<div class="checkbox">
-							<label>
-								<input name="clearCompiled" type="checkbox" value="1"> Clear compiled
-							</label>
-						</div>
-					</div>
-
-					<div class="form-group">
 						<span class="info checkInfo">Clears cached configuration options</span>
 						<div class="checkbox">
 							<label>
@@ -45,15 +36,6 @@
 
 					<div class="form-group">
 						<hr />
-					</div>
-
-					<div class="form-group">
-						<span class="info checkInfo">(Re)generates optimized class loader</span>
-						<div class="checkbox">
-							<label>
-								<input name="optimize" type="checkbox" value="1"> Optimize
-							</label>
-						</div>
 					</div>
 
 					<div class="form-group">
