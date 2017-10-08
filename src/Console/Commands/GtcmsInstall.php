@@ -54,8 +54,17 @@ class GtcmsInstall extends Command
 		}
 
 		$this->publishVendorFiles();
-		$this->updatePackageJson();
+
+		// Update package.json and temporarily remove "laravel-mix" dependency from it
+		$laravelMixVersion = $this->updatePackageJson(false, true);
+
 		$this->installFrontendPackages();
+
+		// Inject "laravel-mix" dependency back into package.json
+		if ($laravelMixVersion) {
+			$this->updatePackageJson(true, false, $laravelMixVersion);
+		}
+
 		$this->deleteUserClassFile();
 		$this->runMigrations();
 
@@ -96,8 +105,10 @@ class GtcmsInstall extends Command
 		$this->call('gtcms:publish');
 	}
 
-	protected function updatePackageJson()
+	protected function updatePackageJson($finalUpdate = true, $skipLaravelMix = false, $laravelMixVersion = null)
 	{
+		$laravelMix = null;
+
 		$packageJson = file_get_contents(base_path('package.json'));
 		$packageJson = json_decode($packageJson, true);
 
@@ -107,17 +118,28 @@ class GtcmsInstall extends Command
 		$packageJson["name"] = $gtcmsPackageJson["name"];
 		$packageJson["description"] = $gtcmsPackageJson["description"];
 
-		foreach ($gtcmsPackageJson["devDependencies"] as $dependency => $version) {
-			$packageJson["devDependencies"][$dependency] = $version;
+		$packageJson["devDependencies"] = $packageJson["devDependencies"] + $gtcmsPackageJson["devDependencies"];
+
+		if ($skipLaravelMix && isset($packageJson["devDependencies"]["laravel-mix"])) {
+			$laravelMix = $packageJson["devDependencies"]["laravel-mix"];
+			unset($packageJson["devDependencies"]["laravel-mix"]);
+		}
+
+		if ($laravelMixVersion) {
+			$packageJson["devDependencies"]["laravel-mix"] = $laravelMixVersion;
 		}
 
 		$packageJson = json_encode($packageJson, JSON_PRETTY_PRINT);
 
 		file_put_contents(base_path('package.json'), $packageJson);
 
-		unlink(base_path('gtcms.package.json'));
+		if ($finalUpdate || ($skipLaravelMix && !$laravelMix)) {
+			unlink(base_path('gtcms.package.json'));
+		} else {
+			$this->info("package.json updated.");
+		}
 
-		$this->info("package.json updated.");
+		return $laravelMix;
 	}
 
 	protected function installBower()
