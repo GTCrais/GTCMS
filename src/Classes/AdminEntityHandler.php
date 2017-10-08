@@ -153,7 +153,7 @@ class AdminEntityHandler
 
 					if ($parentId) {
 						$parent = $parentName::find($parentId);
-					} else if (request()->has($parentIdProperty)) {
+					} else if (request()->filled($parentIdProperty)) {
 						$parent = $parentName::find(request()->get($parentIdProperty));
 					}
 				}

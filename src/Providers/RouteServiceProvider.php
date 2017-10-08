@@ -59,13 +59,10 @@ class RouteServiceProvider extends ServiceProvider
 	{
 		app()->setLocale(config('gtcmslang.defaultAdminLocale'));
 
-		\Route::group([
-			'prefix' => config('gtcms.cmsPrefix'),
-			'middleware' => ['web', 'adminAuth'],
-			'namespace' => $this->namespace,
-		], function ($router) {
-			require base_path('routes/admin.php');
-		});
+		Route::prefix(config('gtcms.cmsPrefix'))
+			->middleware(['web', 'adminAuth'])
+			->namespace($this->namespace)
+			->group(base_path('routes/admin.php'));
 
 		return (!config('gtcms.cmsPrefix') || request()->segment(1) == config('gtcms.cmsPrefix')) ? true : false;
 	}
@@ -91,13 +88,10 @@ class RouteServiceProvider extends ServiceProvider
 			$locale = null;
 		}
 
-		\Route::group([
-			'prefix' => $locale,
-			'middleware' => 'web',
-			'namespace' => $this->namespace,
-		], function ($router) {
-			require base_path('routes/web.php');
-		});
+		Route::prefix($locale)
+			->middleware('web')
+			->namespace($this->namespace)
+			->group(base_path('routes/web.php'));
 	}
 
 	/**
@@ -109,12 +103,9 @@ class RouteServiceProvider extends ServiceProvider
 	 */
 	protected function mapApiRoutes()
 	{
-		\Route::group([
-			'middleware' => 'api',
-			'namespace' => $this->namespace,
-			'prefix' => 'api',
-		], function ($router) {
-			require base_path('routes/api.php');
-		});
+		Route::prefix('api')
+			->middleware('api')
+			->namespace($this->namespace)
+			->group(base_path('routes/api.php'));
 	}
 }
