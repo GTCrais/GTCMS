@@ -1,6 +1,6 @@
 {
-	"name": "GTCMS",
-	"description": "GTCMS",
+	"name": "gtcms",
+	"description": "gtcms",
 	"devDependencies": {
 		"gulp": "^3.9.1",
         "gulp-stylus": "2.4.0",

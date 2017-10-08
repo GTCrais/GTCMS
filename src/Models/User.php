@@ -86,7 +86,7 @@ class User extends BaseModel implements
 
 	public function setPasswordAttribute($value)
 	{
-		if (!request()->has('password')) {
+		if (!request()->filled('password')) {
 			if ($value) {
 				$this->attributes['password'] = $value;
 			} else {

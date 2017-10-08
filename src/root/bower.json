@@ -1,30 +1,30 @@
 {
-	"name": "GTCMS",
-	"ignore": [
-		"**/.*",
-		"node_modules",
-		"components"
-	],
-	"authors": [
-		"Tomislav Modrić <tomislav@gtcrais.net>"
-	],
-	"description": "GTCMS",
-	"homepage": "http://gtcms.createcsolutions.co",
-	"devDependencies": {
-		"nib": "~1.1.0"
-	},
-	"dependencies": {
-		"jquery": "1.12.3",
-		"jquery-ui": "~1.11.4",
-		"jqueryui-timepicker-addon": "1.6.3",
-		"font-awesome": "~4.6.3",
-		"ckeditor": "4.5.9",
-		"chosen": "1.5.1",
-		"selectize": "~0.12.4",
-		"history.js": "~1.8.0",
-		"spin.js": "2.3.2",
-		"blueimp-file-upload": "9.12.3",
-		"bootstrap": "3.3.6",
-		"autosize": "3.0.15"
-	}
+    "name": "gtcms",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "components"
+    ],
+    "authors": [
+        "Tomislav Modrić <tomislav@gtcrais.net>"
+    ],
+    "description": "GTCMS",
+    "homepage": "http://gtcms.createcsolutions.co",
+    "devDependencies": {
+        "nib": "~1.1.0"
+    },
+    "dependencies": {
+        "jquery": "1.12.4",
+        "jquery-ui": "~1.11.4",
+        "jqueryui-timepicker-addon": "1.6.3",
+        "font-awesome": "~4.7.0",
+        "ckeditor": "4.7.3",
+        "chosen": "1.8.2",
+        "selectize": "~0.12.4",
+        "history.js": "~1.8.0",
+        "spin.js": "2.3.2",
+        "blueimp-file-upload": "9.12.3",
+        "bootstrap": "3.3.6",
+        "autosize": "4.0.0"
+    }
 }

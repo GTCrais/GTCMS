@@ -315,7 +315,7 @@ class ModelConfig
 			$this->orderAndDirection['orderBy'] = $this->orderBy;
 		}
 
-		if (request()->has('direction')) {
+		if (request()->filled('direction')) {
 			$direction = request()->get('direction');
 			if (!in_array($direction, ['asc', 'desc'])) {
 				$direction = $this->direction;
@@ -451,9 +451,7 @@ class ModelConfig
 
 	public function hasFile()
 	{
-		if (!$this->formFieldsParsed) {
-			$this->parseFormFields();
-		}
+		$this->parseFormFields();
 
 		return $this->fileFields;
 	}

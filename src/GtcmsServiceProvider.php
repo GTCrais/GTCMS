@@ -7,19 +7,6 @@ use Illuminate\Support\ServiceProvider;
 
 class GtcmsServiceProvider extends ServiceProvider
 {
-	protected $serviceProviders = [
-		'Barryvdh\Debugbar\ServiceProvider',
-		'Collective\Html\HtmlServiceProvider',
-		'Intervention\Image\ImageServiceProvider',
-		'Unisharp\Laravelfilemanager\LaravelFilemanagerServiceProvider'
-	];
-
-	protected $vendorAliases = [
-		'Form' => 'Collective\Html\FormFacade',
-		'Html' => 'Collective\Html\HtmlFacade',
-		'Image' => 'Intervention\Image\Facades\Image'
-	];
-
 	protected $gtcmsAliases = [
 		'Front' => 'Classes\Front',
 		'AdminHelper' => 'Classes\AdminHelper',
@@ -72,18 +59,9 @@ class GtcmsServiceProvider extends ServiceProvider
 	 */
 	public function register()
 	{
-		// Register Service Providers
-		foreach ($this->serviceProviders as $serviceProvider) {
-			$this->app->register($serviceProvider);
-		}
-
 		// Register Aliases
 		$aliasLoader = AliasLoader::getInstance();
 		$namespace = config('gtcms.defaultNamespace', 'App');
-
-		foreach ($this->vendorAliases as $alias => $class) {
-			$aliasLoader->alias($alias, $class);
-		}
 
 		foreach ($this->gtcmsAliases as $alias => $class) {
 			$aliasLoader->alias($alias, $namespace . "\\" . $class);
