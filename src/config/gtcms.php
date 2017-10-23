@@ -2,7 +2,7 @@
 
 return [
 
-	'premium' => false,
+	'premium' => true,
 
 	'allowedUserRoles' => [
 		'admin'
