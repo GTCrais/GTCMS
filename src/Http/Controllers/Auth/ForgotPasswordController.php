@@ -53,11 +53,12 @@ class ForgotPasswordController extends Controller
 	public function sendResetLinkEmail(Request $request)
 	{
 		$attemptsMessage = false;
+
 		if ($this->throttleRequests) {
 			$attemptsMessage = $this->processRequest($request);
 
 			if ($request->hasTooManyAttempts) {
-				return back()->with(compact('message'));
+				return back()->with(['message' => $attemptsMessage]);
 			}
 		}
 

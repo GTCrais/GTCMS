@@ -50,19 +50,19 @@ class RegisterController extends Controller
 
 	public function register(Request $request)
 	{
-		$errorMessage = false;
+		$attemptsMessage = false;
 
 		if ($this->throttleRequests) {
-			$errorMessage = $this->processRequest($request);
+			$attemptsMessage = $this->processRequest($request);
 
 			if ($request->hasTooManyAttempts) {
-				return back()->with(compact('errorMessage'));
+				return back()->with(['errorMessage' => $attemptsMessage]);
 			}
 		}
 
 		$validator = $this->validator($request->all());
 		if ($validator->fails()) {
-			return back()->withErrors($validator)->withInput()->with(compact('errorMessage'));
+			return back()->withErrors($validator)->withInput()->with(['errorMessage' => $attemptsMessage]);
 		}
 
 		try {
