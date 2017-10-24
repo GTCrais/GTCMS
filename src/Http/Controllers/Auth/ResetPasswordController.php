@@ -60,6 +60,7 @@ class ResetPasswordController extends Controller
 	public function reset(Request $request)
 	{
 		$attemptsMessage = false;
+
 		if ($this->throttleRequests) {
 			$attemptsMessage = $this->processRequest($request);
 

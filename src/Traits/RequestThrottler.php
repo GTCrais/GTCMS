@@ -31,13 +31,10 @@ trait RequestThrottler
 		}
 
 		if (!$retriesLeft) {
-			$errorMessage = trans('auth.throttle', ['seconds' => $this->lockoutDuration * 60]);
+			$errorMessage = trans('auth.throttle', ['seconds' => $this->availableIn($this->throttleKey($request))]);
 		} else {
 			$errorMessage = trans_choice('auth.attemptsLeft', $retriesLeft, ['attemptsLeft' => $retriesLeft]);
 		}
-
-		// Trigger countdown here
-		$this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration);
 
 		return $errorMessage;
 	}

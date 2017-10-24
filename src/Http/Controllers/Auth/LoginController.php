@@ -60,7 +60,7 @@ class LoginController extends Controller
 			$attemptsMessage = $this->processRequest($request);
 
 			if ($request->hasTooManyAttempts) {
-				return back()->with(compact('errorMessage'));
+				return back()->with(['errorMessage' => $attemptsMessage]);
 			}
 		}
 
