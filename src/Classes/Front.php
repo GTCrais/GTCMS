@@ -378,6 +378,12 @@ class Front
 						} else {
 							$html .= ($object->$method ? \Html::entities($object->$method->$property) : ' - ');
 						}
+					} else if ($field->type == 'select' && $field->selectType->type == 'list' && $field->displayProperty && $field->displayProperty->type == 'accessor') {
+						if ($field->displayProperty->method == '{default}') {
+							$html .= \Html::entities($object->defaultSelectListValue($field));
+						} else {
+							$html .= \Html::entities($object->$property);
+						}
 					} else if (in_array($field->type, ['date', 'dateTime'])) {
 						$html .= $object->formatDate($object->$property, $field->displayProperty->dateFormat ? $field->displayProperty->dateFormat : $field->dateFormat);
 					} else if ($field->type == 'checkbox') {

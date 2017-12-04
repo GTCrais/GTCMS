@@ -584,7 +584,9 @@ class AdminHelper
 				}
 			} else if ($displayProperty->type == 'accessor') {
 				$method = $displayProperty->method;
-				if ($method == 'indexDate' && $export) {
+				if ($method == '{default}') {
+					$value = $object->defaultSelectListValue($field);
+				} else if ($method == 'indexDate' && $export) {
 					$value = $object->getIndexDateAttribute();
 				} else {
 					$value = $object->$method;
