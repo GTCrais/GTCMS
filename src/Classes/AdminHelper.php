@@ -450,8 +450,12 @@ class AdminHelper
 		if ($field->viewField) {
 			return true;
 
-			// unset property if it's supposed to be hidden for current action
+		// unset property if it's supposed to be hidden for current action
 		} else if ($field->hidden && $field->hidden->$action) {
+			return true;
+
+		// unset property if it's hidden for posted model key
+		} else if (self::fieldShouldBeRemovedForModelKey($field)) {
 			return true;
 		}
 
@@ -470,7 +474,7 @@ class AdminHelper
 		if ($field->restrictedAccess && !$field->restrictedAccess->$userRole) {
 			return true;
 
-			// unset property if it's only meant to be viewed by current user based on their role
+		// unset property if it's only meant to be viewed by current user based on their role
 		} else if ($field->viewFieldForRoles && $field->viewFieldForRoles->$userRole) {
 			return true;
 		}
@@ -478,8 +482,13 @@ class AdminHelper
 		return false;
 	}
 
-	public static function fieldShouldBeNulled($modelConfig, $field, $input, $value)
+	public static function fieldShouldBeNulled($modelConfig, $field, $input = [], $value = null)
 	{
+		// set field to null if it's hidden for posted model key
+		if (self::fieldShouldBeRemovedForModelKey($field)) {
+			return true;
+		}
+
 		if ($field->setNullWhenEmpty && !$value && $value !== 0 && $value !== "0") {
 			return true;
 		}
@@ -489,6 +498,20 @@ class AdminHelper
 				if (!isset($input[$conditionField]) || !in_array($input[$conditionField], $values)) {
 					return true;
 				}
+			}
+		}
+
+		return false;
+	}
+
+	public static function fieldShouldBeRemovedForModelKey($field)
+	{
+		if ($field->modelKey) {
+			$postedModelKey = request('model_key');
+			$modelKeys = self::objectToArray($field->modelKey);
+
+			if ($postedModelKey && !in_array($postedModelKey, $modelKeys)) {
+				return true;
 			}
 		}
 

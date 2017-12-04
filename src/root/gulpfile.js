@@ -20,7 +20,7 @@ function minifyCss(src, dest) {
 }
 
 gulp.task('frontStyle', function () {
-	return minifyCss('public/css/style.styl', 'public/css');
+	return minifyCss('resources/assets/css/style.styl', 'public/css');
 });
 
 gulp.task('adminStyle', function () {
