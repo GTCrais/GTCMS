@@ -907,7 +907,7 @@ function setBackAndForth() {
 }
 
 function setLinkHandling() {
-	var links = $("a:not(.standardLink):not([class*=phpdebugbar])");
+	var links = $("a:not(.standardLink):not(.sf-dump-ref):not(.sf-dump-toggle):not([class*=phpdebugbar])");
 
 	links.off("click");
 	links.on("click", function(e) {

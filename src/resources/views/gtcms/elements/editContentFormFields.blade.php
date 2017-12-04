@@ -133,7 +133,7 @@ foreach ($formFields as $originalField) {
 				echo "<div class='col-sm-" . $modelConfig->form->inputWidth . "'>";
 			}
 
-			echo '<input class="form-control disabledInput readOnly " type="text" readonly="readonly" value="' . $value . '">';
+			echo '<div class="form-control disabledInput readOnly ">' . $value . '</div>';
 
 			if ($modelConfig->form && $modelConfig->form->horizontal) {
 				echo "</div>";

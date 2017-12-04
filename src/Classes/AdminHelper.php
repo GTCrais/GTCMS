@@ -588,7 +588,7 @@ class AdminHelper
 				}
 			} else if (in_array($displayProperty->type, ['date', 'dateTime'])) {
 				$property = $field->property;
-				$value = $object->formatDate($object->$property, $displayProperty->dateFormat ? $displayProperty->dateFormat : $property->dateFormat);
+				$value = $object->formatDate($object->$property, $displayProperty->dateFormat ? $displayProperty->dateFormat : $field->dateFormat);
 			} else if ($displayProperty->type == 'file') {
 				$method = $displayProperty->method;
 				if ($object->$method('name')) {
