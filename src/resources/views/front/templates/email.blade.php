@@ -4,22 +4,27 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
+		<link href="https://fonts.googleapis.com/css?family=Raleway:400,600" rel="stylesheet">
+
 		<style>
 			body {
 				margin: 0;
+				background: #f7f7f7;
 			}
 
 			.outer-container {
 				width: 640px;
 				max-width: 80%;
 				margin: 0 auto;
-				padding-top: 20px;
+				padding: 35px 30px 30px 30px;
+				background: #ffffff;
 			}
 
 			.container {
-				font-family: Tahoma, Verdana, sans-serif;
+				font-family: 'Raleway', Tahoma, Verdana, sans-serif;
 				color: #686868;
 				border-collapse: collapse;
+				width: 100%;
 			}
 
 			p {
@@ -27,7 +32,7 @@
 			}
 
 			.logo-container {
-				margin-bottom: 30px;
+				margin: 0 0 30px;
 				max-width: 100%;
 			}
 
@@ -35,8 +40,21 @@
 				display: block;
 			}
 
-			.logo-link img {
-				max-width: 100%
+			.logo {
+				display: block;
+				margin: 0 auto;
+				width: 200px !important; /* Increase if needed */
+				max-width: 100% !important;
+			}
+
+			@media screen and (max-width: 400px) {
+				.logo-container {
+					width: 150px; /* MAX: 250px */
+				}
+
+				.logo {
+					width: 150px !important; /* MAX: 250px */
+				}
 			}
 
 			.content-container {
@@ -55,6 +73,20 @@
 
 			a:hover {
 				text-decoration: underline;
+			}
+
+			.break-all {
+				overflow-wrap: break-word;
+				word-wrap: break-word;
+				-ms-word-break: break-all;
+				/* This is the dangerous one in WebKit, as it breaks things wherever */
+				word-break: break-all;
+				/* Instead use this non-standard one: */
+				word-break: break-word;
+				-ms-hyphens: auto;
+				-moz-hyphens: auto;
+				-webkit-hyphens: auto;
+				hyphens: auto;
 			}
 
 			a.button {
@@ -86,7 +118,11 @@
 						<td>
 							<div class="logo-container">
 								<a class="logo-link" href="/">
-									<img src="{{$message->embed(asset("img/" . config('gtcms.emailLogo')))}}" alt="{{config('gtcms.siteName')}}" />
+									@if (app()->environment() == 'localdev')
+										<img class="logo" width="150" src="{{$message->embed(asset("img/" . config('gtcms.emailLogo')))}}" alt="{{config('gtcms.siteName')}}" />
+									@else
+										<img class="logo" width="150" src="{{asset("img/" . config('gtcms.emailLogo'))}}" alt="{{config('gtcms.siteName')}}" />
+									@endif
 								</a>
 							</div>
 

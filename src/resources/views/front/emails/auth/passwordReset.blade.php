@@ -4,7 +4,7 @@
 	<h2>Password reset request</h2>
 
 	<p>
-		Hi {{$user->first_name}},
+		Hi {{$user->name}},
 	</p>
 
 	<p>
@@ -15,7 +15,7 @@
 		<a class="button" href="{{URL::route('passwordResetToken', ['token' => $token])}}">Reset password</a>
 	</div>
 
-	<p>
+	<p class="break-all">
 		Can't click the button? Here's the link:<br>
 		<a href="{{url()->route('passwordResetToken', ['token' => $token])}}">
 			{{url()->route('passwordResetToken', ['token' => $token])}}

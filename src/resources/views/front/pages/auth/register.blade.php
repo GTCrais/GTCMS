@@ -75,8 +75,8 @@
 					{{Form::open(['method' => 'post', 'url' => url()->route('submitRegistration')])}}
 
 					<div class="form-group">
-						{{Form::label('first_name', 'First name')}}
-						{{Form::text('first_name', null, ['class' => 'form-control', 'id' => 'first_name'])}}
+						{{Form::label('name', 'Name')}}
+						{{Form::text('name', null, ['class' => 'form-control', 'id' => 'name'])}}
 					</div>
 
 					<div class="form-group">

@@ -2,25 +2,26 @@
 
 namespace App\Classes;
 
+use App\Mail\ContactFormMessage;
+use App\Mail\PasswordReset;
+use App\Mail\SimpleMail;
+
 class Mailer
 {
 	public static function sendPasswordResetLink($user, $token) {
-		\Mail::send('front.emails.auth.passwordReset', ['user' => $user, 'token' => $token], function ($message) use ($user) {
-			$message->to($user->email)->subject(config('gtcms.siteName') . " - Password reset request");
-		});
+		\Mail::to($user)->send(new PasswordReset($user, $token));
 	}
 
 	public static function sendMessage($inputData)
 	{
-		$body = "
-			<strong>Name:</strong> " . \Html::entities($inputData['name']) . "<br>
-			<strong>Email:</strong> " . \Html::entities($inputData['email']) . "<br>
-			<strong>Subject:</strong> " . \Html::entities($inputData['subject']) . "<br>
-			<strong>Message:</strong><br>" . \Html::entities($inputData['message']);
+		$data = [
+			'name' => $inputData['name'],
+			'email' => $inputData['email'],
+			'messageSubject' => $inputData['subject'],
+			'messageContent' => $inputData['message']
+		];
 
-		\Mail::send('front.emails.simple', ['body' => $body], function ($message) {
-			$message->to(config('gtcms.adminEmail'))->subject(config('gtcms.siteName') . " - New message");
-		});
+		\Mail::to(config('gtcms.adminEmail'))->send(new ContactFormMessage($data));
 	}
 
 	public static function sendEmail($body, $email = false, $subject = false)
@@ -33,8 +34,6 @@ class Mailer
 			$subject = "[Testing email functionality]";
 		}
 
-		\Mail::send('front.emails.simple', ['body' => $body], function ($message) use ($email, $subject) {
-			$message->to($email)->subject($subject);
-		});
+		\Mail::to($email)->send(new SimpleMail($email, $subject, $body));
 	}
 }

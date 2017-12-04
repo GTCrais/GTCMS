@@ -20,7 +20,7 @@ class User extends BaseModel implements
 
 	protected $table = 'users';
 	protected $hidden = ['password', 'remember_token'];
-	protected $fillable = ['email', 'password', 'first_name', 'last_name', 'role', 'is_superadmin'];
+	protected $fillable = ['email', 'password', 'name', 'role', 'is_superadmin'];
 
 	public static function userList()
 	{
@@ -29,12 +29,7 @@ class User extends BaseModel implements
 
 	public function getRoleNameAttribute()
 	{
-		$userRoles = self::getUserRoles();
-		if (isset($userRoles[$this->role])) {
-			return $userRoles[$this->role];
-		}
-
-		return null;
+		return self::getUserRoles()[$this->role] ?? null;
 	}
 
 	public static function getUserRoles()
@@ -43,11 +38,6 @@ class User extends BaseModel implements
 			'user' => 'User',
 			'admin' => 'Administrator'
 		];
-	}
-
-	public function getFullNameAttribute()
-	{
-		return $this->first_name . " " . $this->last_name;
 	}
 
 	public function sendPasswordResetNotification($token)
