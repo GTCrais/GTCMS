@@ -88,10 +88,72 @@ function resetApp(soft) {
 	setNumericOnly();
 	setAutosize();
 	setIndexSelectAjaxUpdate();
+	setConditionInputs();
+	setConditionallyShownFields();
 }
 
 function getGtcmsPremium() {
 	return (typeof $gtcmsPremium === "undefined" || !$gtcmsPremium) ? false : true;
+}
+
+function setConditionInputs() {
+	if (typeof $conditionFields != 'undefined' && typeof $conditionallyShownFields != 'undefined') {
+		for (var prop in $conditionFields) {
+			var input = $('#' + prop);
+
+			input.off("change");
+			input.on("change", function() {
+				setConditionallyShownFields();
+			});
+		}
+	}
+}
+
+function setConditionallyShownFields() {
+	var input;
+	var val;
+
+	if (typeof $conditionFields != 'undefined' && typeof $conditionallyShownFields != 'undefined') {
+		var props = {};
+
+		for (var conditionProp in $conditionFields) {
+			input = $('#' + conditionProp);
+			val = null;
+
+			if (input.length) {
+				if (input.attr('type') == 'checkbox') {
+					val = input.prop('checked') ? 1 : 0;
+				}
+
+				if (input.prop('type') == 'select-one') {
+					val = input.val();
+				}
+
+				props[conditionProp] = val;
+			}
+		}
+
+		if (!$.isEmptyObject(props)) {
+			for (var conditionallyShownField in $conditionallyShownFields) {
+				var shown = true;
+
+				for (var conditionField in $conditionallyShownFields[conditionallyShownField]) {
+					if ($conditionallyShownFields[conditionallyShownField][conditionField].indexOf(props[conditionField]) === -1) {
+						shown = false;
+						break;
+					}
+				}
+
+				var container = $('#' + conditionallyShownField).closest('.form-group');
+
+				if (shown) {
+					container.removeClass('hidden');
+				} else {
+					container.addClass('hidden');
+				}
+			}
+		}
+	}
 }
 
 function setAutosize() {
@@ -958,6 +1020,59 @@ function setLinkHandling() {
 	});
 }
 
+function reloadRelatedModels(parentName, parentId, relatedContainerOrModelName, singleModel) {
+	var url = getCmsPrefix(true, true) + parentName + '/edit/' + parentId + '?' + window.location.search.substr(1);
+	var data = {
+		getIgnore_isAjax: true,
+		getIgnore_loadRelatedModels: true
+	};
+
+	if (singleModel) {
+		data.getIgnore_loadRelatedModel = relatedContainerOrModelName;
+	} else if (!relatedContainerOrModelName) {
+		relatedContainerOrModelName = $(".relatedModelsContainer");
+	}
+
+	$.ajax({
+		type: 'GET',
+		url: url,
+		data: data,
+		beforeSend: function(xhr){
+			xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+		},
+		success: function(data) {
+			if (data) {
+				if (data.success) {
+					if (data.replaceUrl) {
+						$linksEnabled = false;
+						History.replaceState(null, $adminTitle, data.replaceUrl);
+						$linksEnabled = true;
+					}
+
+					if (singleModel) {
+						$(".panel.relatedModel" + relatedContainerOrModelName).replaceWith(data.view);
+					} else {
+						relatedContainerOrModelName.replaceWith(data.view);
+					}
+
+					setupRepositioning();
+					setLinkHandling();
+				} else {
+
+				}
+			} else {
+				console.error("no data");
+			}
+		},
+		error: function(jqXHR, error, errorThrown) {
+			console.error("Status: " + jqXHR.status + "; Response text: " + jqXHR.responseText);
+		},
+		complete: function() {
+
+		}
+	});
+}
+
 function toggleNavigationSize() {
 	var body = $("body");
 
@@ -1604,6 +1719,10 @@ function setFormHandling() {
 										updatePaginationInfo(data);
 										setupEditFormInputs();
 										setFormHandling();
+									}
+
+									if (data.reloadRelated) {
+										reloadRelatedModels(data.reloadRelated.model, data.reloadRelated.id);
 									}
 								}
 							});

@@ -249,8 +249,8 @@ foreach ($formFields as $originalField) {
 		echo "<div class='{$formGroupClass} {$ctrlGroup} {$showEditIconClass}'>";
 
 		//label
-		$fieldRules = ModelConfig::rulesToString($field->rules);
-		if (strpos($fieldRules, 'required') !== false || (strpos($fieldRules, 'addRequired') !== false && !$object->id)) {
+		$fieldRules = ModelConfig::rulesToArray($field->rules);
+		if (in_array('required', $fieldRules) || (in_array('addRequired', $fieldRules) && !$object->id)) {
 			$field->label .= " *";
 		}
 
@@ -280,7 +280,7 @@ foreach ($formFields as $originalField) {
 			$fieldProperty = $field->property;
 			echo '<input type="hidden" value="0" name="' . $field->property . '">';
 			echo "<div class='checkbox'><label>";
-			echo Form::$type($field->property, 1, $originalValue);
+			echo Form::$type($field->property, 1, $originalValue, ['id' => $field->property]);
 			echo " " . $field->label . "</label></div>";
 
 			$showEditIcon = false;
@@ -500,3 +500,8 @@ if (!$hideSave) {
 	";
 }
 ?>
+
+<script>
+	$conditionFields = {!! json_encode($modelConfig->conditionFields) !!}
+	$conditionallyShownFields = {!! json_encode($modelConfig->conditionallyShownFields) !!}
+</script>

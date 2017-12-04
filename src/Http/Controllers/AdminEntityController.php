@@ -8,9 +8,11 @@ use App\Classes\AdminHistoryManager;
 use App\Classes\Dbar;
 use App\Classes\Front;
 use App\Classes\GtcmsPremium;
+use App\Classes\ModelConfig;
 use App\Classes\Tools;
 use App\Models\GtcmsSetting;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class AdminEntityController extends Controller
 {
@@ -105,14 +107,31 @@ class AdminEntityController extends Controller
 			$searchDataWithFieldValues = AdminHelper::getSearchData(self::$modelConfig, true);
 			$input = [];
 			AdminHelper::standaloneCheck(self::$modelConfig, 'index', $input);
-			$orderAndDirection = self::$modelConfig->getOrderParams();
-			$objects = $fullEntity::searchResultsEntities(self::$modelConfig)
+
+			$objectsQuery = $fullEntity::searchResultsEntities(self::$modelConfig)
 				->where(function ($query) {
 					if (self::$modelConfig->name == 'User' && !auth()->user()->is_superadmin) {
 						$query->where('is_superadmin', 0);
 					}
-				})->orderBy($orderAndDirection['orderBy'], $orderAndDirection['direction'])
-				->paginate(self::$modelConfig->perPage);
+				});
+
+			$countQuery = clone $objectsQuery;
+			$objectCount = $countQuery->count();
+
+			$orderAndDirection = self::$modelConfig->getOrderParams();
+			$page = filter_var($request->get('page'), FILTER_VALIDATE_INT) ?: 1;
+			$limit = self::$modelConfig->perPage;
+			$offset = ($page - 1) * $limit;
+
+			$objects = $objectsQuery
+				->orderBy($orderAndDirection['orderBy'], $orderAndDirection['direction'])
+				->limit($limit)
+				->offset($offset)
+				->get();
+
+			$objects = new LengthAwarePaginator($objects, $objectCount, $limit, $page, [
+				'path' => $request->url()
+			]);
 		}
 
 		$addEntity = true;
@@ -188,6 +207,10 @@ class AdminEntityController extends Controller
 
 	private function edit(Request $request, $id, $historyLink = false, $settings = false)
 	{
+		if ($request->get('getIgnore_loadRelatedModels')) {
+			return $this->loadRelatedModels($request, $id);
+		}
+
 		$ajaxRequest = $request->ajax() && $request->get('getIgnore_isAjax') ? true : false;
 
 		/** @var \App\Models\BaseModel $entity */
@@ -323,6 +346,86 @@ class AdminEntityController extends Controller
 		];
 
 		return response()->json($returnData);
+	}
+
+	public function loadRelatedModels(Request $request, $parentModelId)
+	{
+		$ajaxRequest = $request->ajax() && $request->get('getIgnore_isAjax') ? true : false;
+
+		if ($ajaxRequest) {
+			$data = [
+				'success' => true,
+				'view' => null
+			];
+
+			$parentModelClass = self::$entity;
+			$relatedModelClass = $request->get('getIgnore_loadRelatedModel');
+
+			try {
+				$modelConfig = AdminHelper::modelExists($parentModelClass);
+				$parentModel = ModelConfig::fullEntityName($parentModelClass);
+				$object = $parentModel::find($parentModelId);
+
+				if (!$object->isEditable()) {
+					session(['accessDenied' => true]);
+
+					return redirect()->route('restricted', ['getIgnore_isAjax' => $request->get('getIgnore_isAjax')]);
+				}
+
+				if (!$relatedModelClass) {
+					$view = view('gtcms.elements.editContentRelatedModels', [
+						'modelConfig' => $modelConfig,
+						'displayModel' => true,
+						'object' => $object,
+						'action' => 'edit',
+						'ignorePage' => true
+					])->render();
+
+					$data['view'] = $view;
+				} else {
+					$foundRelatedModelConfig = false;
+
+					foreach ($modelConfig->relatedModels as $relatedModel) {
+						if ($relatedModel->name == $relatedModelClass) {
+							$foundRelatedModelConfig = $relatedModel;
+							break;
+						}
+					}
+
+					if ($foundRelatedModelConfig) {
+						$view = view('gtcms.elements.editContentRelatedModel', [
+							'modelConfig' => $modelConfig,
+							'relatedModel' => $foundRelatedModelConfig,
+							'displayModel' => true,
+							'object' => $object,
+							'action' => 'edit',
+							'ignorePage' => true
+						])->render();
+
+						$data['view'] = $view;
+					} else {
+						$data['success'] = false;
+					}
+				}
+			} catch (\Exception $e) {
+				\Log::error($e);
+				$data['success'] = false;
+				$data['message'] = $e->getMessage();
+			}
+
+			if ($data['success'] && $modelConfig->relatedModels) {
+				$ignorePages = [];
+				foreach ($modelConfig->relatedModels as $relatedModelConfig) {
+					$ignorePages[$relatedModelConfig->name . "Page"] = null;
+				}
+
+				$data['replaceUrl'] = $request->url() . Tools::getGets($ignorePages);
+			}
+
+			return response()->json($data);
+		}
+
+		return redirect()->to(AdminHelper::getCmsPrefix());
 	}
 
 	private function delete(Request $request, $id)
@@ -469,6 +572,13 @@ class AdminEntityController extends Controller
 			$data['objectId'] = $object->id;
 
 			AdminHistoryManager::replaceAddLink($fullUrl, self::$modelConfig->name);
+		}
+
+		if (self::$modelConfig->reloadRelatedModelsOnSave && !$quickEdit) {
+			$data['reloadRelated'] = [
+				'model' => self::$modelConfig->name,
+				'id' => $object->id
+			];
 		}
 
 		return response()->json($data);

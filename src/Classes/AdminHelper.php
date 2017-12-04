@@ -388,6 +388,8 @@ class AdminHelper
 
 						if (self::fieldShouldBeUnsetFromInput($modelConfig, $field, $action, $user)) {
 							unset($input[$property]);
+						} else if (self::fieldShouldBeNulled($modelConfig, $field, $input, $value)) {
+							$value = null;
 						} else {
 							//format DateTime / Date
 							if (in_array($field->type, ['date', 'dateTime'])) {
@@ -406,11 +408,6 @@ class AdminHelper
 
 							if (!is_array($value) && !is_null($value)) {
 								$value = trim($value);
-							}
-
-							//set null when empty
-							if ($field->setNullWhenEmpty && !$value && $value !== 0 && $value !== "0") {
-								$value = null;
 							}
 						}
 					} else {
@@ -476,6 +473,23 @@ class AdminHelper
 			// unset property if it's only meant to be viewed by current user based on their role
 		} else if ($field->viewFieldForRoles && $field->viewFieldForRoles->$userRole) {
 			return true;
+		}
+
+		return false;
+	}
+
+	public static function fieldShouldBeNulled($modelConfig, $field, $input, $value)
+	{
+		if ($field->setNullWhenEmpty && !$value && $value !== 0 && $value !== "0") {
+			return true;
+		}
+
+		if (array_key_exists($field->property, $modelConfig->conditionallyShownFields)) {
+			foreach ($modelConfig->conditionallyShownFields[$field->property] as $conditionField => $values) {
+				if (!isset($input[$conditionField]) || !in_array($input[$conditionField], $values)) {
+					return true;
+				}
+			}
 		}
 
 		return false;

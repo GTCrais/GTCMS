@@ -35,7 +35,7 @@
 		</h3>
 	</div>
 
-	<div class="col-lg-{{$quickEdit ? '12' : '6'}}">
+	<div class="col-lg-{{$quickEdit ? '12' : ($modelConfig->editFormWidth ?? '6')}}">
 		<div class="globalMessages"></div>
 
 		<?php
