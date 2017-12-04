@@ -34,7 +34,7 @@ return [
 	'searchResultsForCriteria' => 'Search results for criteria',
 	'imageTooSmall' => 'Image is smaller than minimum required dimensions',
 	'clearSearch' => 'CLEAR',
-	'noRelatedModels' => 'This <strong>:modelName1</strong> nas no <strong>:modelName2</strong>',
+	'noRelatedModels' => 'This <strong>:modelName1</strong> has no <strong>:modelName2</strong>',
 	'controls' => 'Controls',
 	'excelExport' => 'Excel Export',
 	'from' => 'from',

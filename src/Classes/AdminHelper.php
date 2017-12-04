@@ -388,6 +388,8 @@ class AdminHelper
 
 						if (self::fieldShouldBeUnsetFromInput($modelConfig, $field, $action, $user)) {
 							unset($input[$property]);
+						} else if (self::fieldShouldBeNulled($modelConfig, $field, $input, $value)) {
+							$value = null;
 						} else {
 							//format DateTime / Date
 							if (in_array($field->type, ['date', 'dateTime'])) {
@@ -406,11 +408,6 @@ class AdminHelper
 
 							if (!is_array($value) && !is_null($value)) {
 								$value = trim($value);
-							}
-
-							//set null when empty
-							if ($field->setNullWhenEmpty && !$value && $value !== 0 && $value !== "0") {
-								$value = null;
 							}
 						}
 					} else {
@@ -453,8 +450,12 @@ class AdminHelper
 		if ($field->viewField) {
 			return true;
 
-			// unset property if it's supposed to be hidden for current action
+		// unset property if it's supposed to be hidden for current action
 		} else if ($field->hidden && $field->hidden->$action) {
+			return true;
+
+		// unset property if it's hidden for posted model key
+		} else if (self::fieldShouldBeRemovedForModelKey($field)) {
 			return true;
 		}
 
@@ -473,9 +474,45 @@ class AdminHelper
 		if ($field->restrictedAccess && !$field->restrictedAccess->$userRole) {
 			return true;
 
-			// unset property if it's only meant to be viewed by current user based on their role
+		// unset property if it's only meant to be viewed by current user based on their role
 		} else if ($field->viewFieldForRoles && $field->viewFieldForRoles->$userRole) {
 			return true;
+		}
+
+		return false;
+	}
+
+	public static function fieldShouldBeNulled($modelConfig, $field, $input = [], $value = null)
+	{
+		// set field to null if it's hidden for posted model key
+		if (self::fieldShouldBeRemovedForModelKey($field)) {
+			return true;
+		}
+
+		if ($field->setNullWhenEmpty && !$value && $value !== 0 && $value !== "0") {
+			return true;
+		}
+
+		if (array_key_exists($field->property, $modelConfig->conditionallyShownFields)) {
+			foreach ($modelConfig->conditionallyShownFields[$field->property] as $conditionField => $values) {
+				if (!isset($input[$conditionField]) || !in_array($input[$conditionField], $values)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public static function fieldShouldBeRemovedForModelKey($field)
+	{
+		if ($field->modelKey) {
+			$postedModelKey = request('model_key');
+			$modelKeys = self::objectToArray($field->modelKey);
+
+			if ($postedModelKey && !in_array($postedModelKey, $modelKeys)) {
+				return true;
+			}
 		}
 
 		return false;
@@ -570,7 +607,9 @@ class AdminHelper
 				}
 			} else if ($displayProperty->type == 'accessor') {
 				$method = $displayProperty->method;
-				if ($method == 'indexDate' && $export) {
+				if ($method == '{default}') {
+					$value = $object->defaultSelectListValue($field);
+				} else if ($method == 'indexDate' && $export) {
 					$value = $object->getIndexDateAttribute();
 				} else {
 					$value = $object->$method;
@@ -588,7 +627,7 @@ class AdminHelper
 				}
 			} else if (in_array($displayProperty->type, ['date', 'dateTime'])) {
 				$property = $field->property;
-				$value = $object->formatDate($object->$property, $displayProperty->dateFormat ? $displayProperty->dateFormat : $property->dateFormat);
+				$value = $object->formatDate($object->$property, $displayProperty->dateFormat ? $displayProperty->dateFormat : $field->dateFormat);
 			} else if ($displayProperty->type == 'file') {
 				$method = $displayProperty->method;
 				if ($object->$method('name')) {

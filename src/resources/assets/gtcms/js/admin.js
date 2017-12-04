@@ -88,10 +88,72 @@ function resetApp(soft) {
 	setNumericOnly();
 	setAutosize();
 	setIndexSelectAjaxUpdate();
+	setConditionInputs();
+	setConditionallyShownFields();
 }
 
 function getGtcmsPremium() {
 	return (typeof $gtcmsPremium === "undefined" || !$gtcmsPremium) ? false : true;
+}
+
+function setConditionInputs() {
+	if (typeof $conditionFields != 'undefined' && typeof $conditionallyShownFields != 'undefined') {
+		for (var prop in $conditionFields) {
+			var input = $('#' + prop);
+
+			input.off("change");
+			input.on("change", function() {
+				setConditionallyShownFields();
+			});
+		}
+	}
+}
+
+function setConditionallyShownFields() {
+	var input;
+	var val;
+
+	if (typeof $conditionFields != 'undefined' && typeof $conditionallyShownFields != 'undefined') {
+		var props = {};
+
+		for (var conditionProp in $conditionFields) {
+			input = $('#' + conditionProp);
+			val = null;
+
+			if (input.length) {
+				if (input.attr('type') == 'checkbox') {
+					val = input.prop('checked') ? 1 : 0;
+				}
+
+				if (input.prop('type') == 'select-one') {
+					val = input.val();
+				}
+
+				props[conditionProp] = val;
+			}
+		}
+
+		if (!$.isEmptyObject(props)) {
+			for (var conditionallyShownField in $conditionallyShownFields) {
+				var shown = true;
+
+				for (var conditionField in $conditionallyShownFields[conditionallyShownField]) {
+					if ($conditionallyShownFields[conditionallyShownField][conditionField].indexOf(props[conditionField]) === -1) {
+						shown = false;
+						break;
+					}
+				}
+
+				var container = $('#' + conditionallyShownField).closest('.form-group');
+
+				if (shown) {
+					container.removeClass('hidden');
+				} else {
+					container.addClass('hidden');
+				}
+			}
+		}
+	}
 }
 
 function setAutosize() {
@@ -907,7 +969,7 @@ function setBackAndForth() {
 }
 
 function setLinkHandling() {
-	var links = $("a:not(.standardLink):not([class*=phpdebugbar])");
+	var links = $("a:not(.standardLink):not(.sf-dump-ref):not(.sf-dump-toggle):not([class*=phpdebugbar])");
 
 	links.off("click");
 	links.on("click", function(e) {
@@ -954,6 +1016,59 @@ function setLinkHandling() {
 
 		} else {
 			return false;
+		}
+	});
+}
+
+function reloadRelatedModels(parentName, parentId, relatedContainerOrModelName, singleModel) {
+	var url = getCmsPrefix(true, true) + parentName + '/edit/' + parentId + '?' + window.location.search.substr(1);
+	var data = {
+		getIgnore_isAjax: true,
+		getIgnore_loadRelatedModels: true
+	};
+
+	if (singleModel) {
+		data.getIgnore_loadRelatedModel = relatedContainerOrModelName;
+	} else if (!relatedContainerOrModelName) {
+		relatedContainerOrModelName = $(".relatedModelsContainer");
+	}
+
+	$.ajax({
+		type: 'GET',
+		url: url,
+		data: data,
+		beforeSend: function(xhr){
+			xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+		},
+		success: function(data) {
+			if (data) {
+				if (data.success) {
+					if (data.replaceUrl) {
+						$linksEnabled = false;
+						History.replaceState(null, $adminTitle, data.replaceUrl);
+						$linksEnabled = true;
+					}
+
+					if (singleModel) {
+						$(".panel.relatedModel" + relatedContainerOrModelName).replaceWith(data.view);
+					} else {
+						relatedContainerOrModelName.replaceWith(data.view);
+					}
+
+					setupRepositioning();
+					setLinkHandling();
+				} else {
+
+				}
+			} else {
+				console.error("no data");
+			}
+		},
+		error: function(jqXHR, error, errorThrown) {
+			console.error("Status: " + jqXHR.status + "; Response text: " + jqXHR.responseText);
+		},
+		complete: function() {
+
 		}
 	});
 }
@@ -1075,93 +1190,93 @@ function handleDeleteLink(button) {
 
 			buttons.fadeOut(100).promise().done(function(){
 				spin($deleteSpinner);
-				spinnerTarget.fadeIn(250);
-			});
+				spinnerTarget.fadeIn(250).promise().done(function() {
+					$.ajax({
+						url: url,
+						type: 'GET',
+						data: {
+							getIgnore_isAjax: true
+						},
+						beforeSend: function(xhr){
+							xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+						},
+						success: function(data) {
+							//console.error(data);
+							if (data && data.success) {
+								spinnerTarget.fadeOut(100).promise().done(function(){
+									$deleteSpinner.stop();
+									successCheckmark.fadeIn(250).promise().done(function(){
+										if (button.hasClass('deleteUploadedFile')) {
+											modal.delay(500).fadeOut(150).promise().done(function() {
+												var parentContainer = button.parents("div.fileUploadContainer");
+												var uploadContainer = parentContainer.find('div.fileUploadForm');
+												var downloadContainer = parentContainer.find('div.fileDownloadContainer');
+												var hiddenInput = parentContainer.find('input[type="hidden"]');
 
-			$.ajax({
-				url: url,
-				type: 'GET',
-				data: {
-					getIgnore_isAjax: true
-				},
-				beforeSend: function(xhr){
-					xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
-				},
-				success: function(data) {
-					//console.error(data);
-					if (data && data.success) {
-						spinnerTarget.fadeOut(100).promise().done(function(){
-							$deleteSpinner.stop();
-							successCheckmark.fadeIn(250).promise().done(function(){
-								if (button.hasClass('deleteUploadedFile')) {
-									modal.delay(500).fadeOut(150).promise().done(function() {
-										var parentContainer = button.parents("div.fileUploadContainer");
-										var uploadContainer = parentContainer.find('div.fileUploadForm');
-										var downloadContainer = parentContainer.find('div.fileDownloadContainer');
-										var hiddenInput = parentContainer.find('input[type="hidden"]');
-
-										parentContainer.attr('data-filenamevalue', '');
-										hiddenInput.val("");
-										if (button.hasClass('deleteImageFile')) {
-											uploadContainer.find('div.imagePreview').html("");
-										}
-										uploadContainer.removeClass('hidden');
-										downloadContainer.addClass('hidden');
-										resetModalDelete(successCheckmark, errorMsg, buttons);
-									});
-								} else {
-									var parentTable = button.parents('table');
-									var buttonParent = button.parent('td').parent('tr');
-									var delRow;
-									if (parentTable.hasClass('hasTreeStructure')) {
-										//var rowContainer = $();
-										//delRow = rowContainer.add(buttonParent);
-										delRow = getChildRows(buttonParent);
-									} else {
-										delRow = buttonParent;
-									}
-
-									modal.delay(500).fadeOut(150).promise().done(function() {
-										//remove table rows
-										delRow.children('td, th')
-											.animate({
-												paddingTop: 0,
-												paddingBottom: 0
-											}, animationSpeed).wrapInner('<div />')
-											.children()
-											.slideUp(animationSpeed)
-											.promise().done(function () {
-												delRow.remove();
+												parentContainer.attr('data-filenamevalue', '');
+												hiddenInput.val("");
+												if (button.hasClass('deleteImageFile')) {
+													uploadContainer.find('div.imagePreview').html("");
+												}
+												uploadContainer.removeClass('hidden');
+												downloadContainer.addClass('hidden');
 												resetModalDelete(successCheckmark, errorMsg, buttons);
 											});
+										} else {
+											var parentTable = button.parents('table');
+											var buttonParent = button.parent('td').parent('tr');
+											var delRow;
+											if (parentTable.hasClass('hasTreeStructure')) {
+												//var rowContainer = $();
+												//delRow = rowContainer.add(buttonParent);
+												delRow = getChildRows(buttonParent);
+											} else {
+												delRow = buttonParent;
+											}
+
+											modal.delay(500).fadeOut(150).promise().done(function() {
+												//remove table rows
+												delRow.children('td, th')
+													.animate({
+														paddingTop: 0,
+														paddingBottom: 0
+													}, animationSpeed).wrapInner('<div />')
+													.children()
+													.slideUp(animationSpeed)
+													.promise().done(function () {
+														delRow.remove();
+														resetModalDelete(successCheckmark, errorMsg, buttons);
+													});
+											});
+										}
 									});
-								}
-							});
-						});
-					} else {
-						spinnerTarget.fadeOut(100).promise().done(function() {
-							$deleteSpinner.stop();
-							errorMsg.fadeIn(250).promise().done(function(){
-								modal.delay(5000).fadeOut(150).promise().done(function() {
-									resetModalDelete(successCheckmark, errorMsg, buttons);
+								});
+							} else {
+								spinnerTarget.fadeOut(100).promise().done(function() {
+									$deleteSpinner.stop();
+									errorMsg.fadeIn(250).promise().done(function(){
+										modal.delay(5000).fadeOut(150).promise().done(function() {
+											resetModalDelete(successCheckmark, errorMsg, buttons);
+										});
+									});
+								});
+							}
+						},
+						error: function() {
+							spinnerTarget.fadeOut(100).promise().done(function() {
+								$deleteSpinner.stop();
+								errorMsg.fadeIn(250).promise().done(function(){
+									modal.delay(5000).fadeOut(150).promise().done(function() {
+										resetModalDelete(successCheckmark, errorMsg, buttons);
+									});
 								});
 							});
-						});
-					}
-				},
-				error: function() {
-					spinnerTarget.fadeOut(100).promise().done(function() {
-						$deleteSpinner.stop();
-						errorMsg.fadeIn(250).promise().done(function(){
-							modal.delay(5000).fadeOut(150).promise().done(function() {
-								resetModalDelete(successCheckmark, errorMsg, buttons);
-							});
-						});
-					});
-				},
-				complete: function() {
+						},
+						complete: function() {
 
-				}
+						}
+					});
+				});
 			});
 		}
 	});
@@ -1604,6 +1719,10 @@ function setFormHandling() {
 										updatePaginationInfo(data);
 										setupEditFormInputs();
 										setFormHandling();
+									}
+
+									if (data.reloadRelated) {
+										reloadRelatedModels(data.reloadRelated.model, data.reloadRelated.id);
 									}
 								}
 							});

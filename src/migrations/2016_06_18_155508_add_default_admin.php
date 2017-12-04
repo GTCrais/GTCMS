@@ -15,8 +15,7 @@ class AddDefaultAdmin extends Migration
 		DB::table('users')->insert([
 			'email' => 'admin@site.com',
 			'password' => \Hash::make('admin'),
-			'first_name' => 'Admin',
-			'last_name' => 'Admin',
+			'name' => 'Admin',
 			'is_superadmin' => 1,
 			'role' => 'admin',
 			'created_at' => \Carbon\Carbon::now(),

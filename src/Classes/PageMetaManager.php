@@ -7,26 +7,17 @@ use App\Models\Page;
 class PageMetaManager
 {
 	public static $page = null;
-	public static $category = null;
-	public static $product = null;
-	public static $post = null;
+	public static $item = null;
 
 	public static function getMetaDescription()
 	{
-		if (self::$post) {
-			return strip_tags(self::$post->excerpt);
-		}
-
-		if (self::$category) {
-			return self::$category->meta_description ? self::$category->meta_description : self::getDefaultMeta('description');
-		}
-
-		if (self::$product) {
-			return self::$product->description;
+		if (self::$item) {
+			// requires Item to have 'metaDescription' accessor
+			return self::$item->metaDescription ?: self::getDefaultMeta('description');
 		}
 
 		if (self::$page) {
-			return self::$page->meta_description ? self::$page->meta_description : self::getDefaultMeta('description');
+			return self::$page->meta_description ?: self::getDefaultMeta('description');
 		}
 
 		return self::getDefaultMeta('description');
@@ -34,12 +25,9 @@ class PageMetaManager
 
 	public static function getMetaKeywords()
 	{
-		if (self::$category) {
-			return self::$category->meta_keywords ? self::$category->meta_keywords : self::getDefaultMeta('keywords');
-		}
-
-		if (self::$product) {
-			return "Default_String " . self::$product->name;
+		if (self::$item) {
+			// requires Item to have 'metaKeywords' accessor
+			return self::$item->metaKeywords ?: self::getDefaultMeta('keywords');
 		}
 
 		if (self::$page) {
@@ -53,13 +41,14 @@ class PageMetaManager
 	{
 		$title = config('gtcms.siteName');
 
-		if (self::$page) {
-			//$title = self::$page->name . " :: " . $title;
-			$title = $title . " :: " . self::$page->name;
+		if (self::$item) {
+			// requires Item to have 'metaTitle' accessor
+			return self::$item->metaTitle . " :: " . $title;
 		}
 
-		if (self::$post) {
-			$title = self::$post->title . " :: " . $title;
+		if (self::$page) {
+			// return $title = self::$page->name . " :: " . $title;
+			return $title = $title . " :: " . self::$page->name;
 		}
 
 		return $title;
@@ -89,18 +78,8 @@ class PageMetaManager
 		self::$page = $page;
 	}
 
-	public static function setCategory($category)
+	public static function setItem($item)
 	{
-		self::$category = $category;
-	}
-
-	public static function setProduct($product)
-	{
-		self::$product = $product;
-	}
-
-	public static function setPost($post)
-	{
-		self::$post = $post;
+		self::$item = $item;
 	}
 }

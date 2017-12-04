@@ -36,6 +36,8 @@ class ModelConfig
 	];
 	public $imageFields = [];
 	public $fileFields = [];
+	public $conditionFields = [];
+	public $conditionallyShownFields = [];
 	public $orderAndDirection = [];
 
 	protected static $faIconColors = null;
@@ -159,6 +161,12 @@ class ModelConfig
 		];
 		$requestOrderBy = request()->get('orderBy');
 		$requestOrderByAcceptable = false;
+
+		$allFields = [];
+
+		foreach ($this->formFields as $field) {
+			$allFields[$field->property] = $field;
+		}
 
 		foreach ($this->formFields as $field) {
 
@@ -293,6 +301,28 @@ class ModelConfig
 
 			if ($field->type == 'file') {
 				$this->fileFields[] = $field;
+			}
+
+			// Condition Fields
+
+			if ($field->showConditions) {
+				foreach ($field->showConditions as $conditionField => $values) {
+					if (in_array($allFields[$conditionField]->type, ['select', 'checkbox'])) {
+						if (!isset($this->conditionallyShownFields[$field->property])) {
+							$this->conditionallyShownFields[$field->property] = [];
+						}
+
+						$values = AdminHelper::objectToArray($values);
+
+						$this->conditionallyShownFields[$field->property][$conditionField] = $values;
+
+						if (!isset($this->conditionFields[$conditionField])) {
+							$this->conditionFields[$conditionField] = [];
+						}
+
+						$this->conditionFields[$conditionField][$field->property] = $values;
+					}
+				}
 			}
 
 			// Order By
@@ -454,6 +484,13 @@ class ModelConfig
 		$this->parseFormFields();
 
 		return $this->fileFields;
+	}
+
+	public function getConditionFields()
+	{
+		$this->parseFormFields();
+
+		return $this->conditionFields;
 	}
 
 	public function getOrderParams()

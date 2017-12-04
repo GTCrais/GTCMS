@@ -39,8 +39,7 @@ class GtcmsServiceProvider extends ServiceProvider
 			__DIR__ . '/Providers' => app_path('/Providers'),
 			__DIR__ . '/Traits' => app_path('/Traits'),
 
-			__DIR__ . '/views' => resource_path('/views'),
-			__DIR__ . '/lang' => resource_path('/lang'),
+			__DIR__ . '/resources' => resource_path(),
 
 			__DIR__ . '/assets' => public_path(),
 

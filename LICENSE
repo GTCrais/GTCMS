@@ -1,13 +1,14 @@
-GTCMS Basic license
+GTCMS Premium license
 
-Copyright (c) 2016 Tomislav Modrić, https://github.com/GTCrais, <tomislav@gtcrais.net>
+Copyright (c) 2016 Tomislav Modrić, https://github.com/GTCrais
 
 Summary
 
 - License does not expire
+- Unlimited number of projects
 - Software can be modified, distributed and / or sublicensed, as long as it is part of a larger work
 - Commercial use allowed
-- Attribution to software creator must be made as specified: Link to the GTCMS homepage (http://gtcms.createcsolutions.co) must be placed on the website
+- Use of Premium features allowed
 
 Terms and conditions
 
@@ -25,8 +26,8 @@ Licensor hereby grants Licensee a Sublicensable, Assignable, Perpetual, Commerci
     2.3. This license is granted perpetually, as long as you do not materially breach it.
     2.4. Assignable: Licensee may assign his rights and duties under this license as long as the party who Licensee assigns the license accepts the license in full, and provides Licensor with a written confirmation of Assignment
     2.5. Commercial, Royalty Free: Licensee may use Software for any purpose, including paid-services, without any royalties
-    2.6. Including the right to Distribute Derivative Works: Licensee may create and distribute derivative works based on Software (modified version of Software as part of larger work), including amending Software’s source code, modifying it, removing portions of Software, integrating it into a larger work, as long as credit to the Licensor is granted and that redistribution is made under the terms of this license.
-    2.7. With Attribution Requirements: Link to the GTCMS homepage (http://gtcms.createcsolutions.co) must be placed on the website
+    2.6. Including the right to Distribute Derivative Works: Licensee may create and distribute derivative works based on Software (modified version of Software as part of larger work), including amending Software’s source code, modifying it, removing portions of Software, integrating it into a larger work, as long as credit to the Licensor is granted and that redistribution is made under the terms of this license. Such redistribution shall not be limited to any number of codebases.
+    2.7. Including the right to use Premium features: Licensee may use GTCMS Premium features within the project licensed under GTCMS Premium license
     2.8. [Multi-]Site: Licensee may use Software on unlimited server[s] and unlimited website[s]
 
 3. Term & Termination
@@ -43,7 +44,7 @@ Software is provided under an AS-IS basis and without any support, updates or ma
 5. Liability
 To the extent permitted under Law, The Software is provided under an AS-IS basis. Licensor shall never, and without any limit, be liable for any damage, cost, expense or any other payment incurred by Licensee as a result of Software’s actions, failure, bugs and/or any other interaction between The Software and Licensee’s end-equipment, computers, other software or any 3rd party, end-equipment, computer or services. Moreover, Licensor shall never be liable for any defect in source code written by Licensee when relying on The Software or using The Software’s source code.
 
-6. Warranty 
+6. Warranty
     6.1. Intellectual Property: Licensor hereby warrants that The Software does not violate or infringe any 3rd party claims in regards to intellectual property, patents and/or trademarks and that to the best of its knowledge no legal action has been taken against it for any infringement or violation of any 3rd party intellectual property rights.
     6.2. No-Warranty: The Software is provided without any warranty; Licensor hereby disclaims any warranty that The Software shall be error free, without defects or code which may cause damage to Licensee’s computers or to Licensee, and that Software shall be functional. Licensee shall be solely liable to any damage, defect or loss incurred as a result of operating software and undertake the risks contained in running The Software on License’s Server[s] and Website[s].
     6.3. Prior Inspection: Licensee hereby states that he inspected The Software thoroughly and found it satisfactory and adequate to his needs, that it does not interfere with his regular operation and that it does meet the standards and scope of his computer systems and architecture. Licensee found that The Software interacts with his development, website and server environment and that it does not infringe any of End User License Agreement of any software Licensee may use in performing his services. Licensee hereby waives any claims regarding The Software's incompatibility, performance, results and features, and warrants that he inspected the The Software.
@@ -53,4 +54,3 @@ Licensee hereby warrants to hold Licensor harmless and indemnify Licensor for an
 
 8. Governing Law, Jurisdiction
 Licensee hereby agrees not to initiate class-action lawsuits against Licensor in relation to this license and to compensate Licensor for any legal fees, cost or attorney fees should any claim brought by Licensee against Licensor be denied, in part or in full.
-

@@ -111,10 +111,15 @@ class AdminController extends Controller
 		if ($user) {
 			$userRole = $user->role;
 			$modelConfig = AdminHelper::modelExists($defaultModel);
-			if ($modelConfig->restrictedAccess && !$modelConfig->restrictedAccess->$userRole) {
+			if (($modelConfig->restrictedAccess && !$modelConfig->restrictedAccess->$userRole) ||
+				($modelConfig->restrictedToSuperadmin && !$user->is_superadmin)
+			) {
 				$modelConfigs = AdminHelper::modelConfigs();
 				foreach ($modelConfigs as $cModelConfig) {
-					if ($cModelConfig->standalone !== false && (!$cModelConfig->restrictedAccess || $cModelConfig->restrictedAccess->$userRole)) {
+					if ($cModelConfig->standalone !== false &&
+						(!$cModelConfig->restrictedAccess || $cModelConfig->restrictedAccess->$userRole) &&
+						(!$cModelConfig->restrictedToSuperadmin || $user->is_superadmin))
+					{
 						return $cModelConfig->name;
 					}
 				}

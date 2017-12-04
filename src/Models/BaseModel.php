@@ -438,6 +438,21 @@ class BaseModel extends \Eloquent
 		return true;
 	}
 
+	public static function defaultModelList($params)
+	{
+		$params = explode('|', trim($params, '{}'));
+
+		return self::pluck($params[0], $params[1]);
+	}
+
+	public function defaultSelectListValue($field)
+	{
+		$property = $field->property;
+		$list = $field->selectType->listMethod;
+
+		return static::$list()[$this->$property] ?? null;
+	}
+
 	public function image($urlOrName = 'url', $folder = 'original', $imageProperty = 'imagename', $filenameValue = false)
 	{
 		$filenameValue = $this->$imageProperty ? $this->$imageProperty : $filenameValue;
