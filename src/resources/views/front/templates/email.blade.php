@@ -4,6 +4,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
+		<link href="https://fonts.googleapis.com/css?family=Raleway:400,600" rel="stylesheet">
+
 		<style>
 			body {
 				margin: 0;
@@ -41,17 +43,17 @@
 			.logo {
 				display: block;
 				margin: 0 auto;
-				width: 310px !important;
+				width: 200px !important; /* Increase if needed */
 				max-width: 100% !important;
 			}
 
 			@media screen and (max-width: 400px) {
 				.logo-container {
-					width: 250px;
+					width: 150px; /* MAX: 250px */
 				}
 
 				.logo {
-					width: 250px !important;
+					width: 150px !important; /* MAX: 250px */
 				}
 			}
 
@@ -117,9 +119,9 @@
 							<div class="logo-container">
 								<a class="logo-link" href="/">
 									@if (app()->environment() == 'localdev')
-										<img class="logo" width="250" src="{{$message->embed(asset("img/" . config('gtcms.emailLogo')))}}" alt="{{config('gtcms.siteName')}}" />
+										<img class="logo" width="150" src="{{$message->embed(asset("img/" . config('gtcms.emailLogo')))}}" alt="{{config('gtcms.siteName')}}" />
 									@else
-										<img class="logo" width="250" src="{{asset("img/" . config('gtcms.emailLogo'))}}" alt="{{config('gtcms.siteName')}}" />
+										<img class="logo" width="150" src="{{asset("img/" . config('gtcms.emailLogo'))}}" alt="{{config('gtcms.siteName')}}" />
 									@endif
 								</a>
 							</div>
