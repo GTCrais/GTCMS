@@ -4,7 +4,7 @@
 	<h2>Password reset request</h2>
 
 	<p>
-		Hi {{$user->first_name}},
+		Hi {{$user->name}},
 	</p>
 
 	<p>

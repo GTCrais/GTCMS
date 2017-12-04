@@ -243,21 +243,8 @@ return [
 					'table' => true,
 				],
 				[
-					'property' => 'first_name',
-					'label' => 'First Name',
-					'type' => 'text',
-					'rules' => 'required',
-					'table' => true,
-					'order' => true,
-					'search' => [
-						'type' => 'standard',
-						'match' => 'pattern'
-					],
-					'excelExport' => true
-				],
-				[
-					'property' => 'last_name',
-					'label' => 'Last Name',
+					'property' => 'name',
+					'label' => 'Name',
 					'type' => 'text',
 					'rules' => 'required',
 					'table' => true,

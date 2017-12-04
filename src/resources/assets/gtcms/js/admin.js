@@ -1190,93 +1190,93 @@ function handleDeleteLink(button) {
 
 			buttons.fadeOut(100).promise().done(function(){
 				spin($deleteSpinner);
-				spinnerTarget.fadeIn(250);
-			});
+				spinnerTarget.fadeIn(250).promise().done(function() {
+					$.ajax({
+						url: url,
+						type: 'GET',
+						data: {
+							getIgnore_isAjax: true
+						},
+						beforeSend: function(xhr){
+							xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
+						},
+						success: function(data) {
+							//console.error(data);
+							if (data && data.success) {
+								spinnerTarget.fadeOut(100).promise().done(function(){
+									$deleteSpinner.stop();
+									successCheckmark.fadeIn(250).promise().done(function(){
+										if (button.hasClass('deleteUploadedFile')) {
+											modal.delay(500).fadeOut(150).promise().done(function() {
+												var parentContainer = button.parents("div.fileUploadContainer");
+												var uploadContainer = parentContainer.find('div.fileUploadForm');
+												var downloadContainer = parentContainer.find('div.fileDownloadContainer');
+												var hiddenInput = parentContainer.find('input[type="hidden"]');
 
-			$.ajax({
-				url: url,
-				type: 'GET',
-				data: {
-					getIgnore_isAjax: true
-				},
-				beforeSend: function(xhr){
-					xhr.setRequestHeader('X-CSRF-TOKEN', $csrf);
-				},
-				success: function(data) {
-					//console.error(data);
-					if (data && data.success) {
-						spinnerTarget.fadeOut(100).promise().done(function(){
-							$deleteSpinner.stop();
-							successCheckmark.fadeIn(250).promise().done(function(){
-								if (button.hasClass('deleteUploadedFile')) {
-									modal.delay(500).fadeOut(150).promise().done(function() {
-										var parentContainer = button.parents("div.fileUploadContainer");
-										var uploadContainer = parentContainer.find('div.fileUploadForm');
-										var downloadContainer = parentContainer.find('div.fileDownloadContainer');
-										var hiddenInput = parentContainer.find('input[type="hidden"]');
-
-										parentContainer.attr('data-filenamevalue', '');
-										hiddenInput.val("");
-										if (button.hasClass('deleteImageFile')) {
-											uploadContainer.find('div.imagePreview').html("");
-										}
-										uploadContainer.removeClass('hidden');
-										downloadContainer.addClass('hidden');
-										resetModalDelete(successCheckmark, errorMsg, buttons);
-									});
-								} else {
-									var parentTable = button.parents('table');
-									var buttonParent = button.parent('td').parent('tr');
-									var delRow;
-									if (parentTable.hasClass('hasTreeStructure')) {
-										//var rowContainer = $();
-										//delRow = rowContainer.add(buttonParent);
-										delRow = getChildRows(buttonParent);
-									} else {
-										delRow = buttonParent;
-									}
-
-									modal.delay(500).fadeOut(150).promise().done(function() {
-										//remove table rows
-										delRow.children('td, th')
-											.animate({
-												paddingTop: 0,
-												paddingBottom: 0
-											}, animationSpeed).wrapInner('<div />')
-											.children()
-											.slideUp(animationSpeed)
-											.promise().done(function () {
-												delRow.remove();
+												parentContainer.attr('data-filenamevalue', '');
+												hiddenInput.val("");
+												if (button.hasClass('deleteImageFile')) {
+													uploadContainer.find('div.imagePreview').html("");
+												}
+												uploadContainer.removeClass('hidden');
+												downloadContainer.addClass('hidden');
 												resetModalDelete(successCheckmark, errorMsg, buttons);
 											});
+										} else {
+											var parentTable = button.parents('table');
+											var buttonParent = button.parent('td').parent('tr');
+											var delRow;
+											if (parentTable.hasClass('hasTreeStructure')) {
+												//var rowContainer = $();
+												//delRow = rowContainer.add(buttonParent);
+												delRow = getChildRows(buttonParent);
+											} else {
+												delRow = buttonParent;
+											}
+
+											modal.delay(500).fadeOut(150).promise().done(function() {
+												//remove table rows
+												delRow.children('td, th')
+													.animate({
+														paddingTop: 0,
+														paddingBottom: 0
+													}, animationSpeed).wrapInner('<div />')
+													.children()
+													.slideUp(animationSpeed)
+													.promise().done(function () {
+														delRow.remove();
+														resetModalDelete(successCheckmark, errorMsg, buttons);
+													});
+											});
+										}
 									});
-								}
-							});
-						});
-					} else {
-						spinnerTarget.fadeOut(100).promise().done(function() {
-							$deleteSpinner.stop();
-							errorMsg.fadeIn(250).promise().done(function(){
-								modal.delay(5000).fadeOut(150).promise().done(function() {
-									resetModalDelete(successCheckmark, errorMsg, buttons);
+								});
+							} else {
+								spinnerTarget.fadeOut(100).promise().done(function() {
+									$deleteSpinner.stop();
+									errorMsg.fadeIn(250).promise().done(function(){
+										modal.delay(5000).fadeOut(150).promise().done(function() {
+											resetModalDelete(successCheckmark, errorMsg, buttons);
+										});
+									});
+								});
+							}
+						},
+						error: function() {
+							spinnerTarget.fadeOut(100).promise().done(function() {
+								$deleteSpinner.stop();
+								errorMsg.fadeIn(250).promise().done(function(){
+									modal.delay(5000).fadeOut(150).promise().done(function() {
+										resetModalDelete(successCheckmark, errorMsg, buttons);
+									});
 								});
 							});
-						});
-					}
-				},
-				error: function() {
-					spinnerTarget.fadeOut(100).promise().done(function() {
-						$deleteSpinner.stop();
-						errorMsg.fadeIn(250).promise().done(function(){
-							modal.delay(5000).fadeOut(150).promise().done(function() {
-								resetModalDelete(successCheckmark, errorMsg, buttons);
-							});
-						});
-					});
-				},
-				complete: function() {
+						},
+						complete: function() {
 
-				}
+						}
+					});
+				});
 			});
 		}
 	});
