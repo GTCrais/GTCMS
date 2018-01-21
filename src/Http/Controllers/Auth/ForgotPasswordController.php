@@ -66,7 +66,7 @@ class ForgotPasswordController extends Controller
 
 		$validator = \Validator::make($request->all(), $rules);
 		if ($validator->fails()) {
-			$message = "Incorrect email format.";
+			$message = $validator->messages()->first();
 
 			if ($attemptsMessage) {
 				$message .= "<br>" . $attemptsMessage;

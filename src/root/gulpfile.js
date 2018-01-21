@@ -104,7 +104,7 @@ gulp.task('minifyAdminJs', function(cb) {
 });
 
 gulp.task('watch', function() {
-	gulp.watch('public/css/style.styl', ['frontStyle']);
+	gulp.watch('resources/assets/css/style.styl', ['frontStyle']);
 	gulp.watch('resources/assets/gtcms/css/style.styl', ['adminStyle']);
 	gulp.watch([
 		'resources/assets/gtcms/js/admin.js',

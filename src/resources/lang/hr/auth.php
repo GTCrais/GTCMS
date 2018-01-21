@@ -15,6 +15,6 @@ return [
 
 	'failed' => 'Netočni podaci za prijavu.',
 	'throttle' => 'Previše neuspjelih pokušaja. Pokušajte ponovo za :seconds sekundi.',
-	'attemptsLeft' => '{1} Imate još :attemptsLeft pokušaj.|[2,Inf] Imate još :attemptsLeft pokušaja.',
+	'attemptsLeft' => '{1} Imate još :attemptsLeft pokušaj.|[2,*] Imate još :attemptsLeft pokušaja.',
 
 ];
