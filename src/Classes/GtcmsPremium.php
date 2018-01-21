@@ -309,7 +309,7 @@ class GtcmsPremium
 					$langDependentPropertyFieldArray = $modelConfig->langDependentPropertyFieldArray;
 
 					if ($modelConfig->generateSlug && $modelConfig->langDependentSlug) {
-						$langDependentPropertyFieldArray[] = 'slug';
+						$langDependentPropertyFieldArray['slug'] = [];
 					}
 
 					if (array_key_exists($key, $langDependentPropertyFieldArray)) {

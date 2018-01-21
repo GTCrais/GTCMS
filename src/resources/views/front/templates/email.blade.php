@@ -118,7 +118,7 @@
 						<td>
 							<div class="logo-container">
 								<a class="logo-link" href="/">
-									@if (app()->environment() == 'localdev')
+									@if (app()->environment() != 'localdev')
 										<img class="logo" width="150" src="{{$message->embed(asset("img/" . config('gtcms.emailLogo')))}}" alt="{{config('gtcms.siteName')}}" />
 									@else
 										<img class="logo" width="150" src="{{asset("img/" . config('gtcms.emailLogo'))}}" alt="{{config('gtcms.siteName')}}" />

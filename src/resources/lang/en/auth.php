@@ -15,6 +15,6 @@ return [
 
 	'failed' => 'These credentials do not match our records.',
 	'throttle' => 'Too many attempts. Please try again in :seconds seconds.',
-	'attemptsLeft' => '{1} :attemptsLeft attempt left.|[2,Inf] :attemptsLeft attempts left.',
+	'attemptsLeft' => '{1} :attemptsLeft attempt left.|[2,*] :attemptsLeft attempts left.',
 
 ];

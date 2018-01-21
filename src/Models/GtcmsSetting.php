@@ -30,4 +30,9 @@ class GtcmsSetting extends BaseModel
 
 		return null;
 	}
+
+	public static function setValue($settingKey, $settingValue)
+	{
+		self::where('setting_key', $settingKey)->update(['setting_value' => $settingValue]);
+	}
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Classes\Dbar;
 use App\Classes\Mailer;
+use App\Mail\SimpleMail;
 use Illuminate\Http\Request;
 
 class ContactController extends Controller
@@ -83,6 +84,17 @@ class ContactController extends Controller
 
 			return "Error while sending test email: " . $e->getMessage();
 		}
+	}
+
+	public function previewEmail(Request $request)
+	{
+		if (auth()->guest() || !auth()->user()->is_superadmin) {
+			abort(404);
+		}
+
+		$body = view()->make('front.emails.test.testContent')->render();
+
+		return new SimpleMail(config('gtcms.adminEmail'), 'Preview Email', $body);
 	}
 
 	protected function returnData($data)
