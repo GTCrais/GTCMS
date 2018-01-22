@@ -9,7 +9,6 @@
             "email": "modric.tomislav@gmail.com"
         }
     ],
-    "license": "GTCMS Basic license",
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
