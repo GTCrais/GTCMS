@@ -66,6 +66,11 @@ class Front
 				$addUrl = "javascript:;";
 			}
 
+			if (!$object->isAddable()) {
+				$addDisabled = "disabled";
+				$addUrl = "javascript:;";
+			}
+
 			$hasChildren = false;
 			if ($modelConfig->children) {
 				$method = $objectChildren->method;
@@ -624,7 +629,11 @@ class Front
 						// instead of just the ones a particular object would return
 						// This method must be declared in Related Model Class
 
-						$list = $selectModel::$listMethod();
+						if (preg_match('/^\{.*\}$/', $listMethod)) {
+							$list = $selectModel::defaultModelList($listMethod);
+						} else {
+							$list = $selectModel::$listMethod();
+						}
 					}
 				} else if ($field->selectType->type == 'list') {
 					$entity = $modelConfig->myFullEntityName();

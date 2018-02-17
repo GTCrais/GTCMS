@@ -299,6 +299,11 @@ class GtcmsPremium
 					$modelConfig = BaseModel::$modelConfigs[$entity];
 				} else {
 					$modelConfig = AdminHelper::modelExists($entity);
+
+					if (!$modelConfig) {
+						Dbar::log("No Model config for entity: " . $entity);
+					}
+
 					BaseModel::$modelConfigs[$modelConfig->name] = $modelConfig;
 				}
 

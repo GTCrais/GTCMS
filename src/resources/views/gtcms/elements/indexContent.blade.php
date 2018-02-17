@@ -35,6 +35,8 @@
 			@if (config('gtcms.premium') && $modelConfig->getFormFields('excelExport', ['count' => true]) && $objects->count())
 			<a href="{{AdminHelper::getCmsPrefix()}}excelExport/{{$modelConfig->name . Tools::getGets()}}" class="btn btn-primary btn-sm excelExport standardLink"><i class="fa fa-download"></i> {{trans('gtcms.excelExport')}}</a>
 			@endif
+
+			<div class="cBoth"></div>
 		</div>
 @endif
 

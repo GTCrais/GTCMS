@@ -1,5 +1,15 @@
 <?php
 
+$displayModel = true;
+if ($modelConfig->reverseConstrainingModels) {
+	foreach ($modelConfig->reverseConstrainingModels as $constraint) {
+		if (method_exists($object, $constraint) && $object->$constraint->count()) {
+			$displayModel = false;
+			break;
+		}
+	}
+}
+
 $method = $relatedModel->method;
 $relatedModelConfig = AdminHelper::modelExists($relatedModel->name);
 
@@ -15,18 +25,11 @@ if (config('gtcms.premium')) {
 ?>
 
 <div class="panel panel-default relatedModel{{$relatedModelConfig->name}}">
-	@if (in_array($relatedModelConfig->name, ['AppLog', 'DbBackup', 'AppLogEntry']))
-		<div class="panel-heading">
-			<h4 class="modelName">{{$relatedModelConfig->hrNamePlural}}</h4>
-		</div>
-	@endif
-
 
 	<div class="panel-body">
 		<?php
 		// --------------- EXCEPTIONS ----------------
 		$addObject = true;
-		$showHeader = false;
 
 		$relatedClassName = $relatedModelConfig->myFullEntityName();
 
@@ -34,50 +37,13 @@ if (config('gtcms.premium')) {
 			$addObject = false;
 		}
 
-		if ($addObject || in_array($relatedModelConfig->name, ['AppLog', 'DbBackup'])) {
-			$showHeader = true;
-		}
-
 		?>
-		@if ($showHeader)
+
+		@if ($addObject)
 			<div class="indexTableHeader sideTableHeader">
-				@if ($addObject)
-					<a href="{{AdminHelper::getCmsPrefix() . $relatedModelConfig->name}}/add{{$gets}}&addToParent=true" class="btn btn-primary btn-sm addRelatedObject">
-						<i class="fa fa-plus-circle"></i> {{$relatedModelConfig->hrName}}
-					</a>
-				@endif
-
-				@if ($relatedModel->name == 'AppLog')
-					<a href="{{url()->route('initialLogsRequest', ['applicationId' => $object->id ?: 'new_gtcms_entry'])}}"
-					   class="btn btn-primary btn-sm appRequest makeInitialRequest {{$object->canMakeInitialLogsRequest() ? '' : 'hidden'}}"
-					>
-						<i class="fa fa-plus-circle"></i> Initial Logs check
-						<div class="buttonSpinner"></div>
-					</a>
-
-					<a href="{{url()->route('scheduleNextLogsRequest', ['applicationId' => $object->id ?: 'new_gtcms_entry'])}}"
-					   class="btn btn-primary btn-sm appRequest scheduleNextLogsCheck {{$object->canScheduleNextLogsRequest() ? '' : 'hidden'}}"
-					>
-						<i class="fa fa-plus-circle"></i> Schedule next Logs check
-						<div class="buttonSpinner"></div>
-					</a>
-				@endif
-
-				@if ($relatedModel->name == 'DbBackup')
-					<a href="{{url()->route('initialDatabaseBackup', ['applicationId' => $object->id ?: 'new_gtcms_entry'])}}"
-					   class="btn btn-primary btn-sm appRequest makeInitialRequest {{$object->canMakeInitialDbBackupRequest() ? '' : 'hidden'}}"
-						>
-						<i class="fa fa-plus-circle"></i> Initial Database backup
-						<div class="buttonSpinner"></div>
-					</a>
-
-					<a href="{{url()->route('scheduleDatabaseBackup', ['applicationId' => $object->id ?: 'new_gtcms_entry'])}}"
-					   class="btn btn-primary btn-sm appRequest scheduleNextLogsCheck {{$object->canScheduleNextDbBackupRequest() ? '' : 'hidden'}}"
-						>
-						<i class="fa fa-plus-circle"></i> Schedule next Database backup
-						<div class="buttonSpinner"></div>
-					</a>
-				@endif
+				<a href="{{AdminHelper::getCmsPrefix() . $relatedModelConfig->name}}/add{{$gets}}&addToParent=true" class="btn btn-primary btn-sm addRelatedObject">
+					<i class="fa fa-plus-circle"></i> {{$relatedModelConfig->hrName}}
+				</a>
 			</div>
 		@endif
 

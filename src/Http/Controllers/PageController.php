@@ -50,6 +50,11 @@ class PageController extends Controller
 		}
 	}
 
+	public function show404()
+	{
+		abort(404);
+	}
+
 	public function sitemap(Request $request)
 	{
 		$pages = Page::orderBy('depth')->orderBy('position')->get();

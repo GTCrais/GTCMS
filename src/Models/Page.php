@@ -19,11 +19,7 @@ class Page extends BaseModel
 
 	public function getUrlAttribute()
 	{
-		$defaultLocale = config('gtcmslang.defaultLocale');
-		$propertyName = config('gtcms.premium') && config('gtcmslang.siteIsMultilingual') ? "slug_" . app()->getLocale() : "slug";
-		$langPrefix = app()->getLocale() == $defaultLocale ? '' : "/" . app()->getLocale();
-
-		return rtrim(request()->root() . $langPrefix . "/" . $this->$propertyName, "/");
+		return route('default') . '/' . $this->slug;
 	}
 
 	public static function getPageKeyList()

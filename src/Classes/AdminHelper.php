@@ -469,6 +469,7 @@ class AdminHelper
 		}
 
 		$userRole = $user && $user->role ? $user->role : "gtcms_undefined_user_role";
+		$superadmin = $user && $user->is_superadmin;
 
 		// unset property if user isn't allowed to edit it
 		if ($field->restrictedAccess && !$field->restrictedAccess->$userRole) {
@@ -476,6 +477,10 @@ class AdminHelper
 
 		// unset property if it's only meant to be viewed by current user based on their role
 		} else if ($field->viewFieldForRoles && $field->viewFieldForRoles->$userRole) {
+			return true;
+
+		// unset property if it's only meant to be viewed by superadmin and current user isn't superadmin
+		} else if ($field->viewFieldUnlessSuperadmin && !$superadmin) {
 			return true;
 		}
 

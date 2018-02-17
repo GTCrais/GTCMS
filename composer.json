@@ -16,12 +16,12 @@
         }
     },
     "require": {
-        "laravelcollective/html": "5.5.*",
+        "laravelcollective/html": "^5.6",
         "barryvdh/laravel-debugbar": "^3.1",
-        "intervention/image": "2.4.1",
-        "doctrine/dbal": "2.6.2",
-        "mk-j/php_xlsxwriter": "0.35",
-        "unisharp/laravel-filemanager": "1.8.1"
+        "intervention/image": "^2.4",
+        "doctrine/dbal": "^2.6",
+        "mk-j/php_xlsxwriter": "^0.37.0",
+        "unisharp/laravel-filemanager": "^1.8"
     },
     "extra": {
         "laravel": {
