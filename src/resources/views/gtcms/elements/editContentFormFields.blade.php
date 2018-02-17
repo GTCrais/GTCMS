@@ -109,8 +109,12 @@ foreach ($formFields as $originalField) {
 		}
 
 		$role = auth()->user()->role;
+		$superAdmin = auth()->user()->is_superadmin;
 
-		if ($field->viewField || ($field->viewFieldForRoles && $field->viewFieldForRoles->$role)) {
+		if ($field->viewField ||
+			($field->viewFieldForRoles && $field->viewFieldForRoles->$role) ||
+			($field->viewFieldUnlessSuperadmin && !$superAdmin)
+		) {
 
 			try {
 				$label = AdminHelper::getModelConfigFieldValue($modelConfig, clone $field, $object, $trueCurrentLanguage, true);

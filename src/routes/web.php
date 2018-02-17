@@ -32,6 +32,6 @@ Route::post('password-reset/new-password', ['as' => 'submitNewPassword', 'uses' 
 Route::post('/send-message', ['as' => 'sendQuery', 'uses' => 'ContactController@handler']);
 
 Route::get('/', ['as' => 'home', 'uses' => 'PageController@showPage']);
-Route::get('{segments}', 'PageController@showPage')->where('segments', '(.*)');
+Route::get('{segments?}', ['as' => 'default', 'uses' => 'PageController@showPage'])->where('segments', '(.*)');
 
 Route::post('{segments}', 'PageController@show404')->where('segments', '(.*)');

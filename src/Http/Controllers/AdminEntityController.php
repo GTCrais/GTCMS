@@ -330,7 +330,7 @@ class AdminEntityController extends Controller
 		$configInParent = $object->relatedModelConfiguration($relatedModelConfig->name);
 		$method = $configInParent->method;
 
-		$relatedObjects = $object->$method()->orderBy($configInParent->orderBy, $configInParent->direction)->paginate($configInParent->perPage, ['*'], $configInParent->name . "Page");;
+		$relatedObjects = $object->$method()->orderBy($configInParent->orderBy, $configInParent->direction)->paginate($configInParent->perPage, ['*'], $configInParent->name . "Page");
 		$objectsView = Front::drawObjectTable($relatedObjects, $relatedModelConfig, 'sideTable', [
 			'parentIdProperty' => self::$modelConfig->id,
 			'parentIdValue' => $object->id,

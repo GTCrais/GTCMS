@@ -50,7 +50,13 @@ class Handler extends ExceptionHandler
 	public function render($request, Exception $exception)
 	{
 		if ($exception instanceof \Illuminate\Session\TokenMismatchException) {
-			$ajaxRequest = $request->ajax() && $request->get('getIgnore_isAjax') ? true : false;
+
+			if (!config('gtcms.cmsPrefix') || $request->segment(1) == config('gtcms.cmsPrefix')) {
+				$ajaxRequest = $request->ajax() && $request->get('getIgnore_isAjax') ? true : false;
+			} else {
+				$ajaxRequest = $request->ajax();
+			}
+
 			$message = "Your session has expired. Please refresh the page and try again.";
 
 			if ($ajaxRequest) {

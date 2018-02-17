@@ -4,7 +4,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-		<link href="https://fonts.googleapis.com/css?family=Raleway:400,600" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Raleway:400,600&amp;subset=latin-ext" rel="stylesheet">
 
 		<style>
 			body {
@@ -25,6 +25,7 @@
 				color: #686868;
 				border-collapse: collapse;
 				width: 100%;
+				line-height: 24px;
 			}
 
 			p {
@@ -117,7 +118,7 @@
 					<tr>
 						<td>
 							<div class="logo-container">
-								<a class="logo-link" href="/">
+								<a class="logo-link" href="{{ route('home') }}">
 									@if (app()->environment() != 'localdev')
 										<img class="logo" width="150" src="{{$message->embed(asset("img/" . config('gtcms.emailLogo')))}}" alt="{{config('gtcms.siteName')}}" />
 									@else
