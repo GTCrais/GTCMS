@@ -16,7 +16,7 @@ trait RequestThrottler
 	{
 		$request->hasTooManyAttempts = false;
 
-		if ($this->hasTooManyAttempts($request, $this->maxAttempts, $this->lockoutDuration)) {
+		if ($this->hasTooManyAttempts($request, $this->maxAttempts)) {
 			$errorMessage = trans('auth.throttle', ['seconds' => $this->availableIn($this->throttleKey($request))]);
 			$request->hasTooManyAttempts = true;
 
@@ -39,7 +39,7 @@ trait RequestThrottler
 		return $errorMessage;
 	}
 
-	protected function hasTooManyAttempts($requestOrKey, $maxAttempts, $lockoutDuration)
+	protected function hasTooManyAttempts($requestOrKey, $maxAttempts)
 	{
 		if ($requestOrKey instanceof Request) {
 			$key = $this->throttleKey($requestOrKey);
@@ -48,7 +48,7 @@ trait RequestThrottler
 		}
 
 		return $this->limiter()->tooManyAttempts(
-			$key, $maxAttempts, $lockoutDuration
+			$key, $maxAttempts
 		);
 	}
 
