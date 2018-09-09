@@ -16,11 +16,11 @@ class CreatePagesTable extends Migration
 			$table->increments('id');
 			$table->integer('page_id')->unsigned()->nullable();
 			$table->foreign('page_id')->references('id')->on('pages')->onUpdate('cascade')->onDelete('cascade');
-			$table->integer('depth')->nullable();
-			$table->integer('position')->nullable();
-			$table->string('name')->nullable();
-			$table->string('slug')->nullable();
-			$table->string('title')->nullable();
+			$table->integer('depth')->index()->nullable();
+			$table->integer('position')->index()->nullable();
+			$table->string('name')->index()->nullable();
+			$table->string('slug')->index()->nullable();
+			$table->string('title')->index()->nullable();
 			$table->text('lead')->nullable();
 			$table->text('content')->nullable();
 			$table->text('meta_keywords')->nullable();

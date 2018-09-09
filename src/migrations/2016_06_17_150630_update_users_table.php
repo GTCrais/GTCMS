@@ -13,11 +13,11 @@ class UpdateUsersTable extends Migration
 	public function up()
 	{
 		Schema::table('users', function ($table) {
-			$table->string('email')->nullable()->change();
+			$table->string('email')->index()->nullable()->change();
 			$table->string('password')->nullable()->change();
-			$table->string('name')->nullable()->change();
-			$table->string('role')->nullable()->after('password');
-			$table->boolean('is_superadmin')->nullable()->default('0')->after('name');
+			$table->string('name')->index()->nullable()->change();
+			$table->string('role')->index()->nullable()->after('password');
+			$table->boolean('is_superadmin')->index()->nullable()->default('0')->after('name');
 		});
 	}
 

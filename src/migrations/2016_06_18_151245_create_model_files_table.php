@@ -14,8 +14,8 @@ class CreateModelFilesTable extends Migration
 	{
 		Schema::create('model_files', function (Blueprint $table) {
 			$table->increments('id');
-			$table->string('filename')->nullable();
-			$table->string('title')->nullable();
+			$table->string('filename')->index()->nullable();
+			$table->string('title')->index()->nullable();
 			$table->timestamps();
 		});
 	}
