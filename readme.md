@@ -11,4 +11,4 @@ Documentation for GTCMS can be found on the [GTCMS website](http://gtcms.createc
 
 ## License
 
-GTCMS is free to use commercially, and licensed under [GTCMS Premium license](http://gtcms.createc.solutions/licenses/gtcms-premium-license).
+GTCMS is licensed under [MIT](https://opensource.org/licenses/MIT).
