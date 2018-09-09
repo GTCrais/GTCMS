@@ -3,6 +3,7 @@
 namespace App\Classes;
 
 use App\Models\BaseModel;
+use App\Models\GtcmsSetting;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -346,67 +347,98 @@ class GtcmsPremium
 		$fullModelName = $modelConfig->myFullEntityName();
 		$table = (new $fullModelName)->getTable();
 		$prefix = \DB::getTablePrefix();
-		$defaultLocale = config('gtcmslang.defaultAdminLocale');
+		$defaultLocale = config('gtcmslang.defaultLocale');
 
 		\DB::beginTransaction();
 
 		try {
-			if ($modelConfig->generateSlug && $modelConfig->langDependentSlug) {
-				$formFields = AdminHelper::objectToArray($modelConfig->formFields);
-				$slug = [
-					'property' => 'slug',
-					'langDependent' => true
-				];
-				$formFields[] = $slug;
-				$formFields = AdminHelper::arrayToObject($formFields, false);
-				$modelConfig->formFields = $formFields;
-			}
+			if ($modelConfig->name == 'GtcmsSetting') {
+				$table = (new GtcmsSetting())->getTable();
 
-			foreach ($modelConfig->formFields as $formField) {
-				if ($formField->langDependent) {
-					$column = $formField->property;
-					$columnData = false;
-					if (\Schema::hasColumn($table, $column)) {
-						$columnData = \DB::select(\DB::raw("DESCRIBE " . $prefix . $table . " " . $column));
-					} else if (\Schema::hasColumn($table, $column . "_" . $defaultLocale)) {
-						$columnData = \DB::select(\DB::raw("DESCRIBE " . $prefix . $table . " " . $column . "_" . $defaultLocale));
-					}
-
-					if ($columnData) {
+				foreach ($modelConfig->formFields as $formField) {
+					if ($formField->langDependent) {
 						foreach (config('gtcmslang.languages') as $language) {
 							if ($language == $defaultLocale) {
-								if (\Schema::hasColumn($table, $column)) {
-									if (\Schema::hasColumn($table, $column . "_" . $language)) {
-										//delete column
-										\Schema::table($table, function ($table) use ($column) {
-											$table->dropColumn([$column]);
-										});
+								if (\DB::table($table)->where('setting_key', $formField->property)->count()) {
+									if (\DB::table($table)->where('setting_key', $formField->property . '_' . $language)->count()) {
+										\DB::table($table)->where('setting_key', $formField->property)->delete();
 									} else {
-										//rename column
-										\Schema::table($table, function ($table) use ($column, $language) {
-											$table->renameColumn($column, $column . "_" . $language);
-										});
+										\DB::table($table)->where('setting_key', $formField->property)->update(['setting_key' => $formField->property . '_' . $language]);
+									}
+								} else {
+									if (!\DB::table($table)->where('setting_key', $formField->property . '_' . $language)->count()) {
+										\DB::table($table)->insert(['setting_key' => $formField->property . '_' . $language]);
+									}
+								}
+							} else {
+								if (!\DB::table($table)->where('setting_key', $formField->property . '_' . $language)->count()) {
+									\DB::table($table)->insert(['setting_key' => $formField->property . '_' . $language]);
+								}
+							}
+						}
+					}
+				}
+
+			} else {
+
+				if ($modelConfig->generateSlug && $modelConfig->langDependentSlug) {
+					$formFields = AdminHelper::objectToArray($modelConfig->formFields);
+					$slug = [
+						'property' => 'slug',
+						'langDependent' => true
+					];
+					$formFields[] = $slug;
+					$formFields = AdminHelper::arrayToObject($formFields, false);
+					$modelConfig->formFields = $formFields;
+				}
+
+				foreach ($modelConfig->formFields as $formField) {
+					if ($formField->langDependent) {
+						$column = $formField->property;
+						$columnData = false;
+						if (\Schema::hasColumn($table, $column)) {
+							$columnData = \DB::select(\DB::raw("DESCRIBE " . $prefix . $table . " " . $column));
+						} else if (\Schema::hasColumn($table, $column . "_" . $defaultLocale)) {
+							$columnData = \DB::select(\DB::raw("DESCRIBE " . $prefix . $table . " " . $column . "_" . $defaultLocale));
+						}
+
+						if ($columnData) {
+							foreach (config('gtcmslang.languages') as $language) {
+								if ($language == $defaultLocale) {
+									if (\Schema::hasColumn($table, $column)) {
+										if (\Schema::hasColumn($table, $column . "_" . $language)) {
+											//delete column
+											\Schema::table($table, function ($table) use ($column) {
+												$table->dropColumn([$column]);
+											});
+										} else {
+											//rename column
+											\Schema::table($table, function ($table) use ($column, $language) {
+												$table->renameColumn($column, $column . "_" . $language);
+											});
+										}
+									} else if (!\Schema::hasColumn($table, $column . "_" . $language)) {
+										//create column
+										$type = $columnData[0]->Type;
+										$statement = "ALTER TABLE " . $prefix . $table . " ADD " . $column . "_" . $language . " " . $type . " NULL";
+										\DB::statement($statement);
 									}
 								} else if (!\Schema::hasColumn($table, $column . "_" . $language)) {
 									//create column
 									$type = $columnData[0]->Type;
 									$statement = "ALTER TABLE " . $prefix . $table . " ADD " . $column . "_" . $language . " " . $type . " NULL";
+
+									if (\Schema::hasColumn($table, $column . "_" . $defaultLocale)) {
+										$statement .= " AFTER " . $column . "_" . $defaultLocale;
+									}
+
 									\DB::statement($statement);
 								}
-							} else if (!\Schema::hasColumn($table, $column . "_" . $language)) {
-								//create column
-								$type = $columnData[0]->Type;
-								$statement = "ALTER TABLE " . $prefix . $table . " ADD " . $column . "_" . $language . " " . $type . " NULL";
-
-								if (\Schema::hasColumn($table, $column . "_" . $defaultLocale)) {
-									$statement .= " AFTER " . $column . "_" . $defaultLocale;
-								}
-
-								\DB::statement($statement);
 							}
 						}
 					}
 				}
+
 			}
 
 			\DB::commit();

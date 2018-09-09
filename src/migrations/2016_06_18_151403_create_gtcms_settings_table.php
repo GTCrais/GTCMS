@@ -14,8 +14,8 @@ class CreateGtcmsSettingsTable extends Migration
 	{
 		Schema::create('gtcms_settings', function (Blueprint $table) {
 			$table->increments('id');
-			$table->string('setting_key')->nullable();
-			$table->string('setting_value')->nullable();
+			$table->string('setting_key')->index()->nullable();
+			$table->string('setting_value')->index()->nullable();
 			$table->timestamps();
 		});
 	}
