@@ -380,9 +380,13 @@ foreach ($formFields as $originalField) {
 					} else {
 						$selectModel = $field->selectType->modelName;
 						$fullModel = ModelConfig::fullEntityName($selectModel);
-						$list = $fullModel::$listMethod();
-					}
 
+						if (preg_match('/^\{.*\}$/', $listMethod)) {
+							$list = $fullModel::defaultModelList($listMethod);
+						} else {
+							$list = $fullModel::$listMethod();
+						}
+					}
 				}
 			} else {
 				throw new \Exception ("Error: selectType['type'] must be 'model'");

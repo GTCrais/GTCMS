@@ -24,69 +24,73 @@ if (config('gtcms.premium')) {
 
 ?>
 
-<div class="panel panel-default relatedModel{{$relatedModelConfig->name}}">
+@if ($displayModel)
 
-	<div class="panel-body">
-		<?php
-		// --------------- EXCEPTIONS ----------------
-		$addObject = true;
+	<div class="panel panel-default relatedModel{{$relatedModelConfig->name}}">
 
-		$relatedClassName = $relatedModelConfig->myFullEntityName();
+		<div class="panel-body">
+			<?php
+			// --------------- EXCEPTIONS ----------------
+			$addObject = true;
 
-		if (!(new $relatedClassName)->isAddable()) {
-			$addObject = false;
-		}
+			$relatedClassName = $relatedModelConfig->myFullEntityName();
 
-		?>
-
-		@if ($addObject)
-			<div class="indexTableHeader sideTableHeader">
-				<a href="{{AdminHelper::getCmsPrefix() . $relatedModelConfig->name}}/add{{$gets}}&addToParent=true" class="btn btn-primary btn-sm addRelatedObject">
-					<i class="fa fa-plus-circle"></i> {{$relatedModelConfig->hrName}}
-				</a>
-			</div>
-		@endif
-
-		<?php
-			$relatedObjects = $object->$method()->orderBy($configInParent->orderBy, $configInParent->direction);
-
-			if ($configInParent->paginate) {
-				$countQuery = clone $relatedObjects;
-				$objectCount = $countQuery->count();
-
-				$pageName = $configInParent->name . "Page";
-
-				$page = isset($ignorePage) ? 1 : (filter_var(request()->get($pageName), FILTER_VALIDATE_INT) ?: 1);
-
-				$limit = $configInParent->perPage;
-				$offset = ($page - 1) * $limit;
-
-				$relatedObjects = $relatedObjects
-					->limit($limit)
-					->offset($offset)
-					->get();
-
-				$relatedObjects = new \Illuminate\Pagination\LengthAwarePaginator($relatedObjects, $objectCount, $limit, $page, [
-					'path' => request()->url(),
-					'pageName' => $pageName
-				]);
-
-			} else {
-				$relatedObjects = $relatedObjects->get();
+			if (!(new $relatedClassName)->isAddable()) {
+				$addObject = false;
 			}
-		?>
 
-		@if ($relatedObjects->count())
-			{!! Front::drawObjectTable($relatedObjects, $relatedModelConfig, 'sideTable', ['parentIdProperty' => $modelConfig->id, 'parentIdValue' => $object->id]) !!}
-		@else
-			{!! trans('gtcms.noRelatedModels', array('modelName1' => $modelConfig->hrName, 'modelName2' => $relatedModelConfig->hrNamePlural)) !!}
-		@endif
+			?>
 
-	</div>
+			@if ($addObject)
+				<div class="indexTableHeader sideTableHeader">
+					<a href="{{AdminHelper::getCmsPrefix() . $relatedModelConfig->name}}/add{{$gets}}&addToParent=true" class="btn btn-primary btn-sm addRelatedObject">
+						<i class="fa fa-plus-circle"></i> {{$relatedModelConfig->hrName}}
+					</a>
+				</div>
+			@endif
 
-	<div class="disableRelatedModel {{$action == 'add' ? '' : 'hidden'}}">
-		<div class="disableTextContainer">
-			<p>{!! trans('gtcms.enableRelatedModels', array('modelName1' => $modelConfig->hrName, 'modelName2' => $relatedModelConfig->hrNamePlural)) !!}</p>
+			<?php
+				$relatedObjects = $object->$method()->orderBy($configInParent->orderBy, $configInParent->direction);
+
+				if ($configInParent->paginate) {
+					$countQuery = clone $relatedObjects;
+					$objectCount = $countQuery->count();
+
+					$pageName = $configInParent->name . "Page";
+
+					$page = isset($ignorePage) ? 1 : (filter_var(request()->get($pageName), FILTER_VALIDATE_INT) ?: 1);
+
+					$limit = $configInParent->perPage;
+					$offset = ($page - 1) * $limit;
+
+					$relatedObjects = $relatedObjects
+						->limit($limit)
+						->offset($offset)
+						->get();
+
+					$relatedObjects = new \Illuminate\Pagination\LengthAwarePaginator($relatedObjects, $objectCount, $limit, $page, [
+						'path' => request()->url(),
+						'pageName' => $pageName
+					]);
+
+				} else {
+					$relatedObjects = $relatedObjects->get();
+				}
+			?>
+
+			@if ($relatedObjects->count())
+				{!! Front::drawObjectTable($relatedObjects, $relatedModelConfig, 'sideTable', ['parentIdProperty' => $modelConfig->id, 'parentIdValue' => $object->id]) !!}
+			@else
+				{!! trans('gtcms.noRelatedModels', array('modelName1' => $modelConfig->hrName, 'modelName2' => $relatedModelConfig->hrNamePlural)) !!}
+			@endif
+
+		</div>
+
+		<div class="disableRelatedModel {{$action == 'add' ? '' : 'hidden'}}">
+			<div class="disableTextContainer">
+				<p>{!! trans('gtcms.enableRelatedModels', array('modelName1' => $modelConfig->hrName, 'modelName2' => $relatedModelConfig->hrNamePlural)) !!}</p>
+			</div>
 		</div>
 	</div>
-</div>
+
+@endif
