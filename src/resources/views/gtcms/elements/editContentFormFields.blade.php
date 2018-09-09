@@ -380,9 +380,13 @@ foreach ($formFields as $originalField) {
 					} else {
 						$selectModel = $field->selectType->modelName;
 						$fullModel = ModelConfig::fullEntityName($selectModel);
-						$list = $fullModel::$listMethod();
-					}
 
+						if (preg_match('/^\{.*\}$/', $listMethod)) {
+							$list = $fullModel::defaultModelList($listMethod);
+						} else {
+							$list = $fullModel::$listMethod();
+						}
+					}
 				}
 			} else {
 				throw new \Exception ("Error: selectType['type'] must be 'model'");
@@ -453,6 +457,11 @@ foreach ($formFields as $originalField) {
 			}
 			echo Form::text($field->property, $originalValue, $options);
 
+			// ----------- PASSWORD ------------
+
+		} else if ($type == 'password') {
+			echo Form::password($field->property, $options);
+
 			// ----------- OTHER FIELDS ------------
 
 		} else {
@@ -464,6 +473,16 @@ foreach ($formFields as $originalField) {
 			{
 				$options['rows'] = 2;
 			}
+
+			if ($field->type == "textarea" &&
+				$field->options &&
+				$field->options->class == "editor" &&
+				isset ($options['data-editortoolbar']) &&
+				\Illuminate\Support\Str::contains($options['data-editortoolbar'], 'auto-paragraph:false')
+			) {
+				$options["class"] .= " auto-paragraph-false";
+			}
+
 			echo Form::$type($field->property, $originalValue, $options);
 		}
 

@@ -1994,6 +1994,14 @@ function setEditors() {
 				toolbar.push(['Styles']);
 			}
 
+			var autoParagraph = true;
+			var enterMode = CKEDITOR.ENTER_P;
+
+			if ($(this).hasClass('auto-paragraph-false')) {
+				autoParagraph = false;
+				enterMode = CKEDITOR.ENTER_BR;
+			}
+
 			// CKE Config
 
 			var ckeConfig = {
@@ -2003,16 +2011,24 @@ function setEditors() {
 				resize_dir: 'vertical',
 				tabSpaces: 4,
 				skin: "gtcms,/gtcms/ckeditor/gtcms-skin/gtcms/",
-				extraPlugins: 'justify,stylesheetparser,webkit-span-fix,autogrow',
+				extraPlugins: 'justify,webkit-span-fix,autogrow',
 				autoGrow_minHeight: 130,
 				autoGrow_maxHeight: 600,
 				autoGrow_bottomSpace: 20,
 				autoGrow_onStartup: true,
-				contentsCss: '/gtcms/css/gtcms-ckeditor.css?v=1.1',
+				contentsCss: '/gtcms/css/gtcms-ckeditor.css?v=1.2',
 				entities_latin: false,
 				forcePasteAsPlainText: true,
+				autoParagraph: autoParagraph,
+				enterMode: enterMode,
 
 				on: {
+					instanceReady: function() {
+						if (!autoParagraph) {
+							var contentHtml = $(editorObjects[i].editor.editable().$);
+							contentHtml.addClass('auto-paragraph-false');
+						}
+					},
 					focus: function() {
 						editors.eq(i).siblings('i.fa').fadeOut(100);
 						var editorHtml = $(editorObjects[i].editor.container.$);

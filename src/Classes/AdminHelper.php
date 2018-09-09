@@ -100,7 +100,9 @@ class AdminHelper
 
 					// If object is set and complete, it means it's being Edited
 					if ($object && $object->id) {
-						if (self::fieldShouldBeUnsetFromInput($modelConfig, $field, 'edit', $user)) {
+						if (self::fieldShouldBeUnsetFromInput($modelConfig, $field, 'edit', $user) ||
+							self::fieldShouldBeNulled($modelConfig, $field, request()->all())
+						) {
 							$fieldRules = [];
 						} else {
 							$fieldRules = $field->editRules ? $editRules : $addRules;
@@ -111,7 +113,9 @@ class AdminHelper
 						}
 					} else {
 						// New object is being created
-						if (self::fieldShouldBeUnsetFromInput($modelConfig, $field, 'add', $user)) {
+						if (self::fieldShouldBeUnsetFromInput($modelConfig, $field, 'add', $user) ||
+							self::fieldShouldBeNulled($modelConfig, $field, request()->all())
+						) {
 							$fieldRules = [];
 						} else {
 							$fieldRules = $addRules;
@@ -217,7 +221,7 @@ class AdminHelper
 			$searchConfig = $searchPropertiesData['searchConfig'];
 			$fieldsWithLabels = $modelConfig->getSearchFieldsWithLabels();
 			$propertiesTables = $modelConfig->getPropertiesTables();
-			$langDependentProperties = $modelConfig->getFormFields('langDependent');
+			$langDependentPropertyFieldArray = $modelConfig->langDependentPropertyFieldArray;
 			$propertyFieldArray = $modelConfig->getPropertyFieldArray();
 
 			foreach (request()->all() as $property => $value) {
@@ -252,7 +256,7 @@ class AdminHelper
 								'property' => $property,
 								'trueProperty' => $trueProperty,
 								'dbProperty' => $propertiesTables[$trueProperty] . "." . $trueProperty,
-								'langDependent' => config('gtcms.premium') && in_array($trueProperty, $langDependentProperties) ? true : false,
+								'langDependent' => config('gtcms.premium') && array_key_exists($trueProperty, $langDependentPropertyFieldArray) ? true : false,
 								'label' => isset($fieldsWithLabels[$property]) ? $fieldsWithLabels[$property] : 'Undefined',
 								'value' => $value,
 								'searchConfig' => $searchConfig[$property],
@@ -497,6 +501,9 @@ class AdminHelper
 		if ($field->setNullWhenEmpty && !$value && $value !== 0 && $value !== "0") {
 			return true;
 		}
+
+		/** @var ModelConfig $modelConfig */
+		$modelConfig->parseFormFields();
 
 		if (array_key_exists($field->property, $modelConfig->conditionallyShownFields)) {
 			foreach ($modelConfig->conditionallyShownFields[$field->property] as $conditionField => $values) {

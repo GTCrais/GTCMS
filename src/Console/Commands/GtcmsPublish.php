@@ -43,7 +43,7 @@ class GtcmsPublish extends Command
 		]);
 
 		$this->callSilent('vendor:publish', [
-			'--provider' => 'Unisharp\Laravelfilemanager\LaravelFilemanagerServiceProvider',
+			'--provider' => 'UniSharp\LaravelFilemanager\LaravelFilemanagerServiceProvider',
 			'--tag' => 'lfm_public'
 		]);
 

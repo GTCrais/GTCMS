@@ -29,6 +29,10 @@ body {
 	margin: -5px 13px 8px;
 }
 
+body.auto-paragraph-false {
+	margin: 8px 13px 8px;
+}
+
 body.editMode {
 	background: white;
 }
