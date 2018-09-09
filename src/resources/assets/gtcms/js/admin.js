@@ -2016,7 +2016,7 @@ function setEditors() {
 				autoGrow_maxHeight: 600,
 				autoGrow_bottomSpace: 20,
 				autoGrow_onStartup: true,
-				contentsCss: '/gtcms/css/gtcms-ckeditor.css?v=1.1',
+				contentsCss: '/gtcms/css/gtcms-ckeditor.css?v=1.2',
 				entities_latin: false,
 				forcePasteAsPlainText: true,
 				autoParagraph: autoParagraph,

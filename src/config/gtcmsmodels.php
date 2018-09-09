@@ -220,7 +220,7 @@ return [
 				[
 					'property' => 'password',
 					'label' => 'Password',
-					'type' => 'text',
+					'type' => 'password',
 					'rules' => '{addRequired}',
 					'info' => 'Leave empty to keep current password',
 					'hiddenInfo' => [
