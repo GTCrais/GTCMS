@@ -67,23 +67,25 @@ class ImageHandler
 					$minHeight = $size[1];
 					$transformMethod = $size[2];
 
-					if (in_array($transformMethod, ['resizeCanvas', 'resize'])) {
-						if ($img->width() < $minWidth && $img->height() < $minHeight) {
-							throw new \Exception (trans('gtcms.imageTooSmall'), self::DIM_ERROR);
+					if (!$imageField->ignoreSizeRestrictions) {
+						if (in_array($transformMethod, ['resizeCanvas', 'resize'])) {
+							if ($img->width() < $minWidth && $img->height() < $minHeight) {
+								throw new \Exception (trans('gtcms.imageTooSmall'), self::DIM_ERROR);
+							}
 						}
-					}
-					if (in_array($transformMethod, ['minWidth'])) {
-						if ($img->width() < $minWidth) {
-							throw new \Exception (trans('gtcms.imageTooSmall'), self::DIM_ERROR);
+						if (in_array($transformMethod, ['minWidth'])) {
+							if ($img->width() < $minWidth) {
+								throw new \Exception (trans('gtcms.imageTooSmall'), self::DIM_ERROR);
+							}
 						}
-					}
-					if (in_array($transformMethod, ['minHeight'])) {
-						if ($img->height() < $minHeight) {
-							throw new \Exception (trans('gtcms.imageTooSmall'), self::DIM_ERROR);
-						}
-					} else {
-						if ($img->width() < $minWidth || $img->height() < $minHeight) {
-							throw new \Exception (trans('gtcms.imageTooSmall'), self::DIM_ERROR);
+						if (in_array($transformMethod, ['minHeight'])) {
+							if ($img->height() < $minHeight) {
+								throw new \Exception (trans('gtcms.imageTooSmall'), self::DIM_ERROR);
+							}
+						} else {
+							if ($img->width() < $minWidth || $img->height() < $minHeight) {
+								throw new \Exception (trans('gtcms.imageTooSmall'), self::DIM_ERROR);
+							}
 						}
 					}
 

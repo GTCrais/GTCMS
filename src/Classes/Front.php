@@ -522,7 +522,7 @@ class Front
 			[
 				'method' => 'get',
 				'url' => AdminHelper::getCmsPrefix() . ($modelConfig->name),
-				'class' => 'searchForm model' . $modelConfig->name . " " . (($modelConfig->form && $modelConfig->form->horizontal) ? ' form-horizontal' : '')
+				'class' => 'searchForm model' . $modelConfig->name . " " . (($modelConfig->searchForm && $modelConfig->searchForm->horizontal) ? ' form-horizontal' : '')
 			]
 		);
 
